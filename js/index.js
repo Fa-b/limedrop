@@ -232,10 +232,37 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 		var $item = $(htmlTemplate);
 		$item.data("itemData", result);
+		$item.data("itemCount", "");
 		$item.click(function () {
 			$(this).toggleClass("selected");
+			
+			if($(this).hasClass("selected")) {
+				$("#dropQueueList").append($(this));
+			} else { // Unselecting an item in the queue should place it back to inventory
+				// First check if currently selected account location is same or ALL, then check if selected character location is the same or ALL
+				if( ($("#account-select").val() === "Show All" || $("#account-select").val() === $(this).data("itemData").account) &&
+					($("#character-select").val().split(".")[0] === "Show All" || $("#character-select").val().split(".")[0] === $(this).data("itemData").character)
+				) {
+					// Yes, then move the item to the inventory
+					$("#items-list").append($(this));
+				} else {
+					// No, then the unselected item should be removed from the DOM!
+					$(this).remove();
+				}
+			}
 		});
-		$("#items-list").append($item);
+		
+		queuedIds = [];
+		// Check our queue list if the item is already listed there
+		$("#dropQueueList div").each(function() {
+			// if there is the property itemData
+			if($(this).data("itemData")) {
+				// get the ID
+				queuedIds[$(this).data("itemData").itemid] = $(this);
+			}
+		});
+		if(queuedIds[result.itemid] === undefined)
+			$("#items-list").append($item);
 	}
 
 	function buildregex(str) {
