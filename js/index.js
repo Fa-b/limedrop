@@ -201,12 +201,19 @@ require(["D2Bot"], function (D2BOTAPI) {
 		return getItemDesc(description.toString().split("$")[0]);
 	}
 
-	function $addItem(result) {
+	function $addItem(result, ids=[]) {
 		var itemUID = result.description.split("$")[1];
 
 		var description = cleanDecription(result.description).split("<br/>");
 		var title = description.shift();
+		var count = 0;
 		description = description.join("<br/>")
+		
+		id = itemUID.split(":")[1];
+		
+		if(ids[id]) {
+			count = ids[id];
+		}
 
 		result.realm = CurrentRealm.toLowerCase();
 		result.itemid = itemUID;
@@ -228,6 +235,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 					</div>
 				</div>
 			</div>
+			<div><h6>` + (count?" ["+count+"]":"") + `</h6></div>
 		</div>`;
 
 		var $item = $(htmlTemplate);
@@ -275,8 +283,34 @@ require(["D2Bot"], function (D2BOTAPI) {
 				if (err) { console.log(err); return; };
 				var y = $(window).scrollTop();
 
+				// Here go the countable item ID ranges.. to extend the list simply append another 'else if' specifying the ranges.
+				// Countable items will receive an additional number field in the view (upper right corner of item box).
+				// Atm only counts items per account or less (according to selection). Todo: Calculate over Realm if no Account is selected
+				countables = [];
 				for (var i in results) {
-					$addItem(results[i]);
+					var itemID = results[i].description.split("$")[1].split(":")[1];
+					// Check if it is one of our countables
+					if (itemID >= 610 && itemID <= 642) {	// Rune
+						if(!countables[itemID])
+							countables[itemID] = 0;
+						countables[itemID] += 1;	
+					} else if ((itemID >= 557 && itemID <= 586) || (itemID >= 597 && itemID <= 601)) {	// Gems
+						if(!countables[itemID])
+							countables[itemID] = 0;
+						countables[itemID] += 1;	
+					} else if (itemID >= 647 && itemID <= 649) {	// Keys
+						if(!countables[itemID])
+							countables[itemID] = 0;
+						countables[itemID] += 1;	
+					} else if (itemID >= 651 && itemID <= 653) {	// Organs
+						if(!countables[itemID])
+							countables[itemID] = 0;
+						countables[itemID] += 1;	
+					}
+				}
+
+				for (var i in results) {
+					$addItem(results[i], countables);
 				}
 
 				itemCount += results.length;
@@ -321,7 +355,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 				var acc = accList[accountListid++];
 
-				doQuery(acc, "", itemCount > MAX_ITEM ? false : window.loadMoreItem);
+				doQuery(acc, "", /*itemCount > MAX_ITEM ? false :*/ window.loadMoreItem);
 			};
 
 			window.loadMoreItem();
