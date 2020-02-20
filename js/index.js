@@ -147,11 +147,11 @@ require(["D2Bot"], function (D2BOTAPI) {
 		})
 	}
 
-	function refreshList() {
+	function refreshList(limit=true) {
 		$("#items-list").html("");
 		itemCount = 0;
 		MAX_ITEM = 100;
-		addItemstoList();
+		addItemstoList(limit);
 	}
 
 	function getItemDesc (desc) {
@@ -277,7 +277,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		return str;
 	}
 
-	function addItemstoList() {
+	function addItemstoList(limit=true) {
 		function doQuery($account, $character, loadMoreItem) {
 			API.emit("query", buildregex($("#search-bar").val().toLocaleLowerCase()), CurrentRealm, $account, $character, function (err, results) {
 				if (err) { console.log(err); return; };
@@ -355,7 +355,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 				var acc = accList[accountListid++];
 
-				doQuery(acc, "", /*itemCount > MAX_ITEM ? false :*/ window.loadMoreItem);
+				doQuery(acc, "", itemCount > MAX_ITEM ? (limit ? false : window.loadMoreItem) : window.loadMoreItem);
 			};
 
 			window.loadMoreItem();
@@ -440,7 +440,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 		$("#search-bar").off("change");
 		$("#search-bar").change(function () {
-			refreshList();
+			refreshList(false);
 		});
 
 		$("#character-select").off("change");
@@ -527,17 +527,14 @@ require(["D2Bot"], function (D2BOTAPI) {
 		$(function () {
 			setInterval(function () {
 				/*var pos;
-
 				var pageTopToDivBottom = $("#load-more").offset().top + $("#load-more")[0].scrollHeight;
 				var scrolledPlusViewable = $(window).scrollTop() + $(window).height();
-
 				if ($(window).scrollTop() > pageTopToDivBottom)
 					pos = "up";
 				else if (scrolledPlusViewable < $("#load-more").offset().top)
 					pos = "down";
 				else
 					pos = "see";
-
 				if (pos == "see") {
 					if (window.loadMoreItem) window.loadMoreItem();
 				}*/
