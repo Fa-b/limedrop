@@ -201,21 +201,15 @@ require(["D2Bot"], function (D2BOTAPI) {
 		return getItemDesc(description.toString().split("$")[0]);
 	}
 
-	function $addItem(result, ids=[]) {
+	function $addItem(result, countables=[]) {
 		var itemUID = result.description.split("$")[1];
 
 		var description = cleanDecription(result.description).split("<br/>");
 		var title = description.shift();
 		var count = 0;
 		description = description.join("<br/>")
-		
-		id = itemUID.split(":")[1];
-		
-		if(ids[id]) {
-			count = ids[id];
-		}
 
-		result.realm = CurrentRealm.toLowerCase();
+		result.realm = CurrentRealm;
 		result.itemid = itemUID;
 		var templateid = CurrentRealm + "-" + result.account + "-" + result.character + "-" + itemUID;
 		var htmlTemplate = `
@@ -235,12 +229,10 @@ require(["D2Bot"], function (D2BOTAPI) {
 					</div>
 				</div>
 			</div>
-			<div><h6>` + (count?" ["+count+"]":"") + `</h6></div>
 		</div>`;
 
 		var $item = $(htmlTemplate);
 		$item.data("itemData", result);
-		$item.data("itemCount", "");
 		$item.click(function () {
 			$(this).toggleClass("selected");
 			
@@ -269,8 +261,11 @@ require(["D2Bot"], function (D2BOTAPI) {
 				queuedIds[$(this).data("itemData").itemid] = $(this);
 			}
 		});
-		if(queuedIds[result.itemid] === undefined)
+		// Check if item is not already queued and also not already flagged as a countable
+		if(queuedIds[result.itemid] === undefined && countables[result.itemid.split(":")[1]] === undefined)
 			$("#items-list").append($item);
+		
+		return $item;
 	}
 
 	function buildregex(str) {
@@ -278,39 +273,43 @@ require(["D2Bot"], function (D2BOTAPI) {
 	}
 
 	function addItemstoList(limit=true) {
-		function doQuery($account, $character, loadMoreItem) {
+		function doQuery($account, $character, loadMoreItem, countables=[]) {
 			API.emit("query", buildregex($("#search-bar").val().toLocaleLowerCase()), CurrentRealm, $account, $character, function (err, results) {
 				if (err) { console.log(err); return; };
 				var y = $(window).scrollTop();
 
+				var item;
+				
 				// Here go the countable item ID ranges.. to extend the list simply append another 'else if' specifying the ranges.
 				// Countable items will receive an additional number field in the view (upper right corner of item box).
 				// Atm only counts items per account or less (according to selection). Todo: Calculate over Realm if no Account is selected
-				countables = [];
 				for (var i in results) {
-					var itemID = results[i].description.split("$")[1].split(":")[1];
+					item = $addItem(results[i], countables);
+					
+					var itemID = item.data("itemData").itemid.split(":")[1];
+					
 					// Check if it is one of our countables
 					if (itemID >= 610 && itemID <= 642) {	// Rune
 						if(!countables[itemID])
-							countables[itemID] = 0;
-						countables[itemID] += 1;	
+							countables[itemID] = [];
+						countables[itemID].push(item);	
 					} else if ((itemID >= 557 && itemID <= 586) || (itemID >= 597 && itemID <= 601)) {	// Gems
 						if(!countables[itemID])
-							countables[itemID] = 0;
-						countables[itemID] += 1;	
+							countables[itemID] = [];
+						countables[itemID].push(item);	
 					} else if (itemID >= 647 && itemID <= 649) {	// Keys
 						if(!countables[itemID])
-							countables[itemID] = 0;
-						countables[itemID] += 1;	
-					} else if (itemID >= 651 && itemID <= 653) {	// Organs
+							countables[itemID] = [];
+						countables[itemID].push(item);	
+					} else if (itemID >= 650 && itemID <= 652) {	// Organs
 						if(!countables[itemID])
-							countables[itemID] = 0;
-						countables[itemID] += 1;	
+							countables[itemID] = [];
+						countables[itemID].push(item);	
+					} else if (itemID >= 653) {		// Token
+						if(!countables[itemID])
+							countables[itemID] = [];
+						countables[itemID].push(item);
 					}
-				}
-
-				for (var i in results) {
-					$addItem(results[i], countables);
 				}
 
 				itemCount += results.length;
@@ -330,6 +329,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 		if (character == "Show All") {
 			var accList = [];
+			var countables = [];
 
 			if (account == "Show All") {
 				for (var i in AccountsMap) {
@@ -345,7 +345,44 @@ require(["D2Bot"], function (D2BOTAPI) {
 			window.loadMoreItem = function () {
 				if (accountListid == accList.length) {
 					if (!ended) {
-						$("#items-list").append("<div>End of Items on Accounts</div>");
+						
+						var entryCount = itemCount;
+						var countableCount = 0;
+						console.log(countables);
+						Object.keys(countables).forEach(id => {
+							var count = countables[id].length;
+							countableCount += 1;
+							entryCount -= (count-1);
+							countables[id][0].data("itemCount", count);
+							var data = countables[id][0].data("itemData");
+							var description = cleanDecription(data.description).split("<br/>");
+							var title = description.shift();
+							var templateid = data.realm + "-" + data.account + "-" + data.character + "-" + data.itemid;
+							$(countables[id][0]).replaceWith(`
+		<div class="d-flex flex-row comment-row p-l-0 m-t-0 m-b-0" id="` + templateid + `">
+			<div class="p-2 ld-img-col">
+				<img src="data:image/jpeg;base64, ` + data.image + `" alt="user" class="ld-item">
+			</div>
+			<div class="comment-text w-100">
+				<h6 class="-medium">` + title + `</h6>
+				<span class="m-b-15 d-block">` + description + `
+				</span>
+				<div class="comment-footer">
+					<div class="flex">
+						<span class="text-muted float-right">` + data.realm + "/" + data.account + "/" + data.character + "/{" + data.itemid + '}' + `</span>
+						<!--<button type="button" class="btn btn-cyan btn-sm">Helm</button>
+						<button type="button" class="btn btn-success btn-sm">Armor</button>-->
+					</div>
+				</div>
+			</div>
+			<div><h6>` + (count?" ["+count+"]":"") + `</h6></div>
+		</div>`);
+						});
+						$("#items-list").append(`
+		<div><p>End of Items on all Accounts</p>
+			<span class="m-b-15 d-block">` + itemCount + ` Items in total.<br>` + countableCount + ` Countable entries, ` + entryCount + ` Entries in total.
+			</span>
+		</div>`);
 						ended = true;
 						window.loadMoreItem = false;
 					}
@@ -355,12 +392,12 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 				var acc = accList[accountListid++];
 
-				doQuery(acc, "", itemCount > MAX_ITEM ? (limit ? false : window.loadMoreItem) : window.loadMoreItem);
+				doQuery(acc, "", itemCount > MAX_ITEM ? (limit ? false : window.loadMoreItem) : window.loadMoreItem, countables);
 			};
 
 			window.loadMoreItem();
 		}
-		else doQuery($("#account-select").val(), character);
+		else doQuery(account, character);
 	}
 
 	function pupulateAccountCharSelect(realm, core, type, ladder) {
@@ -527,14 +564,17 @@ require(["D2Bot"], function (D2BOTAPI) {
 		$(function () {
 			setInterval(function () {
 				/*var pos;
+
 				var pageTopToDivBottom = $("#load-more").offset().top + $("#load-more")[0].scrollHeight;
 				var scrolledPlusViewable = $(window).scrollTop() + $(window).height();
+
 				if ($(window).scrollTop() > pageTopToDivBottom)
 					pos = "up";
 				else if (scrolledPlusViewable < $("#load-more").offset().top)
 					pos = "down";
 				else
 					pos = "see";
+
 				if (pos == "see") {
 					if (window.loadMoreItem) window.loadMoreItem();
 				}*/
