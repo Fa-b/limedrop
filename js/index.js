@@ -151,7 +151,31 @@ require(["D2Bot"], function (D2BOTAPI) {
 		$("#items-list").html("");
 		itemCount = 0;
 		MAX_ITEM = 100;
-		addItemstoList(limit);
+		
+		// Get Regular Expressions from countables.json and use these to filter countables
+		var regex = ""
+		$.ajax({
+			url: "countables.json",
+			dataType: 'json',
+			success: function(result){
+				console.log("token recieved: " + result);
+				for (var entry in result) {
+					regex = regex + result[entry] + "|";
+				}
+				regex = regex.substring(0, regex.length - 1);
+			},
+			error: function(request, textStatus, errorThrown) {
+				console.log(textStatus);
+			},
+			complete: function(request, textStatus) { //for additional info
+				console.log(textStatus);
+				console.log("RegEx: " + regex);
+				addItemstoList(limit, regex);
+			}
+
+		});
+
+		
 	}
 
 	function getItemDesc (desc) {
@@ -272,7 +296,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 		return str;
 	}
 
-	function addItemstoList(limit=true) {
+	function addItemstoList(limit=true, regex="") {
+		function queryCountables($account, $character, loadMoreItem, countables=[]) {
+			API.emit("query", buildregex(regex), CurrentRealm, $account, $character, function (err, results) {
+				if (err) { console.log(err); return; };
+				var y = $(window).scrollTop();
+			});
+		},
 		function doQuery($account, $character, loadMoreItem, countables=[]) {
 			API.emit("query", buildregex($("#search-bar").val().toLocaleLowerCase()), CurrentRealm, $account, $character, function (err, results) {
 				if (err) { console.log(err); return; };
@@ -288,24 +318,24 @@ require(["D2Bot"], function (D2BOTAPI) {
 					
 					var itemID = item.data("itemData").itemid.split(":")[1];
 					
-					// Check if it is one of our countables
-					if (itemID >= 610 && itemID <= 642) {	// Rune
+					// Check if it is one of our countables: \d+:[6]([1-3][0-9]|[4][0-2]):[37]:\d:\d|\d+:[5]([6-7][0-9]|[5][7-9]|[8][0-6]|[9][7-9])|[6][0][0-1]:[37]:\d:\d|\d+:[6][4][7-9]:[37]:\d:\d|\d+:[6][5][0-2]:[37]:\d:\d|\d+:[6][5][3]:[37]:\d:\d|\d+:[6][5][3-8]:[37]:\d:\d
+					if (itemID >= 610 && itemID <= 642) {	// Runes: "\d+:[6]([1-3][0-9]|[4][0-2]):[37]:\d:\d"
 						if(!countables[itemID])
 							countables[itemID] = [];
 						countables[itemID].push(item);	
-					} else if ((itemID >= 557 && itemID <= 586) || (itemID >= 597 && itemID <= 601)) {	// Gems
+					} else if ((itemID >= 557 && itemID <= 586) || (itemID >= 597 && itemID <= 601)) {	// Gems: "\d+:[5]([6-7][0-9]|[5][7-9]|[8][0-6]|[9][7-9])|[6][0][0-1]:[37]:\d:\d"
 						if(!countables[itemID])
 							countables[itemID] = [];
 						countables[itemID].push(item);	
-					} else if (itemID >= 647 && itemID <= 649) {	// Keys
+					} else if (itemID >= 647 && itemID <= 649) {	// Keys: "\d+:[6][4][7-9]:[37]:\d:\d"
 						if(!countables[itemID])
 							countables[itemID] = [];
 						countables[itemID].push(item);	
-					} else if (itemID >= 650 && itemID <= 652) {	// Organs
+					} else if (itemID >= 650 && itemID <= 652) {	// Organs: "\d+:[6][5][0-2]:[37]:\d:\d"
 						if(!countables[itemID])
 							countables[itemID] = [];
 						countables[itemID].push(item);	
-					} else if (itemID >= 653) {		// Token
+					} else if (itemID >= 653 && itemID <= 658) {		// Token, Essences, Standards: "\d+:[6][5][3-8]:[37]:\d:\d"
 						if(!countables[itemID])
 							countables[itemID] = [];
 						countables[itemID].push(item);
