@@ -191,3 +191,18 @@ td {
     width: 132px;
     text-align: left;
 }
+
+.ld-loader {
+  border: 10px solid #53a53a;
+  border-top: 18px solid #191919;
+  border-bottom: 3px solid #191919;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
