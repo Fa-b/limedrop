@@ -1,5 +1,7 @@
 var $ = window.jQuery;
 
+let LimeConfig = require(["LimeConfig"]);
+
 try {
 	window.socket = window.io();
 }
@@ -29,7 +31,9 @@ require(["D2Bot"], function (D2BOTAPI) {
 	var API = (typeof socket !== "undefined") ? socket : D2BOTAPI();
 	var md5 = CryptoJS.MD5;
 	var itemCount = 0;
-	var MAX_ITEM = 100;
+	var entryCount = 0;
+	var MAX_ITEM = 1000;
+	var countables = [];
 
 	(function enableBackToTop() {
 		var backToTop = $('<a>', { id: 'back-to-top', href: '#top' });
@@ -61,6 +65,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 	function initialize()
 	{
 		cookie.load();
+		
+		console.log(cookie);
 
 		if (!cookie.data.server) {
 			cookie.data.server = "http://localhost:8080";
@@ -88,7 +94,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			});
 		}
 
-		refreshList();
+		//refreshList();
 	}
 
 	function login(username, password, server, callback)
@@ -103,11 +109,16 @@ require(["D2Bot"], function (D2BOTAPI) {
 				return callback(false);
 			}
 
-			cookie.data.server = server;
-			cookie.data.username = username;
-			cookie.data.session = result;
-			cookie.data.loggedin = (username !== "public") ? true : false;
-			cookie.save();
+			// Don't override Cookie with default..
+			if (username !== "public") {
+				cookie.data.server = server;
+				cookie.data.username = username;
+				cookie.data.session = result;
+				cookie.data.loggedin = (username !== "public") ? true : false;
+				cookie.save();
+			}
+			// Pleeeease do not overwrite custom server config after reload...
+			$("#ld-login-api").val(cookie.data.server);
 			showNotification("Notification", "Now logged in as " + username, false);
 			callback(cookie.data.loggedin);
 		});
@@ -150,32 +161,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 	function refreshList(limit=true) {
 		$("#items-list").html("");
 		itemCount = 0;
-		MAX_ITEM = 100;
+		entryCount = 0;
+		MAX_ITEM = 1000;
+		countables = [];
 		
-		// Get Regular Expressions from countables.json and use these to filter countables
-		var regex = ""
-		$.ajax({
-			url: "countables.json",
-			dataType: 'json',
-			success: function(result){
-				console.log("token recieved: ", result);
-				for (var entry in result) {
-					regex = regex + result[entry] + "|";
-				}
-				regex = regex.substring(0, regex.length - 1);
-			},
-			error: function(request, textStatus, errorThrown) {
-				console.log(textStatus);
-			},
-			complete: function(request, textStatus) { //for additional info
-				console.log(textStatus);
-				//console.log("RegEx: " + regex);
-				addItemstoList(limit, regex);
-			}
-
-		});
-
-		
+		console.log("refresh");
+		// Get Regular Expressions from LimeConfig.js and use these to filter countables
+		addItemstoList(limit, LimeConfig["ItemGroup"]);
 	}
 
 	function getItemDesc (desc) {
@@ -225,12 +217,28 @@ require(["D2Bot"], function (D2BOTAPI) {
 		return getItemDesc(description.toString().split("$")[0]);
 	}
 
-	function $addItem(result, countables=[]) {
+	function $addItem(result) {
 		var itemUID = result.description.split("$")[1];
+		
+		// Check our queue list if the item is already listed there
+		$("#dropQueueList div").each(function() {
+			var data = $(this).data("itemData");
+			// if there is the property itemData and the ID's match
+			if(data && data.itemid === itemUID) {
+				// ID is already queued.. get out of here
+				return undefined;
+			}
+		});
+		
+		var itemID = itemUID.split(":")[1]
+		// Check if (non unique) itemID is not already listed as a countable
+		if(countables[itemID] != undefined)
+			return undefined;
+		
+		
 
 		var description = cleanDecription(result.description).split("<br/>");
 		var title = description.shift();
-		var count = 0;
 		description = description.join("<br/>")
 
 		result.realm = CurrentRealm;
@@ -276,36 +284,143 @@ require(["D2Bot"], function (D2BOTAPI) {
 			}
 		});
 		
-		queuedIds = [];
-		// Check our queue list if the item is already listed there
-		$("#dropQueueList div").each(function() {
-			// if there is the property itemData
-			if($(this).data("itemData")) {
-				// get the ID
-				queuedIds[$(this).data("itemData").itemid] = $(this);
-			}
-		});
-		var itemID = itemUID.split(":")[1]
-		// Check if item is not already queued and also not already flagged as a countable
-		if(queuedIds[itemUID] === undefined && countables[itemID] === undefined)
-			$("#items-list").append($item);
-		
-		// The first found countable will be appended in the second round:
-		if(countables[itemID] != undefined) {
-			var countableItem = countables[itemID].find(item => item.data("itemData").itemid === itemUID);
-			// Countable item will replace the original standard item here
-			if(countables[itemID].indexOf(countableItem) === 0)
-				$("#items-list").append($(countableItem));
-		}
+		$("#items-list").append($item);
 		
 		return $item;
+	}
+	
+	function $updateItemGroup($group, result) {
+		var itemUID = result.description.split("$")[1];
+		var id = itemUID.split(":")[1]
+		
+		var optionTemplate =`<option value="` + itemUID + `" id="item-menu-option-` + id + `">` + itemUID.split(":")[0] + " - " + result.account+"/"+result.character + `</option>`;
+		
+		var $itemOption = $(optionTemplate);
+		$group.find('#item-menu-select-'+id).append($itemOption);
+		
+		var count = $group.data("itemCount");
+		count++;
+		$group.data("itemCount", count);
+		var countTemplate = `<h6 if="item-menu-count-` + id + `">` + (count?" ["+count+"]":"") + `</h6>`;
+		$("#item-menu-count-"+id).html(countTemplate);
+					
+		return $itemOption;
+	}
+	
+	function $addItemGroup(result) {
+		var itemUID = result.description.split("$")[1];
+		result.realm = CurrentRealm;
+		result.itemid = itemUID;
+		var templateid = CurrentRealm + "-" + result.account + "-" + result.character + "-" + itemUID;
+		var id = itemUID.split(":")[1]
+
+		// Group doesn't exist yet.. create it
+		var description = cleanDecription(result.description).split("<br/>");
+		var title = description.shift();
+		var count = 0;
+		description = description.join("<br/>");
+		
+		var htmlTemplate = `
+		<div class="d-flex flex-row comment-row p-l-0 m-t-0 m-b-0" aria-haspopup="true" id="` + templateid + `">
+			<div class="p-2 ld-img-col">
+				<img src="data:image/jpeg;base64, ` + result.image + `" alt="user" class="ld-item">
+			</div>
+			<div class="comment-text w-100">
+				<h6 class="-medium">` + title + `</h6>
+				<span class="m-b-15 d-block">` + description + `</span>
+				<div class="comment-footer">
+					<div class="flex">
+						<span class="text-muted float-right">` + result.realm + "/" + result.account + "/" + result.character + "/{" + result.itemid + '}' + `</span>
+						<!--<button type="button" class="btn btn-cyan btn-sm">Helm</button>
+						<button type="button" class="btn btn-success btn-sm">Armor</button>-->
+					</div>
+				</div>
+			</div>
+			<div>
+				<h6 id="item-menu-count-` + id + `">` + (count?" ["+count+"]":"") + `</h6>
+				<div class="item-menu" id="item-menu-` + id + `">
+					<input type="number" placeholder="0" id="item-menu-input-` + id + `" style="width:100%;"/>
+					<select multiple="multiple" size='10' class="dropdown-menu-right" id="item-menu-select-`+ id + `"></select>
+				</div>
+			</div>
+		</div>`;
+		
+		var $itemGroup = $(htmlTemplate);
+		$itemGroup.data("itemData", result);
+		$itemGroup.data("itemCount", count);
+		
+		function updateSelectCount(selected) {
+			var i = 0;
+			selected.find(":selected").each(function() {
+				i++;
+			});
+			
+			$("#item-menu-input-"+id).val(i);
+		}
+		
+		/* // Try to get the most efficient drop
+		function updateSelection(count, group) {
+			var characters = [];
+			var total = 0;
+			var selection = [];
+			// first, count the individual amounts on the single characters
+			$("#item-menu-select-"+id+" option").each(function() {
+				if(!characters[$(this).text()])
+					characters[$(this).text()] = 0;
+				characters[$(this).text()] += 1;
+				total += 1;
+			});
+			
+			Object.keys(characters).forEach(character => {
+				var num = characters[character];
+				if(count > num) {
+					console.log(num + " Items from " + character);
+					count -= num
+				}
+				
+				total -= 1;
+			});
+
+		}
+		
+		$("#item-menu-input-"+id).keypress(function (e) {
+			var key = e.which;
+			if(key == 13) {
+				updateSelection($(this).val(), $("#item-menu-select-"+id));
+			}
+		}); */  
+
+		$(document).on('click', function(event) {
+			if ($(event.target).closest($itemGroup).length) {
+				// Show dropdown item selection
+				$("#item-menu-"+id).show();
+				$("#item-menu-select-"+id).on("change", function() {
+					updateSelectCount($(this));
+				});
+				// Using mousedown & move might be good for checking the change events in the input box :)
+				$("#item-menu-select-"+id).on('mousedown', function (e) {
+					$("#item-menu-select-"+id).on('mousemove', function (e) {
+						updateSelectCount($(this));
+					});
+				});
+			} else if (!$(event.target).closest("#item-menu-select-"+id).length) {
+				// Close the dropdown item selection if the user clicks outside of it
+				$("#item-menu-"+id).hide();
+			}
+		});
+		
+		
+
+		$("#items-list").append($itemGroup);
+
+		return $itemGroup;
 	}
 
 	function buildregex(str) {
 		return str;
 	}
 
-	function addItemstoList(limit=true, regex="") {
+	function addItemstoList(limit=true, group=[]) {
 		var htmlTemplate = `
 		<div>
 			<div class="d-flex flex-column" style="text-align: center;justify-content: center;align-items: center;">
@@ -317,8 +432,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 		$loader = $(htmlTemplate);
 		$("#items-list").append($loader);
 		
-		function queryCountables($account, $character, loadMoreItem, countables=[]) {
-			API.emit("query", buildregex($("#search-bar").val().toLocaleLowerCase()+".*("+regex+")"), CurrentRealm, $account, $character, function (err, results) {
+		function queryCountables($account, $character, loadMoreItem, regex) {
+			API.emit("query", buildregex($("#search-bar").val().toLocaleLowerCase())+".*?("+regex[0]+")", CurrentRealm, $account, $character, function (err, results) {
 				if (err) { console.log(err); return; };
 				var y = $(window).scrollTop();
 				
@@ -327,10 +442,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 				// Here go the countable items by RegEx.. to extend the list simply append another entry to countables.json.
 				// Countable items will receive an additional number field in the view (upper right corner of item box).
 				for (var i in results) {
-					var itemID = results[i].description.split("$")[1].split(":")[1];
-					if(!countables[itemID])
-						countables[itemID] = [];
-					countables[itemID].push($addItem(results[i], countables));
+					if(results[i].description) {
+						var itemID = results[i].description.split("$")[1].split(":")[1];
+						if(!countables[itemID])
+							countables[itemID] = $addItemGroup(results[i]);
+
+						$updateItemGroup(countables[itemID], results[i]);
+					}
 				}
 				
 				$loader.hide();
@@ -341,7 +459,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			});
 		}
 		
-		function doQuery($account, $character, loadMoreItem, countables=[]) {
+		function doQuery($account, $character, loadMoreItem) {
 			API.emit("query", buildregex($("#search-bar").val().toLocaleLowerCase()), CurrentRealm, $account, $character, function (err, results) {
 				if (err) { console.log(err); return; };
 				var y = $(window).scrollTop();
@@ -351,7 +469,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				for (var i in results) {
 					var itemID = results[i].description.split("$")[1].split(":")[1];
 					// Only the first countable item will be used
-					item = $addItem(results[i], countables);
+					item = $addItem(results[i]);
 				}
 				
 				itemCount += results.length;
@@ -375,8 +493,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 		var chr = "";
 		var accList = [];
-		var countables = [];
-
+		var groupList = [];
+		
 		if (character == "Show All") {
 			chr = "";
 		} else {
@@ -390,10 +508,15 @@ require(["D2Bot"], function (D2BOTAPI) {
 		} else {
 			accList.push(account);
 		}
+		
+		for (var i in group) {
+			groupList.push(group[i]);
+		}
+			
 
-		var entryCount = itemCount;
 		var countableCount = 0;
 		accountListid = 0;
+		groupListid = 0;
 		ended = false;
 		
 		window.loadMoreItem = function () {
@@ -401,11 +524,15 @@ require(["D2Bot"], function (D2BOTAPI) {
 			
 			if (accountListid == accList.length) {
 				if (!ended) {
-					$("#items-list").append(`
+					
+					entryCount += itemCount;
+					$("#load-more").html("");
+					$footer = `
 		<div><p>End of Items on all Accounts</p>
-			<span class="m-b-15 d-block">` + itemCount + ` Items in total.<br>` + countableCount + ` Countable entries, saved ` + (-entryCount) + ` Entries by grouping.
+			<span class="m-b-15 d-block">` + itemCount + ` Items in total.<br>` + countableCount + ` Countable entries, saved ` + entryCount + ` Entries by grouping.
 			</span>
-		</div>`);
+		</div>`;
+					$("#load-more").append($footer);
 					ended = true;
 					window.loadMoreItem = false;
 					
@@ -417,57 +544,28 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 			var acc = accList[accountListid++];
 
-			doQuery(acc, chr, itemCount > MAX_ITEM ? (limit ? false : window.loadMoreItem) : window.loadMoreItem, countables);
+			doQuery(acc, chr, itemCount > MAX_ITEM ? (limit ? false : window.loadMoreItem) : window.loadMoreItem);
 		};
 		
 		window.loadAllCountable = function () {
 			$loader.show();
 			
-			if (accountListid == accList.length) {
+			if (groupListid == groupList.length) {
 				if (!ended) {
 					
 					Object.keys(countables).forEach(id => {
-						var count = countables[id].length;
+						//console.log(countables[id]);
 						countableCount += 1;
-						entryCount -= (count-1);
-						
-						var data = countables[id][0].data("itemData");
-						var description = cleanDecription(data.description).split("<br/>");
-						var title = description.shift();
-						var templateid = data.realm + "-" + data.account + "-" + data.character + "-" + data.itemid;
-						var htmlTemplate = `
-		<div class="d-flex flex-row comment-row p-l-0 m-t-0 m-b-0" id="` + templateid + `">
-			<div class="p-2 ld-img-col">
-				<img src="data:image/jpeg;base64, ` + data.image + `" alt="user" class="ld-item">
-			</div>
-			<div class="comment-text w-100">
-				<h6 class="-medium">` + title + `</h6>
-				<span class="m-b-15 d-block">` + description + `
-				</span>
-				<div class="comment-footer">
-					<div class="flex">
-						<span class="text-muted float-right">` + data.realm + "/" + data.account + "/" + data.character + "/{" + data.itemid + '}' + `</span>
-						<!--<button type="button" class="btn btn-cyan btn-sm">Helm</button>
-						<button type="button" class="btn btn-success btn-sm">Armor</button>-->
-					</div>
-				</div>
-			</div>
-			<div><h6>` + (count?" ["+count+"]":"") + `</h6></div>
-		</div>`;
-						countables[id][0] = $(htmlTemplate);
-						countables[id][0].data("itemData", data);
-						countables[id][0].data("itemCount", count);
+						entryCount -= (countables[id].length - 1);	// -1 for the groupItem 
 					});
 					
 					console.log(countables);
 
 					window.loadAllCountable = false;
-					
-					console.log("Finished collecting Countables, populating list now...");
-		
 					accountListid = 0;
-					ended = false;
 					
+					console.log("Finished collecting Countables, fetching the rest now...");
+
 					$loader.hide();
 					
 					window.loadMoreItem();
@@ -475,11 +573,16 @@ require(["D2Bot"], function (D2BOTAPI) {
 				
 				return;
 			}
+			
 
-			accountListid = accList.length;
-			var acc = "";
+			var regex = groupList[groupListid++];
 
-			queryCountables(acc, chr, window.loadAllCountable, countables);
+			var acc = account;
+			if (acc == "Show All")
+				acc = ""
+			
+			
+			queryCountables(acc, chr, window.loadAllCountable, regex);
 		};
 		
 		window.loadAllCountable();		
@@ -667,7 +770,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				var scrollPosition = $(window).height() + $(window).scrollTop();
 				if ((scrollHeight - scrollPosition) / scrollHeight < 0.3 && itemCount > MAX_ITEM) {
 					if (window.loadMoreItem) {
-						MAX_ITEM += 50;
+						MAX_ITEM += 200;
 						window.loadMoreItem();
 					}
 				}
@@ -679,6 +782,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 							return;
 						}
 
+						console.log(msg);
 						msg.body = JSON.parse(msg.body);
 
 						for (var i = 0; i < msg.body.length; i++) {
@@ -753,8 +857,10 @@ require(["D2Bot"], function (D2BOTAPI) {
 				delete item.description;
 
 				$item.remove();
+				
+				item.realm = item.realm.toLowerCase();
 
-				var hash = API.md5(item.realm.toLowerCase() + item.account.toLowerCase()).toString();
+				var hash = API.md5(item.realm + item.account.toLowerCase()).toString();
 
 				if (!drops[hash]) {
 					drops[hash] = [];

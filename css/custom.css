@@ -84,6 +84,21 @@ td {
     font-size: 10px;
 }
 
+.item-menu  {
+  display: none;
+  position: absolute;
+  min-width: 132px;
+  font-size: 12px;
+  background-color: #f1f1f1;
+  z-index: 1;
+  
+}
+
+.item-menu .select {
+	border-radius: 0px;
+    border-color: rgb(169, 169, 169);
+}
+
 .card {
     background-color: #191919;
 }

@@ -14275,7 +14275,7 @@ File: scss
       border-bottom: 0px; }
     .comment-widgets .comment-row:hover, .comment-widgets .comment-row.active {
       background: rgba(0, 0, 0, 0.05); }
-
+	  
 .comment-text {
   padding-left: 15px;
   width: 100%; }
