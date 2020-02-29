@@ -1,6 +1,6 @@
 var $ = window.jQuery;
 
-let LimeConfig = require(["LimeConfig"]);
+var LimeConfig = require(["LimeConfig"]);
 
 try {
 	window.socket = window.io();
@@ -31,8 +31,9 @@ require(["D2Bot"], function (D2BOTAPI) {
 	var API = (typeof socket !== "undefined") ? socket : D2BOTAPI();
 	var md5 = CryptoJS.MD5;
 	var itemCount = 0;
-	var entryCount = 0;
+	var groupItemCount = 0;
 	var MAX_ITEM = 1000;
+    var roundTime = [];
 	var countables = [];
 
 	(function enableBackToTop() {
@@ -64,9 +65,192 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 	function initialize()
 	{
+        $(".app-search").toggle(0);
+        
+        function appendTextField(name, data) {
+            var htmlTemplate = `
+            <span class="form-filter-element">
+                <label class="form-filter-label" for="search-data-` + name + `" id="label-` + name + `">` + name + `:</label>
+                <div class="form-filter">
+                    <input class="form-filter-input" type="text" id="search-data-` + name + `" name="search-data-` + name + `"/>
+                </div>
+            </span>`;
+        
+            var $formFilter = $(htmlTemplate);
+            var mask = new RegExp(data.mask);
+            var regex = [];
+            for (var entry in data.regex) {
+                regex.push([new RegExp(data.regex[entry][0], 'g'), data.regex[entry][1]]);
+            }
+            $formFilter.data("regex", regex);
+            $formFilter.data("name", name);
+            $formFilter.data("inputmask", mask);
+            $formFilter.data("validate", function(value) {
+                $("#search-data-" + name).removeClass("valid");
+                
+                if($formFilter.data("inputmask").exec(value)) {
+                    $("#search-data-" + name).addClass("valid");
+                    var output = value;
+                    var regList = $formFilter.data("regex");
+                    for (var regex in regList) {
+                        output = output.replace(regList[regex][0], regList[regex][1]);
+                    }
+                    $formFilter.attr('title', $formFilter.data("name") + " is: \'" + value + "\'\n\t => (" + output + ")");
+                }                    
+            });
+            
+            $formFilter.on("keypress keyup", function(event){
+                var str = $("#search-data-" + name).val();
+                var keycode = (event.keyCode ? event.keyCode : event.which);
+                if(keycode == '13'){
+                    
+                    while(!$(this).data("inputmask").exec(str)) {
+                        if(str.length === 0) {
+                            str = data.default;
+                            break;
+                        }
+                        str = str.substring(0, str.length - 1);
+                    }
+                    $("#search-data-" + name).val(str);
+                }
+                
+                $(this).data("validate")(str);
+            });
+            
+            $("#search-group").append($formFilter);
+            
+            // Check validity on init
+            $("#search-data-" + name).val(data.default);
+            $formFilter.data("validate")(data.default);
+        }
+        
+        function appendCheckBox(name, data) {
+            var htmlTemplate = `
+            <span class="form-filter-element">
+                <label class="form-filter-label" for="search-data-` + name + `" id="label-` + name + `">` + name + `:</label>
+                <div class="form-filter">
+                    <input type="checkbox" id="search-data-` + name + `" name="search-data-` + name + `"/>
+                </div>
+            </span>`;
+            
+            var $formFilter = $(htmlTemplate);
+            var regex = [];
+            for (var entry in data.regex) {
+                regex.push([new RegExp(data.regex[entry][0], 'g'), data.regex[entry][1]]);
+            }
+            $formFilter.data("regex", regex);
+            $formFilter.find("#search-data-" + name).indeterminate = true;
+            $formFilter.data("name", name);
+            $formFilter.data("setState", function(state) {
+                if(data.checked === state) {
+                    $("#search-data-" + name).prop("checked", true);
+                    $formFilter.data("state", "checked");
+                } else if(data.unchecked === state) {
+                    $("#search-data-" + name).prop("checked", false);
+                    $formFilter.data("state", "unchecked");
+                } else if(data.indeterminate === state) {
+                    $("#search-data-" + name).prop("indeterminate", true);
+                    $formFilter.data("state", "indeterminate");
+                }
+                
+                var output = state;
+                var regList = $formFilter.data("regex");
+                for (var regex in regList) {
+                    output = output.replace(regList[regex][0], regList[regex][1]);
+                }
+                
+                $formFilter.attr('title', name + " is: \'" + state + "\'\n\t => (" + output + ")");
+                $("#label-" + name).text(state + ":");
+            });
+            
+            $formFilter.on("click", function(event){
+                var next = {"checked":"unchecked", "unchecked":"indeterminate", "indeterminate":"checked"};
+                var value = data[next[$(this).data("state")]];
+
+                $(this).data("setState")(value);
+            });
+            
+            $("#search-group").append($formFilter);
+            
+            // Check validity on init
+            $formFilter.data("setState")(data.default);
+        }
+        
+        function appendSelectBox(name, data) {
+            var htmlTemplate = `
+            <span class="form-filter-element">
+                <label class="form-filter-label" for="search-data-` + name + `" id="label-` + name + `">` + name + `:</label>
+                <div class="form-filter">
+                    <select multiple id="search-data-` + name + `" name="search-data-` + name + `"/>
+                </div>
+            </span>`;
+        
+            var $formFilter = $(htmlTemplate);
+            var mask = new RegExp(data.mask);
+            var regex = [];
+            for (var entry in data.regex) {
+                regex.push([new RegExp(data.regex[entry][0], 'g'), data.regex[entry][1]]);
+            }
+            $formFilter.data("regex", regex);
+            $formFilter.data("name", name);
+            $formFilter.data("values", data.values);
+            
+            $("#search-group").append($formFilter);
+            
+            var optionList = $formFilter.data("values")
+            for (var option in optionList) {
+                $("#search-data-" + name).append(`<option value="` + optionList[option] + `">` + optionList[option] + `</option>`);
+            }
+            
+            
+            $("#search-data-" + name).on("change", function(e, param) {
+                var value = "";
+                var output;
+                var selected = $("#search-data-" + name).val();
+                for (var str in selected) {
+                    value += selected[str] + ", ";
+                }
+                
+                output = value.replace(/, /g, ",")
+                output = output.substring(0, output.lastIndexOf(","));
+                
+
+                var regList = $formFilter.data("regex");
+                for (var regex in regList) {
+                    output = output.replace(regList[regex][0], regList[regex][1]);
+                }
+                
+                
+                
+                $formFilter.attr('title', name + " is: \'" + value + "\'\n\t=> (" + output + ")");
+            });
+
+            $("#search-data-" + name).val(data.default);
+            
+            $("#search-data-" + name).chosen({ rtl: true, placeholder_text_multiple: "Select " + name, display_selected_options: false, hide_results_on_select: false, width: '100% !important' });
+            $("#search-data-" + name).trigger("change");
+            
+            // Check validity on init
+            //$("#search-data-" + name).val(data.default);
+            //$formFilter.data("validate")(data.default);
+        }
+        
+        for (var entry in LimeConfig["SearchFilter"]) {
+            var filter = LimeConfig["SearchFilter"][entry];
+            //console.log(filter);
+            if(filter.type === "text") { // Textfield
+                appendTextField(entry, filter);
+                
+            } else if(filter.type === "tristate") {   // Tristate Checkbox
+                appendCheckBox(entry, filter);
+            } else if(filter.type === "multi") {   // Tristate Checkbox
+                appendSelectBox(entry, filter);
+            } else {
+                console.info("Invalid Config Entry for Search Filters");
+            }
+        }
+        
 		cookie.load();
-		
-		console.log(cookie);
 
 		if (!cookie.data.server) {
 			cookie.data.server = "http://localhost:8080";
@@ -93,6 +277,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 				start(loggedin);
 			});
 		}
+        
+        $(".search-group").toggle(0);
 
 		//refreshList();
 	}
@@ -109,12 +295,12 @@ require(["D2Bot"], function (D2BOTAPI) {
 				return callback(false);
 			}
 
+			cookie.data.loggedin = (username !== "public") ? true : false;
 			// Don't override Cookie with default..
 			if (username !== "public") {
 				cookie.data.server = server;
 				cookie.data.username = username;
 				cookie.data.session = result;
-				cookie.data.loggedin = (username !== "public") ? true : false;
 				cookie.save();
 			}
 			// Pleeeease do not overwrite custom server config after reload...
@@ -161,13 +347,16 @@ require(["D2Bot"], function (D2BOTAPI) {
 	function refreshList(limit=true) {
 		$("#items-list").html("");
 		itemCount = 0;
-		entryCount = 0;
+		groupItemCount = 0;
 		MAX_ITEM = 1000;
+        roundTime = [];
 		countables = [];
 		
 		console.log("refresh");
 		// Get Regular Expressions from LimeConfig.js and use these to filter countables
-		addItemstoList(limit, LimeConfig["ItemGroup"]);
+        // Only when logged in..
+        //if(cookie.data.loggedin)
+            addItemstoList(limit, LimeConfig["ItemGroup"]);
 	}
 
 	function getItemDesc (desc) {
@@ -221,18 +410,25 @@ require(["D2Bot"], function (D2BOTAPI) {
 		var itemUID = result.description.split("$")[1];
 		
 		// Check our queue list if the item is already listed there
-		$("#dropQueueList div").each(function() {
+		$("#dropQueueList div").each( function() {
 			var data = $(this).data("itemData");
 			// if there is the property itemData and the ID's match
 			if(data && data.itemid === itemUID) {
 				// ID is already queued.. get out of here
+				itemUID = undefined;
 				return undefined;
 			}
 		});
 		
+		// Maybe the description of our item is corrupted
+		// But more likely, the requested item is already listed in the queue
+		if(!itemUID)
+			return undefined;
+		
 		var itemID = itemUID.split(":")[1]
-		// Check if (non unique) itemID is not already listed as a countable
-		if(countables[itemID] != undefined)
+		// Check if item is not already listed as a countable, unless it is just 
+		// a group list entry
+		if(!result.groupId && countables[itemID] != undefined)
 			return undefined;
 		
 		
@@ -275,8 +471,18 @@ require(["D2Bot"], function (D2BOTAPI) {
 				if( ($("#account-select").val() === "Show All" || $("#account-select").val() === $(this).data("itemData").account) &&
 					($("#character-select").val().split(".")[0] === "Show All" || $("#character-select").val().split(".")[0] === $(this).data("itemData").character)
 				) {
-					// Yes, then move the item to the inventory
-					$("#items-list").append($(this));
+					// Yes, then check if it is a group item
+					var itemGroup = $(this).data("itemData");
+					if(itemGroup.groupId) {
+						// first remove it from the DOM
+						$(this).remove();
+						// we have the group and the item info still here, so we can add it back to the list
+						$updateItemGroup($("#items-list").each(function() {if($(this).data("itemData") && $(this).data("itemData").itemid===itemGroup.itemid) { return $(this); }}), result);
+					} else {
+						// No.. move the item to the inventory
+						$("#items-list").append($(this));
+					}
+					
 				} else {
 					// No, then the unselected item should be removed from the DOM!
 					$(this).remove();
@@ -284,25 +490,46 @@ require(["D2Bot"], function (D2BOTAPI) {
 			}
 		});
 		
-		$("#items-list").append($item);
+		if(!result.groupId)
+			$("#items-list").append($item);
 		
 		return $item;
+	}
+	
+	function updateItemCount(id) {
+		var count = $('#item-menu-select-'+id+" option").length;
+		var countTemplate = `<h6 if="item-menu-count-` + id + `">` + "[x"+count+"]" + `</h6>`;
+		$("#item-menu-count-"+id).html(countTemplate);
 	}
 	
 	function $updateItemGroup($group, result) {
 		var itemUID = result.description.split("$")[1];
 		var id = itemUID.split(":")[1]
 		
+		// Check our queue list if the item is already listed there
+		$("#dropQueueList div").each( function() {
+			var data = $(this).data("itemData");
+			// if there is the property itemData and the ID's match
+			if(data && data.itemid === itemUID) {
+				// ID is already queued.. get out of here
+				itemUID = undefined;
+				return undefined;
+			}
+		});
+		
+		// Maybe the description of our item is corrupted
+		// But more likely, the requested item is already listed in the queue
+		if(!itemUID)
+			return undefined;
+		
 		var optionTemplate =`<option value="` + itemUID + `" id="item-menu-option-` + id + `">` + itemUID.split(":")[0] + " - " + result.account+"/"+result.character + `</option>`;
 		
 		var $itemOption = $(optionTemplate);
+		result.groupId = $group.attr("id");
+		$itemOption.data("itemData", result);
 		$group.find('#item-menu-select-'+id).append($itemOption);
 		
-		var count = $group.data("itemCount");
-		count++;
-		$group.data("itemCount", count);
-		var countTemplate = `<h6 if="item-menu-count-` + id + `">` + (count?" ["+count+"]":"") + `</h6>`;
-		$("#item-menu-count-"+id).html(countTemplate);
+		updateItemCount(id);
 					
 		return $itemOption;
 	}
@@ -357,54 +584,35 @@ require(["D2Bot"], function (D2BOTAPI) {
 			
 			$("#item-menu-input-"+id).val(i);
 		}
-		
-		/* // Try to get the most efficient drop
-		function updateSelection(count, group) {
-			var characters = [];
-			var total = 0;
-			var selection = [];
-			// first, count the individual amounts on the single characters
-			$("#item-menu-select-"+id+" option").each(function() {
-				if(!characters[$(this).text()])
-					characters[$(this).text()] = 0;
-				characters[$(this).text()] += 1;
-				total += 1;
-			});
-			
-			Object.keys(characters).forEach(character => {
-				var num = characters[character];
-				if(count > num) {
-					console.log(num + " Items from " + character);
-					count -= num
-				}
-				
-				total -= 1;
-			});
-
-		}
-		
-		$("#item-menu-input-"+id).keypress(function (e) {
-			var key = e.which;
-			if(key == 13) {
-				updateSelection($(this).val(), $("#item-menu-select-"+id));
-			}
-		}); */  
 
 		$(document).on('click', function(event) {
 			if ($(event.target).closest($itemGroup).length) {
 				// Show dropdown item selection
 				$("#item-menu-"+id).show();
-				$("#item-menu-select-"+id).on("change", function() {
+                // Using mousedown & move might be good for checking the change events in the input box :)
+				$("#item-menu-select-"+id).on("change mousedown mousemove", function() {
 					updateSelectCount($(this));
 				});
-				// Using mousedown & move might be good for checking the change events in the input box :)
-				$("#item-menu-select-"+id).on('mousedown', function (e) {
-					$("#item-menu-select-"+id).on('mousemove', function (e) {
-						updateSelectCount($(this));
-					});
+				$("#item-menu-select-"+id).on('keypress', function(e){
+					var key = e.which;
+					if(key == 13)// the enter key code
+					{
+						list = $(this).val();
+						for (var item in list) {
+							$(this).find("option[value='" + list[item] + "']").each(function() {
+								var item = $addItem($(this).data("itemData"));
+								item.trigger("click");
+								$(this).remove();
+								updateItemCount(id);
+							});
+						}
+					}		
+
 				});
+
 			} else if (!$(event.target).closest("#item-menu-select-"+id).length) {
 				// Close the dropdown item selection if the user clicks outside of it
+                $("#item-menu-select-"+id).off();
 				$("#item-menu-"+id).hide();
 			}
 		});
@@ -433,7 +641,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		$("#items-list").append($loader);
 		
 		function queryCountables($account, $character, loadMoreItem, regex) {
-			API.emit("query", buildregex($("#search-bar").val().toLocaleLowerCase())+".*?("+regex[0]+")", CurrentRealm, $account, $character, function (err, results) {
+			API.emit("query", buildregex($("#search-bar").val().toLocaleLowerCase()+".*?"+regex), CurrentRealm, $account, $character, function (err, results) {
 				if (err) { console.log(err); return; };
 				var y = $(window).scrollTop();
 				
@@ -448,13 +656,18 @@ require(["D2Bot"], function (D2BOTAPI) {
 							countables[itemID] = $addItemGroup(results[i]);
 
 						$updateItemGroup(countables[itemID], results[i]);
+						
+						groupItemCount += 1;
+						itemCount += 1;
 					}
 				}
 				
+                $(window).scrollTop(y);
+                
 				$loader.hide();
 				
 				if (loadMoreItem) {
-					loadMoreItem();
+					loadMoreItem(err);
 				}
 			});
 		}
@@ -467,19 +680,23 @@ require(["D2Bot"], function (D2BOTAPI) {
 				var item;
 				
 				for (var i in results) {
-					var itemID = results[i].description.split("$")[1].split(":")[1];
-					// Only the first countable item will be used
-					item = $addItem(results[i]);
+                    if(results[i].description) {
+                        var itemID = results[i].description.split("$")[1].split(":")[1];
+                        // Only the first countable item will be used
+                        item = $addItem(results[i]);
+                        
+                        itemCount += 1;
+                    }
 				}
 				
-				itemCount += results.length;
-
 				$(window).scrollTop(y);
 				
 				$loader.hide();
 				
+				var temp = roundTime[roundTime.length - 1];
+				roundTime[roundTime.length - 1] = (new Date().getTime() - temp);
 				if (loadMoreItem) {
-					loadMoreItem();
+					loadMoreItem(err);
 				}
 			});
 		}
@@ -493,7 +710,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 		var chr = "";
 		var accList = [];
-		var groupList = [];
+		var groupList = "(";
 		
 		if (character == "Show All") {
 			chr = "";
@@ -510,29 +727,43 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
 		
 		for (var i in group) {
-			groupList.push(group[i]);
+			groupList += "("+group[i]+")|";
 		}
-			
+		
+		groupList = groupList.substring(0, groupList.lastIndexOf("|"));
+		groupList += ")";
 
-		var countableCount = 0;
+		var groupCount = 0;
+		var start = new Date().getTime();
+		var elapsed = start;
 		accountListid = 0;
 		groupListid = 0;
 		ended = false;
 		
-		window.loadMoreItem = function () {
+		window.loadMoreItem = function (err=null) {
+			roundTime.push(new Date().getTime());
 			$loader.show();
 			
 			if (accountListid == accList.length) {
+				
 				if (!ended) {
 					
-					entryCount += itemCount;
-					$("#load-more").html("");
+					// Last element is invalid (not a time difference)
+					roundTime.pop();
+                    
+					var total = 0;
+					for (var i in roundTime) {
+						total += roundTime[i];
+					}
+					
 					$footer = `
 		<div><p>End of Items on all Accounts</p>
-			<span class="m-b-15 d-block">` + itemCount + ` Items in total.<br>` + countableCount + ` Countable entries, saved ` + entryCount + ` Entries by grouping.
+			<span class="m-b-15 d-block">` + itemCount + ` Items in total.<br>
+                ` + groupCount + ` Countable entries after `+ (elapsed / 1000).toFixed(3) + ` seconds. Saved ` + (groupItemCount - groupCount) + ` Entries by grouping.<br>
+                After ` + ((total + elapsed) / 1000).toFixed(3) + ` seconds in total.
 			</span>
 		</div>`;
-					$("#load-more").append($footer);
+					$("#load-more").html($footer);
 					ended = true;
 					window.loadMoreItem = false;
 					
@@ -547,42 +778,39 @@ require(["D2Bot"], function (D2BOTAPI) {
 			doQuery(acc, chr, itemCount > MAX_ITEM ? (limit ? false : window.loadMoreItem) : window.loadMoreItem);
 		};
 		
-		window.loadAllCountable = function () {
+		window.loadAllCountable = function (err=null) {
 			$loader.show();
 			
-			if (groupListid == groupList.length) {
-				if (!ended) {
-					
-					Object.keys(countables).forEach(id => {
-						//console.log(countables[id]);
-						countableCount += 1;
-						entryCount -= (countables[id].length - 1);	// -1 for the groupItem 
-					});
-					
-					console.log(countables);
+			if (accountListid == accList.length) {
+                if (!ended) {
+                    
+                    Object.keys(countables).forEach(id => {
+                        groupCount += 1;
+                    });
 
-					window.loadAllCountable = false;
-					accountListid = 0;
-					
-					console.log("Finished collecting Countables, fetching the rest now...");
+                    window.loadAllCountable = false;
+                    accountListid = 0;
+                    
+                    console.log("Finished collecting item groups", group, "Fetching the rest now...");
 
-					$loader.hide();
-					
-					window.loadMoreItem();
-				}
-				
-				return;
+                    $loader.hide();
+                    
+					elapsed = new Date().getTime() - start;
+                    window.loadMoreItem();
+                }
+                
+                return;
 			}
 			
 
-			var regex = groupList[groupListid++];
+			//var regex = groupList[groupListid++];
 
-			var acc = account;
-			if (acc == "Show All")
-				acc = ""
+			// var acc = account;
+			// if (acc == "Show All")
+				// acc = ""
+			var acc = accList[accountListid++];
 			
-			
-			queryCountables(acc, chr, window.loadAllCountable, regex);
+			queryCountables(acc, chr, window.loadAllCountable, groupList);
 		};
 		
 		window.loadAllCountable();		
@@ -662,7 +890,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			}
 			refreshList();
 		});
-
+        
 		$("#search-bar").off("change");
 		$("#search-bar").change(function () {
 			refreshList(false);
@@ -770,7 +998,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				var scrollPosition = $(window).height() + $(window).scrollTop();
 				if ((scrollHeight - scrollPosition) / scrollHeight < 0.3 && itemCount > MAX_ITEM) {
 					if (window.loadMoreItem) {
-						MAX_ITEM += 200;
+						MAX_ITEM += 1000;
 						window.loadMoreItem();
 					}
 				}
@@ -857,8 +1085,9 @@ require(["D2Bot"], function (D2BOTAPI) {
 				delete item.description;
 
 				$item.remove();
-				
-				item.realm = item.realm.toLowerCase();
+                
+                // It appears this causes issues during realm selection otherwise
+                item.realm = item.realm.toLowerCase();
 
 				var hash = API.md5(item.realm + item.account.toLowerCase()).toString();
 

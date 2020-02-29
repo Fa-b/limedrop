@@ -27,9 +27,13 @@ $(function() {
         $(".nav-lock i").toggleClass("mdi-toggle-switch-off");
         $("body, .page-wrapper").trigger("resize");
     });
-    $(".search-box a, .search-box .app-search .srh-btn").on('click', function() {
-        $(".app-search").toggle(200);
-        $(".app-search input").focus();
+    $(".search-box .nav-link, .search-box .app-search .srh-btn").on('click', function() {
+        $(".app-search").toggle(500);
+        $("#search-bar").focus();
+    });
+    $(".search-box .grp-btn").on('click', function() {
+        $(".search-group").toggle(500);
+        $("#search-bar").focus();
     });
 
     // ============================================================== 

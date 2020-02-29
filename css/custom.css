@@ -82,6 +82,44 @@ td {
 
 .comment-widgets{
     font-size: 10px;
+	cursor: pointer;
+}
+
+.grp-btn {
+    align-self:center;
+    position:relative;
+    cursor: pointer;
+    left: -50px; }
+
+.form-filter-element {
+  display: inline-flex;
+  min-width: 280px;
+  justify-content: flex-start;
+}
+
+.form-filter-label {
+  align-self: center;
+  padding-right: 10px;
+  margin-bottom: 4px;
+  min-width: 100px;
+  text-align: right;
+  font-size: 0.75rem;
+}
+
+.form-filter {
+  margin-right: 18px;
+  align-self: center;
+  width: 100% !important;
+  margin-bottom: 4px;
+  font-size: 0.75rem;
+}
+.form-filter-input { 
+  width:100%;
+  background-color: #F622178f;
+}
+.form-filter-input.valid {
+  width:100%;
+  background-color: #57E96488;
 }
 
 .item-menu  {
@@ -91,7 +129,6 @@ td {
   font-size: 12px;
   background-color: #f1f1f1;
   z-index: 1;
-  
 }
 
 .item-menu .select {

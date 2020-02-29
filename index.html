@@ -14,6 +14,7 @@
     <!-- Custom CSS -->
     <link href="./css/style.min.css" rel="stylesheet">
     <link href="./css/custom.css" rel="stylesheet">
+    <link href="./chosen/dist/css/chosen.min.css" rel="stylesheet">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -98,11 +99,17 @@
                             <a class="nav-link waves-effect waves-dark" href="javascript:void(0)">
                                 <i class="ti-search"></i>
                             </a>
-                            <form class="app-search position-absolute" onSubmit="javascript: return false;">
-                                <input type="text" class="form-control" placeholder="Search &amp; enter" id="search-bar">
+                            <form class="app-search position-fixed" style="display: flex; top:0px;" onSubmit="javascript: return false;">
+                                <input class="form-control" type="text" placeholder="Search &amp; enter" id="search-bar">
                                 <a class="srh-btn">
                                     <i class="ti-close"></i>
                                 </a>
+                                <div class="form-control" style="flex: 1 1 0px;display:flex;">
+                                    <div class="grp-btn" title="Filter search results">
+                                        <a><i class="ti-filter"></i></a>
+                                    </div>
+                                    <div class="search-group" id="search-group"></div>
+                                </div>
                             </form>
                         </li>
                     </ul>
@@ -449,6 +456,7 @@
     <!-- ============================================================== -->
     <!-- All Jquery -->
     <!-- ============================================================== -->
+    
     <!--<script src="./public/limedrop-client/assets/libs/jquery/dist/jquery.min.js"></script>-->
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <!-- Bootstrap tether Core JavaScript -->
@@ -484,9 +492,11 @@
     <script src="./js/CryptoJS/pbkdf2.js"></script>
     <script src="./js/CryptoJS/md5.js"></script>
     <script src="./js/base64.js"></script>
+    <script src="./chosen/dist/js/chosen.jquery.min.js"></script>
 
     <script src="/socket.io/socket.io.js"></script>
     <script data-main="js/index" src="./js/require.js"></script>
+    
 </body>
 
 </html>
