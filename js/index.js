@@ -19,7 +19,7 @@ var cookie = {
 	},
 
 	save: function (expires, path) {
-		var d = expires || new Date(2020, 02, 02);
+		var d = expires || new Date(Date.now() + 12096e5);
 		var p = path || '/';
 		document.cookie = escape(JSON.stringify(this.data))
 						  + ';path=' + p
@@ -30,6 +30,7 @@ var cookie = {
 require(["D2Bot"], function (D2BOTAPI) {
 	var API = (typeof socket !== "undefined") ? socket : D2BOTAPI();
 	var md5 = CryptoJS.MD5;
+    var regexFilter = [];
 	var itemCount = 0;
 	var groupItemCount = 0;
 	var MAX_ITEM = 1000;
@@ -67,6 +68,15 @@ require(["D2Bot"], function (D2BOTAPI) {
 	{
         $(".app-search").toggle(0);
         
+        function printRegEx() {
+            var printStr = "";
+            for (var entry in LimeConfig["SearchFilter"]) {
+                if (regexFilter[entry])
+                    printStr += regexFilter[entry];
+            }
+                console.log("Generated RegEx:", printStr);
+        }
+        
         function appendTextField(name, data) {
             var htmlTemplate = `
             <span class="form-filter-element">
@@ -95,7 +105,9 @@ require(["D2Bot"], function (D2BOTAPI) {
                     for (var regex in regList) {
                         output = output.replace(regList[regex][0], regList[regex][1]);
                     }
-                    $formFilter.attr('title', $formFilter.data("name") + " is: \'" + value + "\'\n\t => (" + output + ")");
+                    $formFilter.attr('title', $formFilter.data("name") + " is: \'" + value + "\'\n\t => " + output);
+                    regexFilter[name] = output;
+                    printRegEx();
                 }                    
             });
             
@@ -159,7 +171,10 @@ require(["D2Bot"], function (D2BOTAPI) {
                     output = output.replace(regList[regex][0], regList[regex][1]);
                 }
                 
-                $formFilter.attr('title', name + " is: \'" + state + "\'\n\t => (" + output + ")");
+                $formFilter.attr('title', name + " is: \'" + state + "\'\n\t => " + output);
+                regexFilter[name] = output;
+                printRegEx();
+                
                 $("#label-" + name).text(state + ":");
             });
             
@@ -211,9 +226,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                     value += selected[str] + ", ";
                 }
                 
-                output = value.replace(/, /g, ",")
-                output = output.substring(0, output.lastIndexOf(","));
-                
+                output = value.substring(0, value.lastIndexOf(","));                
 
                 var regList = $formFilter.data("regex");
                 for (var regex in regList) {
@@ -222,7 +235,9 @@ require(["D2Bot"], function (D2BOTAPI) {
                 
                 
                 
-                $formFilter.attr('title', name + " is: \'" + value + "\'\n\t=> (" + output + ")");
+                $formFilter.attr('title', name + " is: \'" + value + "\'\n\t=> " + output);
+                regexFilter[name] = output;
+                printRegEx();
             });
 
             $("#search-data-" + name).val(data.default);
@@ -230,14 +245,10 @@ require(["D2Bot"], function (D2BOTAPI) {
             $("#search-data-" + name).chosen({ rtl: true, placeholder_text_multiple: "Select " + name, display_selected_options: false, hide_results_on_select: false, width: '100% !important' });
             $("#search-data-" + name).trigger("change");
             
-            // Check validity on init
-            //$("#search-data-" + name).val(data.default);
-            //$formFilter.data("validate")(data.default);
         }
         
         for (var entry in LimeConfig["SearchFilter"]) {
             var filter = LimeConfig["SearchFilter"][entry];
-            //console.log(filter);
             if(filter.type === "text") { // Textfield
                 appendTextField(entry, filter);
                 
@@ -256,7 +267,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			cookie.data.server = "http://localhost:8080";
 			cookie.save();
 		}
-
+		
 		if (cookie.data.username && cookie.data.session) {
 			API.emit('validate', cookie.data.username, cookie.data.session, function (err, valid) {
 				if (err) {
@@ -465,6 +476,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			$(this).toggleClass("selected");
 			
 			if($(this).hasClass("selected")) {
+				//console.log($(this));
 				$("#dropQueueList").append($(this));
 			} else { // Unselecting an item in the queue should place it back to inventory
 				// First check if currently selected account location is same or ALL, then check if selected character location is the same or ALL
@@ -616,8 +628,6 @@ require(["D2Bot"], function (D2BOTAPI) {
 				$("#item-menu-"+id).hide();
 			}
 		});
-		
-		
 
 		$("#items-list").append($itemGroup);
 
@@ -625,7 +635,12 @@ require(["D2Bot"], function (D2BOTAPI) {
 	}
 
 	function buildregex(str) {
-		return str;
+		var retRegex = str?"(?=.*?"+str+")":"";
+		for (var entry in LimeConfig["SearchFilter"]) {
+			if (regexFilter[entry])
+				retRegex += regexFilter[entry];
+		}
+		return retRegex;
 	}
 
 	function addItemstoList(limit=true, group=[]) {
@@ -641,7 +656,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		$("#items-list").append($loader);
 		
 		function queryCountables($account, $character, loadMoreItem, regex) {
-			API.emit("query", buildregex($("#search-bar").val().toLocaleLowerCase()+".*?"+regex), CurrentRealm, $account, $character, function (err, results) {
+			API.emit("query", "^"+regex.toLocaleLowerCase()+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$", CurrentRealm, $account, $character, function (err, results) {
 				if (err) { console.log(err); return; };
 				var y = $(window).scrollTop();
 				
@@ -673,7 +688,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
 		
 		function doQuery($account, $character, loadMoreItem) {
-			API.emit("query", buildregex($("#search-bar").val().toLocaleLowerCase()), CurrentRealm, $account, $character, function (err, results) {
+			API.emit("query", "^"+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$", CurrentRealm, $account, $character, function (err, results) {
 				if (err) { console.log(err); return; };
 				var y = $(window).scrollTop();
 
@@ -759,7 +774,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 					$footer = `
 		<div><p>End of Items on all Accounts</p>
 			<span class="m-b-15 d-block">` + itemCount + ` Items in total.<br>
-                ` + groupCount + ` Countable entries after `+ (elapsed / 1000).toFixed(3) + ` seconds. Saved ` + (groupItemCount - groupCount) + ` Entries by grouping.<br>
+                ` + groupCount + ` Countable entries after ` + (elapsed / 1000).toFixed(3) + ` seconds. Saved ` + (groupItemCount - groupCount) + ` Entries by grouping.<br>
                 After ` + ((total + elapsed) / 1000).toFixed(3) + ` seconds in total.
 			</span>
 		</div>`;
@@ -772,8 +787,11 @@ require(["D2Bot"], function (D2BOTAPI) {
 				
 				return;
 			}
-
-			var acc = accList[accountListid++];
+			
+			var acc = accList[accountListid];
+			
+			if(!err)
+				accountListid++;
 
 			doQuery(acc, chr, itemCount > MAX_ITEM ? (limit ? false : window.loadMoreItem) : window.loadMoreItem);
 		};
