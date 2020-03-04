@@ -4,7 +4,7 @@ When adding RegEx to ./js/LimeConfig.js, make sure you are using valid JSON http
 After selecting multiple items, press 'enter' to add them to the drop queue.
 
 # LimeConfig
-You can cusomize the way limedrop searches the mule logs using [LimeConfig.js](https://github.com/Fa-b/limedrop/js/LimeConfig.js).
+You can customize the way limedrop searches the mule logs using [LimeConfig.js](https://github.com/Fa-b/limedrop/blob/master/js/LimeConfig.js).
 All regular expressions are passed to your running D2Bot instance and evaluated there, only matching items are sent over to the view.
 
 ## Customizing LimeConfig
@@ -40,7 +40,7 @@ After the grouping has finished, all other items will load according to your [Se
 
 ## SearchFilter
 Here filters can be added, adjusted or removed from search-bar.
-At the moment there are 3 types of filters configurable using the [LimeConfig.js](https://github.com/Fa-b/limedrop/js/LimeConfig.js):
+At the moment there are 3 types of filters configurable using the [LimeConfig.js](https://github.com/Fa-b/limedrop/blob/master/js/LimeConfig.js):
 - `"text"`: A text input field.
 - `"tristate"`: A checkbox with added indeterminate state (therefore 3-state).
 - `"multi"`: A multi value selection field.
