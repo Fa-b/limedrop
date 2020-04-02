@@ -155,7 +155,7 @@ define(["events"],function (events) {
                     done(null, JSON.parse(msg.body));
                 }
                 else {
-                    done(null,msg);
+                    console.log("status: " + msg);//done(null,msg);
                 }
             }, function (textStatus) {
                 done(textStatus);
@@ -221,9 +221,10 @@ define(["events"],function (events) {
             });
         })
 
-        D2BotAPI.on("validate", function (username, session, callback) {
+        D2BotAPI.on("validate", function (username, session, server, callback) {
             d2botConfig.username = username;
             d2botConfig.session = session;
+			d2botConfig.host = server;
             $get({ func: "validate", args: [] }, function (msg) {
                 callback(null, msg.status == "success" ? true : false);
             }, function (textStatus) {

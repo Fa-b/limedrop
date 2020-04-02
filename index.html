@@ -145,23 +145,23 @@
                                     <i class="font-24 mdi mdi-account-circle"></i>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right user-dd animated p-b-0">
-                                <div class="logged-in-out">
+                                <form class="logged-in-out">
                                     <a class="dropdown-item input-group">
                                         <i class="ti-server m-r-5 m-l-5 ld-input-icon"></i>
-                                        <input type="text" class="form-control" id="ld-login-api" placeholder="http://localhost:8080" aria-label="Username" aria-describedby="basic-addon1" required="">
-                                    </a>								
+                                        <input type="text" class="form-control" id="ld-login-api" placeholder="http://localhost:8080" onSubmit="javascript: return true;" aria-label="Username" aria-describedby="basic-addon1" required="">
+									</a>								
                                     <a class="dropdown-item input-group">
                                         <i class="ti-user m-r-5 m-l-5 ld-input-icon"></i>
-                                        <input type="text" class="form-control" id="ld-login-user" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" required="">
-                                    </a>
+                                        <input type="text" class="form-control" id="ld-login-user" placeholder="Username" onSubmit="javascript: return true;" aria-label="Username" aria-describedby="basic-addon1" required="">
+									</a>
                                     <a class="dropdown-item input-group">
                                         <i class="ti-lock m-r-5 m-l-5 ld-input-icon"></i>
-                                        <input type="password" class="form-control" id="ld-login-pw" placeholder="Password" aria-label="Password" aria-describedby="basic-addon1" required="">
-                                    </a>
+                                        <input type="password" class="form-control" id="ld-login-pw" placeholder="Password" onSubmit="javascript: return true;" aria-label="Password" aria-describedby="basic-addon1" required="">
+									</a>
                                     <a class="dropdown-item" id="login-ok-btn" href="javascript:void(0)">
                                         <i class="fa fa-power-off m-r-5 m-l-5 ld-btn-icon"></i> Login </a>
-                                </div>
-                                <div class="logged-in-out hide">
+                                </form>
+                                <form class="logged-in-out hide">
                                     <a class="dropdown-item current-user-btn" href="javascript:void(0)">
                                         <i class="font-24 mdi mdi-account-circle current-user-btn"></i> Public </a>
                                     <a class="dropdown-item add-acc-btn" href="javascript:void(0)">
@@ -172,7 +172,7 @@
                                         <i class="ti-settings m-r-5 m-l-5 ld-btn-icon"></i> Settings </a>
                                     <a class="dropdown-item logout-btn" href="javascript:void(0)">
                                         <i class="fa fa-power-off m-r-5 m-l-5 ld-btn-icon"></i> Logout </a>
-                                </div>
+                                </form>
                             </div>
                         </li>
                         <!-- ============================================================== -->
@@ -309,8 +309,14 @@
                         <div class="card">
                             <h4 class="card-title ld-title-indent">Inventory</h4>
                             <div class="comment-widgets scrollable">
+								<div id="loader" hidden>
+									<div class="d-flex flex-column" style="text-align: center;justify-content: center;align-items: center;">
+									<h2>Loading Items</h2>
+									<div class="d-flex ld-loader"></div>
+									</div>
+								</div>
                                 <div class="items-list" id="items-list"></div>
-
+								
                                 <div id="load-more"></div>
 
                             </div>
@@ -493,7 +499,7 @@
     <script src="./js/CryptoJS/md5.js"></script>
     <script src="./js/base64.js"></script>
     <script src="./chosen/dist/js/chosen.jquery.min.js"></script>
-
+	<script src="./js/item.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script data-main="js/index" src="./js/require.js"></script>
     

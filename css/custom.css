@@ -80,6 +80,10 @@ td {
     color:white;
 }
 
+.comment-widgets .comment-row.hidden {
+	visibility: hidden;
+}
+
 .comment-widgets{
     font-size: 10px;
 	cursor: pointer;
