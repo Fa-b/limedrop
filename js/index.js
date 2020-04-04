@@ -489,8 +489,6 @@ require(["D2Bot"], function (D2BOTAPI) {
 			</div>
 		</div>`;
 
-
-
 		// Todo: try using DOM operations instead of jQuery
 		var $item = $(htmlTemplate);
 
@@ -738,8 +736,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 			$(document).on('click', function (event) {
 				if ($(event.target).closest($itemGroup).length) {
 					// Show dropdown item selection
-					$("#item-menu-" + groupId).show();
-					$(".styled-item-menu").show(); // My solution :D 
+					//$("#item-menu-" + groupId).show();
+					$(".styled-item-menu").show(); // < is not working as intended when you click one it shows menu, once clicked another popups first too HALP.
 					// Using mousedown & move might be good for checking the change events in the input box :)
 					$("#item-menu-select-" + groupId).on("change mousedown mousemove", function () {
 						updateSelectCount($(this));
