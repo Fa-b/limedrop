@@ -35,7 +35,6 @@ require(["D2Bot"], function (D2BOTAPI) {
 	var savedEntryCount = 0;
 	var groupEntryCount = 0;
 	var MAX_ITEM = 1000;
-    var roundTime = [];
 	var countables = [];
 
 	(function enableBackToTop() {
@@ -822,6 +821,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				
                 $(window).scrollTop(y);
                 
+				roundTime.elapsed = new Date().getTime();
 				if (loadMoreItem) {
 					loadMoreItem();
 				}
@@ -853,9 +853,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				$(window).scrollTop(y);
 				loader.hidden = true;
 				
-				var temp = roundTime[roundTime.length - 1];
-				roundTime[roundTime.length - 1] = (new Date().getTime() - temp);
-				//console.log(temp);
+				roundTime.elapsed = new Date().getTime();
 				if (loadMoreItem) {
 					loadMoreItem();
 				}
@@ -892,33 +890,35 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 		var groupCount = 0;
         var groupItemCount = 0;
-		var start = new Date().getTime();
-		var elapsed = start;
+
+		var roundTime = {
+			start: new Date().getTime(),
+			elapsed: new Date().getTime(),
+			groups: 0,
+			total: 0
+		};
+		
 		accountListid = 0;
 		groupListid = 0;
 		ended = false;
 		
 		window.loadMoreItem = function () {
-			roundTime.push(new Date().getTime());
+			var time_ms = roundTime.elapsed - roundTime.start;
+			roundTime.total += time_ms;
+			roundTime.start = new Date().getTime();
+			
+			//console.log("Found Account:", accList[accountListid - 1], "After:", (time_ms / 1000).toFixed(3),"seconds");
 			loader.hidden = false;
 			if (accountListid == accList.length) {
 				
 				if (!ended) {
 					
-					// Last element is invalid (not a time difference)
-					roundTime.pop();
-                    
-					var total = 0;
-					for (var i in roundTime) {
-						total += roundTime[i];
-					}
-					
 					$footer = `
 		<div><p>End of Items on all Accounts</p>
 			<span class="m-b-15 d-block">` + itemCount + ` Items in total.<br>
-                ` + groupCount + ` item groups sorted after ` + (elapsed / 1000).toFixed(3) + ` seconds. ` + groupItemCount + ` items were grouped.<br>
+                ` + groupCount + ` item groups sorted after ` + (roundTime.groups / 1000).toFixed(3) + ` seconds. ` + groupItemCount + ` items were grouped.<br>
 				Saved `+ savedEntryCount + ` list entries with ` + groupEntryCount + ` group entries<br>
-                After ` + ((total + elapsed) / 1000).toFixed(3) + ` seconds in total.
+                After ` + (roundTime.total / 1000).toFixed(3) + ` seconds in total.
 			</span>
 		</div>`;
 					$("#load-more").html($footer);
@@ -933,12 +933,15 @@ require(["D2Bot"], function (D2BOTAPI) {
 				return;
 			}
 			
-			var acc = accList[accountListid++];
-
-			doQuery(acc, chr, itemCount > MAX_ITEM ? (limit ? false : window.loadMoreItem) : window.loadMoreItem);
+			doQuery(accList[accountListid++], chr, itemCount > MAX_ITEM ? (limit ? false : window.loadMoreItem) : window.loadMoreItem);
 		};
 		
 		window.loadAllCountable = function () {
+			var time_ms = roundTime.elapsed - roundTime.start;
+			roundTime.groups += time_ms;
+			roundTime.start = new Date().getTime();
+			
+			//console.log("Found Group:", groupList[groupListid - 1], "After:", (time_ms / 1000).toFixed(3),"seconds");
 			loader.hidden = false;
 			//if (accountListid == accList.length) {
             if (groupListid == groupList.length) {
@@ -956,8 +959,6 @@ require(["D2Bot"], function (D2BOTAPI) {
                         });
                         
                     });
-                    
-                    console.log(sortedGroups);
 
                     window.loadAllCountable = false;
                     accountListid = 0;
@@ -966,26 +967,18 @@ require(["D2Bot"], function (D2BOTAPI) {
 					
 					loader.hidden = true;
 					
-					elapsed = new Date().getTime() - start;
-                    window.loadMoreItem();
+					roundTime.total += roundTime.groups;
+                    
+					doQuery(accList[accountListid++], chr, itemCount > MAX_ITEM ? (limit ? false : window.loadMoreItem) : window.loadMoreItem);
                 }
                 
                 return;
 			}
 			
-            var regex = groupList[groupListid++];
-            
-            console.log("Searching Group:", regex);
-
-			// var acc = account;
-			// if (acc == "Show All")
-				// acc = ""
-			//var acc = accList[accountListid++];
-			
-			queryCountables("", chr, window.loadAllCountable, regex);  
+			queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);  
 		};            
 		
-		window.loadAllCountable();
+		queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]); 
 	}
 
 	function pupulateAccountCharSelect(realm, core, type, ladder) {

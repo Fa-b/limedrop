@@ -8,6 +8,7 @@ LimeConfig = {
 		"Essences": ["(?=.+?:65[4-7]:[37]:\\d:\\d$)"],
 		"Standards": ["(?=.+?:658:[37]:\\d:\\d$)"],
 		"Sojs": ["(?=ÿc4the stone of jordan.+?:522:[37]:\\d:\\d$)"],
+		"BulKathos": ["(?=ÿc4bul-kathos'.+?5\\%.+?:522:[37]:\\d:\\d$)"],
 		"Maras": ["(?=ÿc4Mara.+?30\\$.+?:520:[37]:\\d:\\d$)"],
 		"ColdRbfUp": ["(?=ÿc4rainbow.+?level-up.+?5\\% to cold.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)"],
 		"ColdRbfDie": ["(?=ÿc4rainbow.+?die.+?5\\% to cold.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)"],
