@@ -642,7 +642,6 @@ require(["D2Bot"], function (D2BOTAPI) {
 			var title = description.shift();
 			var count = 0;
 			description = description.join("<br/>");
-
 			var htmlTemplate = `
 			<div class="d-flex flex-row comment-row hidden p-l-0 m-t-0 m-b-0" aria-haspopup="true" id="` + groupId + `">
 				<div class="p-2" id="png-` + groupId + `">
