@@ -588,7 +588,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 	function updateItemCount(groupId) {
 		var count = $('#item-menu-select-' + groupId + " option").length;
-		var countTemplate = `<h6 if="item-menu-count-` + groupId + `">` + "[x" + count + "]" + `</h6>`;
+		var countTemplate = `<h6 class="styled-counter" if="item-menu-count-` + groupId + `">` + count + `</h6>`;
 		$("#item-menu-count-" + groupId).html(countTemplate);
 	}
 
@@ -643,17 +643,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 			var count = 0;
 			description = description.join("<br/>");
 			var htmlTemplate = `
-			<div class="d-flex flex-row comment-row hidden p-l-0 m-t-0 m-b-0" aria-haspopup="true" id="` + groupId + `">
-				<div class="p-2" id="png-` + groupId + `">
-					image
-				</div>
-					<h6 class="styled-counter p-2" id="item-menu-count-` + groupId + `">` + /*(count?" ["+*/ count /*+"]":"")*/ + `</h6>
-					<div class="styled-item-menu">
-					<div class="styled-item-menu" id="item-menu-` + groupId + `">
-						<input type="number" placeholder="0"  id="item-menu-input-` + groupId + `" style="width:100%;"/>
-						<select multiple="multiple" size='10'  id="item-menu-select-` + groupId + `"></select>
-					</div>
-				</div>
+			<div class="d-flex align-items-start hidden p-l-0 m-t-0 m-b-0" aria-haspopup="true" id="` + groupId + `">
+				<div class="pt-3 pl-3 pb-2 pr-0" id="png-` + groupId + `">image</div>
+					<span class="badge badge-secondary mt-2"><div id="item-menu-count-` + groupId + `">` + /*(count?" ["+*/ count /*+"]":"")*/ + `</div></span>
+						<div class="styled-item-menu" id="item-menu-` + groupId + `">
+							<input type="number" placeholder="0"  id="item-menu-input-` + groupId + `"/>
+							<select multiple="multiple" size='10'  id="item-menu-select-` + groupId + `"></select>
+						</div>
 				<div class="p-2 comment-text w-100">
 					<h6 class="-medium">` + title + `</h6>
 					<span class="m-b-15 d-block">` + description + `</span>
@@ -735,8 +731,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			$(document).on('click', function (event) {
 				if ($(event.target).closest($itemGroup).length) {
 					// Show dropdown item selection
-					//$("#item-menu-" + groupId).show();
-					$(".styled-item-menu").show(); // < is not working as intended when you click one it shows menu, once clicked another popups first too HALP.
+					$("#item-menu-" + groupId).show();
 					// Using mousedown & move might be good for checking the change events in the input box :)
 					$("#item-menu-select-" + groupId).on("change mousedown mousemove", function () {
 						updateSelectCount($(this));

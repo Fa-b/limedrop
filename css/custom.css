@@ -336,11 +336,41 @@ td {
     border-radius: 20px;
 }
 
-.styled-counter h6 {
-    font-size: 15px;
+.styled-counter {
+    font-size: 12px;
+    font-family: inherit;
+    display: block;
     border: none;
-    color: white;
+    color: rgb(4, 253, 24);
     background-color: transparent;
-    align-items: center;
-    margin: auto;
+    margin: 0px;
+}
+
+span.badge.badge-secondary.mt-2{
+    background-color: #2c2c2e;
+    border-radius: 20px;
+    margin-left: -10px;
+    margin-bottom: -10px;
+}
+
+.drop-queue-styled {
+    margin: 10px;
+    display: block;
+    height: 400px;
+    overflow-y: scroll;
+    -webkit-scrollbar-thumb: width 5px;
+}
+h6.drop-queue-styled {
+    font-size: 5px;
+}
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    background-color: #505050;
+    border-radius: 20px;
+}
+::-webkit-scrollbar-thumb {
+    width: 5px;
+    background-color: #11c501;
+    border-radius: 20px;
 }
