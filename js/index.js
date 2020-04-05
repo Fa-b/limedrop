@@ -774,7 +774,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 	}
 
 	function buildregex(str) {
-		var retRegex = str?"(?=.*?"+str+")":"";
+		var retRegex = str?"(?=.*?("+str+")+)":"";
 		for (var entry in LimeConfig["SearchFilter"]) {
 			if (regexFilter[entry])
 				retRegex += regexFilter[entry];
