@@ -304,6 +304,9 @@ td {
 
 .styled-item-menu {
     display: none;
+    width: min-content;
+    padding-left: 10px;
+    padding-right: 20px;
 }
 
 .styled-item-menu input {
@@ -318,7 +321,9 @@ td {
 
 .styled-item-menu select {
     border: none;
+    align-content: center;
     color: white;
+    width: 100%;
     background-color: #505050;
     border-radius: 5px;
     margin: auto;
@@ -346,7 +351,7 @@ td {
     margin: 0px;
 }
 
-span.badge.badge-secondary.mt-2{
+span.badge.badge-secondary.mt-2 {
     background-color: #2c2c2e;
     border-radius: 20px;
     margin-left: -10px;
@@ -360,17 +365,27 @@ span.badge.badge-secondary.mt-2{
     overflow-y: scroll;
     -webkit-scrollbar-thumb: width 5px;
 }
+
 h6.drop-queue-styled {
     font-size: 5px;
 }
+
 ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
     background-color: #505050;
     border-radius: 20px;
 }
+
 ::-webkit-scrollbar-thumb {
     width: 5px;
     background-color: #11c501;
     border-radius: 20px;
+}
+
+.card.drop-queue {
+    position: fixed;
+    right: 20px;
+    left: calc((100% - 250px)*0.667 + 260px);
+    height: calc(100% - 104px);
 }
