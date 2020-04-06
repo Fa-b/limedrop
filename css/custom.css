@@ -323,6 +323,7 @@ td {
   align-content: center;
   color: white;
   width: 100%;
+  padding: 5px;
   background-color: #505050;
   border-radius: 5px;
   margin: auto;
@@ -345,6 +346,7 @@ td {
   font-family: inherit;
   display: block;
   border: none;
+  padding-left: -10px;
   color: rgb(4, 253, 24);
   background-color: transparent;
   margin: 0px;
@@ -385,6 +387,16 @@ h6.drop-queue-styled {
 .card.drop-queue {
   position: fixed;
   right: 20px;
+  overflow-y: scroll;
   left: calc((100% - 250px) * 0.667 + 260px);
-  height: calc(100% - 104px);
+  height: calc(80% - 104px);
+  animation: fadeInRight 0.2s ease-in;
+}
+
+@media (max-width: 600px) {
+  .card.drop-queue {
+    position: unset;
+    overflow-y: scroll;
+    height: 300px;
+  }
 }
