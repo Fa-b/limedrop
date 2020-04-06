@@ -601,15 +601,15 @@ require(["D2Bot"], function (D2BOTAPI) {
 		if(!itemUID)
 			return undefined;
 
-		var specs = itemUID.split(":")[0] + " -";
+		var specs = itemUID.split(":")[0] + " - ";
 		if(result.groupData.specs) {
 			specs = "";
 			result.groupData.specs.forEach((entry) => {
-				specs += result.description.replace(/\n|\r/gm, "").replace(new RegExp(entry[0], 'gi'), entry[1]) + " -";
+				specs += result.description.replace(/\n|\r/gm, "").replace(new RegExp(entry[0], 'gi'), entry[1]) + " - ";
 			});
 		}
 		result.groupId = $group.attr("id");
-		var optionTemplate =`<option value="` + itemUID + `" id="item-menu-option-` + result.groupId + `">` + specs + " " + result.account+"/"+result.character + `</option>`;
+		var optionTemplate =`<option value="` + itemUID + `" id="item-menu-option-` + result.groupId + `">` + specs + result.account+"/"+result.character + `</option>`;
 		
 		var $itemOption = $(optionTemplate);
 		$itemOption.data("itemData", result);

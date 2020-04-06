@@ -33,29 +33,13 @@ LimeConfig = {
 				["^.+\\+(\\d\\d)\\$.+$", "$1@"]
 			]
 		},
-		"ColdRbfUp": {
-			"regex": "(?=ÿc4rainbow.+?level-up.+?5\\% to cold.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)",
-		},
-		"ColdRbfDie": {
-			"regex": "(?=ÿc4rainbow.+?die.+?5\\% to cold.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)",
-		},
-		"FireRbfUp": {
-			"regex": "(?=ÿc4rainbow.+?level-up.+?5\\% to enemy fire.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)",
-		},
-		"FireRbfDie": {
-			"regex": "(?=ÿc4rainbow.+?die.+?5\\% to enemy fire.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)",
-		},
-		"LightRbfUp": {
-			"regex": "(?=ÿc4rainbow.+?level-up.+?5\\% to enemy light.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)",
-		},
-		"LightRbfDie": {
-			"regex": "(?=ÿc4rainbow.+?die.+?5\\% to enemy light.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)",
-		},
-		"PoisonRbfUp": {
-			"regex": "(?=ÿc4rainbow.+?level-up.+?5\\% to poison.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)",
-		},
-		"PoisonRbfDie": {
-			"regex": "(?=ÿc4rainbow.+?die.+?5\\% to poison.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)",
+		"Rbf": {
+			"regex": "(?=ÿc4rainbow.+?:643:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+(.\\d)\\%.+(.\\d)\\%.+\\$.+$", "$1/$2"],
+				["^.+((fire)|(cold)|(light)|(poison)).+$", "$1"],
+				["^.+((level-up)|(die)).+$", "$1"]
+			]
 		},
 		"NonEthUnid": {
 			"regex": "(?=.+?unidentified.+?[37]:\\d:\\d$)",
