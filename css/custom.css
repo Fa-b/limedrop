@@ -393,10 +393,13 @@ h6.drop-queue-styled {
   animation: fadeInRight 0.2s ease-in;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1120px) {
   .card.drop-queue {
     position: unset;
     overflow-y: scroll;
     height: 300px;
   }
+}
+.card button {
+  width: 100%;
 }
