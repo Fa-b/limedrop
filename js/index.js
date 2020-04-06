@@ -603,9 +603,11 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 		var specs = itemUID.split(":")[0] + " - ";
 		if(result.groupData.specs) {
+			var desc = result.description.replace(/\n|\r/gm, "");
 			specs = "";
 			result.groupData.specs.forEach((entry) => {
-				specs += result.description.replace(/\n|\r/gm, "").replace(new RegExp(entry[0], 'gi'), entry[1]) + " - ";
+				if(desc.match(new RegExp(entry[0], 'gi')))
+					specs += desc.replace(new RegExp(entry[0], 'gi'), entry[1]) + " - ";
 			});
 		}
 		result.groupId = $group.attr("id");
@@ -651,7 +653,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 					<span class="m-b-15 d-block">` + description + `</span>
 					<div class="comment-footer">
 						<div class="flex">
-							<span class="text-muted float-right">` + result.realm + "/" + result.account + "/" + result.character + "/{" + result.itemid + '}' + `</span>
+							<!--<span class="text-muted float-right">` + result.realm + "/" + result.account + "/" + result.character + "/{" + result.itemid + '}' + `</span>-->
 							<!--<button type="button" class="btn btn-cyan btn-sm">Helm</button>
 							<button type="button" class="btn btn-success btn-sm">Armor</button>-->
 						</div>
