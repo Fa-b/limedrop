@@ -34,7 +34,10 @@ require(["D2Bot"], function (D2BOTAPI) {
 	var savedEntryCount = 0;
 	var groupEntryCount = 0;
 	var MAX_ITEM = 1000;
+<<<<<<< HEAD
 	var roundTime = [];
+=======
+>>>>>>> 4b0b1155af06971f89e3496b762263c81e265748
 	var countables = [];
 
 	(function enableBackToTop() {
@@ -778,7 +781,11 @@ require(["D2Bot"], function (D2BOTAPI) {
 	}
 
 	function buildregex(str) {
+<<<<<<< HEAD
 		var retRegex = str ? "(?=.*?" + str + ")" : "";
+=======
+		var retRegex = str?"(?=.*?("+str+")+)":"";
+>>>>>>> 4b0b1155af06971f89e3496b762263c81e265748
 		for (var entry in LimeConfig["SearchFilter"]) {
 			if (regexFilter[entry])
 				retRegex += regexFilter[entry];
@@ -825,9 +832,16 @@ require(["D2Bot"], function (D2BOTAPI) {
 						//}
 					}
 				}
+<<<<<<< HEAD
 
 				$(window).scrollTop(y);
 
+=======
+				
+                $(window).scrollTop(y);
+                
+				roundTime.elapsed = new Date().getTime();
+>>>>>>> 4b0b1155af06971f89e3496b762263c81e265748
 				if (loadMoreItem) {
 					loadMoreItem();
 				}
@@ -861,10 +875,15 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 				$(window).scrollTop(y);
 				loader.hidden = true;
+<<<<<<< HEAD
 
 				var temp = roundTime[roundTime.length - 1];
 				roundTime[roundTime.length - 1] = (new Date().getTime() - temp);
 				//console.log(temp);
+=======
+				
+				roundTime.elapsed = new Date().getTime();
+>>>>>>> 4b0b1155af06971f89e3496b762263c81e265748
 				if (loadMoreItem) {
 					loadMoreItem();
 				}
@@ -900,19 +919,36 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
 
 		var groupCount = 0;
+<<<<<<< HEAD
 		var groupItemCount = 0;
 		var start = new Date().getTime();
 		var elapsed = start;
+=======
+        var groupItemCount = 0;
+
+		var roundTime = {
+			start: new Date().getTime(),
+			elapsed: new Date().getTime(),
+			groups: 0,
+			total: 0
+		};
+		
+>>>>>>> 4b0b1155af06971f89e3496b762263c81e265748
 		accountListid = 0;
 		groupListid = 0;
 		ended = false;
 
 		window.loadMoreItem = function () {
-			roundTime.push(new Date().getTime());
+			var time_ms = roundTime.elapsed - roundTime.start;
+			roundTime.total += time_ms;
+			roundTime.start = new Date().getTime();
+			
+			//console.log("Found Account:", accList[accountListid - 1], "After:", (time_ms / 1000).toFixed(3),"seconds");
 			loader.hidden = false;
 			if (accountListid == accList.length) {
 
 				if (!ended) {
+<<<<<<< HEAD
 
 					// Last element is invalid (not a time difference)
 					roundTime.pop();
@@ -928,6 +964,15 @@ require(["D2Bot"], function (D2BOTAPI) {
                 ` + groupCount + ` item groups sorted after ` + (elapsed / 1000).toFixed(3) + ` seconds. ` + groupItemCount + ` items were grouped.<br>
 				Saved ` + savedEntryCount + ` list entries with ` + groupEntryCount + ` group entries<br>
                 After ` + ((total + elapsed) / 1000).toFixed(3) + ` seconds in total.
+=======
+					
+					$footer = `
+		<div><p>End of Items on all Accounts</p>
+			<span class="m-b-15 d-block">` + itemCount + ` Items in total.<br>
+                ` + groupCount + ` item groups sorted after ` + (roundTime.groups / 1000).toFixed(3) + ` seconds. ` + groupItemCount + ` items were grouped.<br>
+				Saved `+ savedEntryCount + ` list entries with ` + groupEntryCount + ` group entries<br>
+                After ` + (roundTime.total / 1000).toFixed(3) + ` seconds in total.
+>>>>>>> 4b0b1155af06971f89e3496b762263c81e265748
 			</span>
 		</div>`;
 					$("#load-more").html($footer);
@@ -941,13 +986,23 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 				return;
 			}
+<<<<<<< HEAD
 
 			var acc = accList[accountListid++];
 
 			doQuery(acc, chr, itemCount > MAX_ITEM ? (limit ? false : window.loadMoreItem) : window.loadMoreItem);
+=======
+			
+			doQuery(accList[accountListid++], chr, itemCount > MAX_ITEM ? (limit ? false : window.loadMoreItem) : window.loadMoreItem);
+>>>>>>> 4b0b1155af06971f89e3496b762263c81e265748
 		};
 
 		window.loadAllCountable = function () {
+			var time_ms = roundTime.elapsed - roundTime.start;
+			roundTime.groups += time_ms;
+			roundTime.start = new Date().getTime();
+			
+			//console.log("Found Group:", groupList[groupListid - 1], "After:", (time_ms / 1000).toFixed(3),"seconds");
 			loader.hidden = false;
 			//if (accountListid == accList.length) {
 			if (groupListid == groupList.length) {
@@ -956,6 +1011,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 					var sortedGroups = [];
 					Object.keys(countables).forEach(uid => {
 						Object.keys(countables[uid]).forEach(name => {
+<<<<<<< HEAD
 							if (!sortedGroups[name]) {
 								sortedGroups[name] = 0;
 								groupCount++;
@@ -995,6 +1051,37 @@ require(["D2Bot"], function (D2BOTAPI) {
 		};
 
 		window.loadAllCountable();
+=======
+                            if(!sortedGroups[name]) {
+                                sortedGroups[name] = 0;
+                                groupCount++;
+                            }
+                            sortedGroups[name]++;
+                            groupItemCount++;
+                        });
+                        
+                    });
+
+                    window.loadAllCountable = false;
+                    accountListid = 0;
+                    
+                    console.log("Finished collecting item groups:", sortedGroups, "\nFetching the rest now...");
+					
+					loader.hidden = true;
+					
+					roundTime.total += roundTime.groups;
+                    
+					doQuery(accList[accountListid++], chr, itemCount > MAX_ITEM ? (limit ? false : window.loadMoreItem) : window.loadMoreItem);
+                }
+                
+                return;
+			}
+			
+			queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);  
+		};            
+		
+		queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]); 
+>>>>>>> 4b0b1155af06971f89e3496b762263c81e265748
 	}
 
 	function pupulateAccountCharSelect(realm, core, type, ladder) {
