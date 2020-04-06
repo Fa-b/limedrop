@@ -403,3 +403,7 @@ h6.drop-queue-styled {
 .card button {
   width: 100%;
 }
+
+.dropQueueList .comment-footer {
+  display: none;
+}
