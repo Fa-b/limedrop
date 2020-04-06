@@ -548,13 +548,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 					($("#character-select").val().split(".")[0] === "Show All" || $("#character-select").val().split(".")[0] === $(this).data("itemData").character)
 				) {
 					// Yes, then check if it is a group item
-					var itemGroup = $(this).data("itemData");
-					if($("#"+itemGroup.groupId).length) {
+					var itemData = $(this).data("itemData");
+					if($("#"+itemData.groupId).length) {
 						// first remove it from the DOM
 						$(this).remove();
 
 						// we have the group and the item info still here, so we can add it back to the list
-						$updateItemGroup($("#"+itemGroup.groupId), itemGroup);
+						$updateItemGroup($("#"+itemData.groupId), itemData);
 					} else {
 						// No.. move the item to the inventory
 						$("#items-list").append($(this));
@@ -601,8 +601,15 @@ require(["D2Bot"], function (D2BOTAPI) {
 		if(!itemUID)
 			return undefined;
 
+		var specs = itemUID.split(":")[0] + " -";
+		if(result.groupData.specs) {
+			specs = "";
+			result.groupData.specs.forEach((entry) => {
+				specs += result.description.replace(/\n|\r/gm, "").replace(new RegExp(entry[0], 'gi'), entry[1]) + " -";
+			});
+		}
 		result.groupId = $group.attr("id");
-		var optionTemplate =`<option value="` + itemUID + `" id="item-menu-option-` + result.groupId + `">` + itemUID.split(":")[0] + " - " + result.account+"/"+result.character + `</option>`;
+		var optionTemplate =`<option value="` + itemUID + `" id="item-menu-option-` + result.groupId + `">` + specs + " " + result.account+"/"+result.character + `</option>`;
 		
 		var $itemOption = $(optionTemplate);
 		$itemOption.data("itemData", result);
@@ -782,11 +789,11 @@ require(["D2Bot"], function (D2BOTAPI) {
 		return retRegex;
 	}
 
-	function addItemstoList(limit=true, group=[]) {
+	function addItemstoList(limit=true, itemGroups=[]) {
 		var loader = document.getElementById("loader");
 		
-		function queryCountables($account, $character, loadMoreItem, regex=["all", ""]) {
-			API.emit("query", "^"+regex[1].toLocaleLowerCase()+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$", CurrentRealm, $account, $character, function (err, results) {
+		function queryCountables($account, $character, loadMoreItem, itemGroup={key: "all", value: { regex: "" } }) {
+			API.emit("query", "^"+itemGroup.value.regex.toLocaleLowerCase()+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$", CurrentRealm, $account, $character, function (err, results) {
 				if (err) { console.log(err); return false; };
 				var y = $(window).scrollTop();
 				
@@ -807,14 +814,15 @@ require(["D2Bot"], function (D2BOTAPI) {
 								y: results[i].description.split("$")[1].split(":")[4]
 							};
 							var itemID = results[i].description.split("$")[1].split(":")[1];
-							results[i].group = regex[0];
+							results[i].group = itemGroup.key;
+							results[i].groupData = itemGroup.value;
 							if(!countables[item.uid])
 								countables[item.uid] = []
-							if(!countables[item.uid][regex[0]])
-								countables[item.uid][regex[0]] = $addItemGroup(results[i]);
+							if(!countables[item.uid][itemGroup.key])
+								countables[item.uid][itemGroup.key] = $addItemGroup(results[i]);
 								
 
-							$updateItemGroup(countables[item.uid][regex[0]], results[i]);
+							$updateItemGroup(countables[item.uid][itemGroup.key], results[i]);
 						//}
 					}
 				}
@@ -884,8 +892,10 @@ require(["D2Bot"], function (D2BOTAPI) {
 			accList.push(account);
 		}
 		
-		for (var i in group) {
-			groupList.push([i, group[i][0]]);
+		console.log(itemGroups);
+		
+		for (var group in itemGroups) {
+			groupList.push({ key: group, value: itemGroups[group] });
 		}
 
 		var groupCount = 0;
