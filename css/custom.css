@@ -151,7 +151,7 @@ td {
   margin-bottom: 4px;
   min-width: 100px;
   text-align: right;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
 }
 
 .form-filter {
@@ -411,22 +411,22 @@ h6.drop-queue-styled {
 }
 
 .app-search {
-  background-color: #191919;
+  background-color: #292929;
   color: #18fc00;
 }
 
 .app-search :focus {
-  background-color: #191919;
+  background-color: #292929;
   color: #18fc00;
 }
 
 .app-search input {
-  background-color: #191919;
+  background-color: #292929;
   color: #18fc00;
 }
 
 .form-control div {
   list-style: inside;
-  background-color: #191919;
+  background-color: #292929;
   color: #18fc00;
 }
