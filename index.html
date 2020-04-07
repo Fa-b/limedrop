@@ -161,21 +161,18 @@
                   onSubmit="javascript: return false;"
                 >
                   <input
-                    class="form-control"
+                    class="form-control col-lg-8"
                     type="text"
                     placeholder="Search &amp; enter"
                     id="search-bar"
                   />
-                  <a class="srh-btn">
-                    <i class="ti-close"></i>
-                  </a>
-                  <div
-                    class="form-control"
-                    style="flex: 1 1 0px; display: flex;"
-                  >
+                  <div class="form-control col-lg-4">
                     <div class="grp-btn" title="Filter search results">
                       <a><i class="ti-filter"></i></a>
                     </div>
+                    <a class="srh-btn">
+                      <i class="ti-close"></i>
+                    </a>
                     <div class="search-group" id="search-group"></div>
                   </div>
                 </form>
@@ -525,22 +522,6 @@
         <!-- Container fluid  -->
         <!-- ============================================================== -->
         <div class="container-fluid">
-          <button
-            class="btn btn-success mb-2"
-            data-toggle="collapse"
-            data-target="#dropqueuecollapse"
-          >
-            Queue
-            <i class="fa fa-arrow-circle-down pl-1" aria-hidden="true"></i>
-          </button>
-          <!-- <button
-            class="btn btn-success mb-2"
-            data-toggle="collapse"
-            data-target="#TradeListCollapseBtn"
-          >
-            Trade list
-            <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-          </button> -->
           <div class="row">
             <!-- column -->
             <div class="col-xs-12 col-lg-8">
@@ -567,27 +548,27 @@
             </div>
             <!-- column -->
             <div class="col-lg-4">
-              <div class="collapse" id="dropqueuecollapse">
-                <button class="ml-1 mb-1 btn btn-success">Trade List <i class="ml-1 far fa-images"></i></button>
-                <div class="card">
-                  <div class="card drop-queue">
-                    <h4 class="card-title ld-title-indent">Drop Queue</h4>
-                    <div class="dropQueueList p-2" id="dropQueueList"></div>
-                    <!-- Comment Row -->
-                    <!--<div class="d-flex flex-row comment-row m-t-0">-->
-                    <!--    <div class="p-2">-->
-                    <!--        <img src="./public/limedrop-client/assets/images/users/1.png" alt="user" width="70" class="rounded-circle">-->
-                    <!--    </div>-->
-                    <!--    <div class="comment-text w-100">-->
-                    <!--        <h6 class="font-medium">Aldur's Stony Gaze</h6>-->
-                    <!--        <div class="comment-footer">-->
-                    <!--            <span class="text-muted float-right">29838203</span>-->
-                    <!--            <button type="button" class="btn btn-cyan btn-sm">Helm</button>-->
-                    <!--            <button type="button" class="btn btn-success btn-sm">Armor</button>-->
-                    <!--        </div>-->
-                    <!--    </div>-->
-                    <!--</div>-->
-                  </div>
+              <button class="ml-1 mb-1 btn btn-success" id="TradeListBtn">
+                Trade List <i class="ml-1 far fa-images"></i>
+              </button>
+              <div class="card">
+                <div class="card drop-queue">
+                  <h4 class="card-title ld-title-indent">Drop Queue</h4>
+                  <div class="dropQueueList p-2" id="dropQueueList"></div>
+                  <!-- Comment Row -->
+                  <!--<div class="d-flex flex-row comment-row m-t-0">-->
+                  <!--    <div class="p-2">-->
+                  <!--        <img src="./public/limedrop-client/assets/images/users/1.png" alt="user" width="70" class="rounded-circle">-->
+                  <!--    </div>-->
+                  <!--    <div class="comment-text w-100">-->
+                  <!--        <h6 class="font-medium">Aldur's Stony Gaze</h6>-->
+                  <!--        <div class="comment-footer">-->
+                  <!--            <span class="text-muted float-right">29838203</span>-->
+                  <!--            <button type="button" class="btn btn-cyan btn-sm">Helm</button>-->
+                  <!--            <button type="button" class="btn btn-success btn-sm">Armor</button>-->
+                  <!--        </div>-->
+                  <!--    </div>-->
+                  <!--</div>-->
                 </div>
               </div>
             </div>

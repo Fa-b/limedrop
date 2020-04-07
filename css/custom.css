@@ -168,8 +168,10 @@ td {
 }
 
 .form-filter-input.valid {
-  width: 100%;
-  background-color: #57e96488;
+  width: 30%;
+  border: #11c501 2px solid;
+  border-radius: 10px;
+  padding-left: 5px;
 }
 
 .card {
@@ -406,4 +408,25 @@ h6.drop-queue-styled {
 
 .dropQueueList .comment-footer {
   display: none;
+}
+
+.app-search {
+  background-color: #191919;
+  color: #18fc00;
+}
+
+.app-search :focus {
+  background-color: #191919;
+  color: #18fc00;
+}
+
+.app-search input {
+  background-color: #191919;
+  color: #18fc00;
+}
+
+.form-control div {
+  list-style: inside;
+  background-color: #191919;
+  color: #18fc00;
 }
