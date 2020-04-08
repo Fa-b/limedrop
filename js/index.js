@@ -1655,6 +1655,12 @@ require(["D2Bot"], function (D2BOTAPI) {
       $("#login-ok-btn").trigger("click");
     }
   });
+  
+  $("#imgur-upload-btn").click(function () {
+	  console.log("test");
+    $("#upload-imgur-modal").modal("show");
+    
+  });
 
   initialize();
   showNotification("Notification", "Welcome to Lime Drop!", true);

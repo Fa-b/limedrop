@@ -549,8 +549,8 @@
             </div>
             <!-- column -->
             <div class="col-lg-4">
-              <button class="ml-1 mb-1 btn btn-success" id="TradeListBtn">
-                Trade List <i class="ml-1 far fa-images"></i>
+              <button class="ml-1 mb-1 btn btn-success" id="imgur-upload-btn">
+                Imgur Upload <i class="ml-1 far fa-images"></i>
               </button>
               <div class="card">
                 <div class="card drop-queue">
@@ -740,6 +740,39 @@
             <button type="button" class="btn btn-primary ok-btn" id="">
               OK
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+	
+	<!-- Modal -->
+    <div
+      class="modal fade"
+      id="upload-imgur-modal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="template-imgurUpload"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="template-upload">Upload to Imgur</h5>
+			<button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            	<div id="itemScreenshot">
+		</div>
+          </div>
+          <div class="modal-footer">
+            
           </div>
         </div>
       </div>
