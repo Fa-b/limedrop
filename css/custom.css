@@ -165,16 +165,13 @@ td {
 
 .form-filter-input {
   width: 40%;
-  border: #af0000 2px solid;
-  border-radius: 10px;
+  border: 1px solid #af0000;
+  border-radius: 5px;
   text-align: center;
 }
 
 .form-filter-input.valid {
-  width: 40%;
-  border: #11c501 2px solid;
-  border-radius: 10px;
-  text-align: center;
+  border: 1px solid #18fc00;
 }
 
 .card {
@@ -469,7 +466,7 @@ h6.drop-queue-styled {
     width: 100%;
     z-index: 1060;
     background-color: #292929;
-    border: solid;
+    border: 2px solid;
     box-shadow: -2px 2px 7px #292929;
 }
 

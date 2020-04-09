@@ -425,7 +425,7 @@ require(["D2Bot"], function (D2BOTAPI) {
     var template =
       `<a class="` +
       (perm ? `always-there ` : "") +
-      `ld-notify-card link border-top">
+      `ld-notify-card link" style="border-top:1px solid #3c3c3c">
 		<div class="d-flex no-block align-items-center p-10">
 			<span class="btn btn-success btn-circle">
 				<i class="ti-calendar"></i>
@@ -1219,6 +1219,18 @@ require(["D2Bot"], function (D2BOTAPI) {
     };
 
     queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
+    
+    
+    if($("#account-select").length <= 1) {
+        console.warn("No accounts found. Appending dummy data..");
+        var items = Items;
+    
+        for (var key in items) {
+            console.log(items[key]);
+            $addItem(items[key]);
+        }
+    }
+    
   }
 
   function pupulateAccountCharSelect(realm, core, type, ladder) {
