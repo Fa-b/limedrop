@@ -160,27 +160,29 @@
                   style="display: flex; top: 0px; border: 2px solid;"
                   onSubmit="javascript: return false;"
                 >
-                  <div class="col-auto" style="display:contents;">
-                      <input
-                        class="form-control"
-                        type="text"
-                        placeholder="Search &amp; enter"
-                        id="search-bar"
-                      />
+                  <div class="col-auto" style="display: contents;">
+                    <input
+                      class="form-control"
+                      type="text"
+                      placeholder="Search &amp; enter"
+                      id="search-bar"
+                    />
                     <div class="grp-btn" title="Filter search results">
-                        <a class="waves-effect waves-dark"><i class="ti-filter"></i></a>
+                      <a class="waves-effect waves-dark"
+                        ><i class="ti-filter"></i
+                      ></a>
                     </div>
                   </div>
-                  
-                  <div class="col-xl-3 col-lg-5 col-md-6 col-sm-7 search-filter">
+
+                  <div
+                    class="col-xl-3 col-lg-5 col-md-6 col-sm-7 search-filter"
+                  >
                     <div class="styled-search-menu">
-                        <div class="search-group" id="search-group">
-                        </div>
+                      <div class="search-group" id="search-group"></div>
                     </div>
-                    
                   </div>
                   <a class="srh-btn waves-effect waves-dark">
-                      <i class="ti-close"></i>
+                    <i class="ti-close"></i>
                   </a>
                 </form>
               </li>
@@ -558,12 +560,21 @@
               <div class="card">
                 <div class="card drop-queue">
                   <h4 class="card-title ld-title-indent">Queue</h4>
-                  <div style="display: flex;flex-direction: row;flex-wrap: wrap;">
-                    <button class="btn btn-success" id="imgur-upload-btn">Upload To Imgur<i class="ml-1 far fa-images"></i>
+                  <div
+                    style="display: flex; flex-direction: row; flex-wrap: wrap;"
+                  >
+                    <button class="btn btn-success" id="imgur-upload-btn">
+                      Upload To Imgur<i class="ml-1 far fa-images"></i>
                     </button>
-                    <button class="btn btn-success" id="imgur-upload-btn">Save For Later<i class="ml-1 far fa-arrow-alt-circle-up"></i>
+                    <button class="btn btn-success" id="imgur-upload-btn">
+                      Save For Later<i
+                        class="ml-1 far fa-arrow-alt-circle-up"
+                      ></i>
                     </button>
-                    <button class="btn btn-success" id="imgur-upload-btn">Restore From Cookie<i class="ml-1 far fa-arrow-alt-circle-down"></i>
+                    <button class="btn btn-success" id="imgur-upload-btn">
+                      Restore From Cookie<i
+                        class="ml-1 far fa-arrow-alt-circle-down"
+                      ></i>
                     </button>
                   </div>
                   <div class="dropQueueList p-2" id="dropQueueList"></div>
@@ -755,8 +766,8 @@
         </div>
       </div>
     </div>
-	
-	<!-- Modal -->
+
+    <!-- Modal -->
     <div
       class="modal fade"
       id="upload-imgur-modal"
@@ -769,7 +780,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="template-upload">Upload to Imgur</h5>
-			<button
+            <button
               type="button"
               class="close"
               data-dismiss="modal"
@@ -779,12 +790,9 @@
             </button>
           </div>
           <div class="modal-body">
-            	<div style="text-align="center" id="itemScreenshot">
-		</div>
+            <div style="text-align: center;" id="itemScreenshot"></div>
           </div>
-          <div class="modal-footer">
-            
-          </div>
+          <div class="modal-footer"></div>
         </div>
       </div>
     </div>
@@ -829,11 +837,11 @@
     <script src="./js/CryptoJS/md5.js"></script>
     <script src="./js/base64.js"></script>
     <script src="./chosen/dist/js/chosen.jquery.min.js"></script>
-	<script src='./js/packer.growing.js'></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
-	<script src="./js/font16.js"></script>
+    <script src="./js/packer.growing.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+    <script src="./js/font16.js"></script>
     <script src="./js/item.js"></script>
-	<script src="./js/itemScreenshot.js"></script>
+    <script src="./js/itemScreenshot.js"></script>
     <script src="./js/testItems.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script data-main="js/index" src="./js/require.js"></script>
