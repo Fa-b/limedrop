@@ -157,25 +157,31 @@
                 </a>
                 <form
                   class="app-search position-fixed"
-                  style="display: flex; top: 0px;"
+                  style="display: flex; top: 0px; border: solid;"
                   onSubmit="javascript: return false;"
                 >
-                  <input
-                    class="form-control col-xl-9 col-lg-7 col-md-6 col-sm-5"
-                    type="text"
-                    placeholder="Search &amp; enter"
-                    id="search-bar"
-                  />
-                  <div class=" col-lg-8 col-md-7 col-sm-6 grp-btn" title="Filter search results">
-                    <a><i class="ti-filter"></i></a>
-                  </div>
-                  <div class="styled-search-menu">
-                    <div class="search-group" id="search-group">
+                  <div class="col-auto" style="display:contents;">
+                      <input
+                        class="form-control"
+                        type="text"
+                        placeholder="Search &amp; enter"
+                        id="search-bar"
+                      />
+                    <div class="grp-btn" title="Filter search results">
+                        <a><i class="ti-filter"></i></a>
                     </div>
-                    <a class="srh-btn">
-                      <i class="ti-close"></i>
-                    </a>
                   </div>
+                  
+                  <div class="col-xl-3 col-lg-5 col-md-6 col-sm-7 search-filter">
+                    <div class="styled-search-menu">
+                        <div class="search-group" id="search-group">
+                        </div>
+                    </div>
+                    
+                  </div>
+                  <a class="srh-btn">
+                      <i class="ti-close"></i>
+                  </a>
                 </form>
               </li>
             </ul>

@@ -32,7 +32,7 @@ $(function() {
         $("#search-bar").focus();
     });
     $(".search-box .grp-btn").on('click', function() {
-        $(".search-group").toggle(500);
+        $(".search-filter").toggle(300);
         $("#search-bar").focus();
     });
 

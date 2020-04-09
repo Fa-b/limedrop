@@ -10056,7 +10056,7 @@ ul.list-style-none li a:hover {
   left: 0px;
 }
 .search-box .app-search .form-control {
-  padding: 23px 40px 20px 23px;
+  padding: 19px 40px 20px 23px;
   -webkit-transition: 0.2s ease-in;
   -o-transition: 0.2s ease-in;
   transition: 0.2s ease-in;
@@ -10065,9 +10065,9 @@ ul.list-style-none li a:hover {
   border-color: transparent;
 }
 .search-box .app-search .srh-btn {
-  position: absolute;
-  top: 10px;
-  right: 25px;
+  z-index: 1080;
+  padding-top: 10px;
+  padding-right: 15px;
   cursor: pointer;
   color: #15b403;
 }

@@ -136,7 +136,7 @@ td {
   align-self: center;
   position: relative;
   cursor: pointer;
-  left: -50px;
+  left: -20px;
 }
 
 .form-filter-element {
@@ -146,18 +146,18 @@ td {
 }
 
 .form-filter-label {
-  align-self: center;
-  padding-right: 5px;
-  margin-bottom: 4px;
-  min-width: 100px;
-  text-align: right;
-  font-size: 0.85rem;
+    align-self: center;
+    padding-right: 10px;
+    margin-bottom: 4px;
+    min-width: 120px;
+    text-align: right;
+    font-size: 0.85rem;
 }
 
 .form-filter {
   margin-right: 18px;
   align-self: center;
-  width: 100% !important;
+  width: 100%;
   margin-bottom: 4px;
   font-size: 0.75rem;
 }
@@ -455,12 +455,19 @@ h6.drop-queue-styled {
 }
 
 .styled-search-menu {
-  position: fixed;
-  top: 10px;
-  padding: 5px;
-  right: 10px;
-  z-index: 1060;
-  display: block;
-  max-width: 300px;
-  background-color: #292929;
+    position: absolute;
+    padding: 5px;
+    padding-top: 15px;
+    top: -3px;
+    right: -32px;
+    width: 100%;
+    z-index: 1060;
+    background-color: #292929;
+    border: solid;
+    box-shadow: -2px 2px 7px #292929;
+}
+
+.search-group {
+    display: flex;
+    flex-direction: column;
 }
