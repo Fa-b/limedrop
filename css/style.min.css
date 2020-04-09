@@ -9427,6 +9427,7 @@ html[dir="ltr"] body .p-l-0 {
 .page-wrapper {
   background: #eeeeee;
   position: relative;
+  margin-top: 64px;
   margin-left: 250px;
 }
 .page-wrapper > .container-fluid {
@@ -9523,7 +9524,7 @@ html[dir="ltr"] body .p-l-0 {
 }
 body {
   margin: 0;
-  overflow-x: hidden;
+  overflow: hidden;
   color: #3e5569;
   background: #fff;
 }
@@ -9724,7 +9725,7 @@ ul.list-style-none li a:hover {
   color: #2962ff;
 }
 .card {
-  margin-bottom: 20px;
+    
 }
 .card .card-subtitle {
   font-weight: 300;
@@ -9988,7 +9989,8 @@ ul.list-style-none li a:hover {
   }
 }
 .topbar {
-  position: relative;
+  position: fixed;
+  width: 100%;
   z-index: 50;
   -webkit-box-shadow: 1px 0px 7px rgba(0, 0, 0, 0.05);
   box-shadow: 1px 0px 7px rgba(0, 0, 0, 0.05);

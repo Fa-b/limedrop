@@ -90,7 +90,8 @@
 }
 
 #main-wrapper .page-wrapper .container-fluid {
-  min-height: 100vh;
+  height: calc(100vh - 94px);
+  overflow-y: scroll;
 }
 
 th {
@@ -181,6 +182,9 @@ td {
 }
 
 .footer {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  height: 30px;
   background-color: #141619;
 }
 
@@ -413,7 +417,7 @@ h6.drop-queue-styled {
   position: fixed;
   right: 20px;
   left: calc((100% - 250px) * 0.667 + 260px);
-  height: calc(80% - 104px);
+  height: calc(100% - 134px);
   animation: fadeInRight 0.2s ease-in;
 }
 
@@ -424,11 +428,11 @@ h6.drop-queue-styled {
   }
 }
 .card button {
-  width: 100%;
+  flex: auto;
 }
 
 .dropQueueList {
-    overflow-y: scroll;
+  overflow-y: scroll;
 }
 
 .dropQueueList .comment-footer {
