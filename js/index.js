@@ -1657,9 +1657,24 @@ require(["D2Bot"], function (D2BOTAPI) {
   });
   
   $("#imgur-upload-btn").click(function () {
-	  console.log("test");
     $("#upload-imgur-modal").modal("show");
-    
+    var queuedItems = document.getElementById("dropQueueList").children;
+	var itemList = {};
+    for (var i = 0; i < queuedItems.length; i++) {
+		var item = $(queuedItems[i]).data("itemData");
+		if(item.itemImage)
+			item.image = item.itemImage.image;
+		else
+			item.image = JSON.parse(item.image).code;
+		itemList[i] = item;
+    }
+	
+	var container = document.getElementById("itemScreenshot");
+	window.ItemScreenshot.drawCompilation(itemList).then((image) => {
+		container.innerHTML = `<img src="` + image.toDataURL() + `"/>`;
+	});
+	
+	
   });
 
   initialize();

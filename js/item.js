@@ -7,6 +7,7 @@ function BaseItem() {
             let name = "r" + (i+1).toString().padStart(2, "0");
             runes.push(new Promise((resolve, reject) => {
                 let img = new Image();
+				img.crossOrigin = "anonymous";
                 img.src = "https://blizzhackers.github.io/ItemScreenshot/assets/gfx/" + name + "/21.png";
                 img.onload = () => {
                     let newRune = document.createElement('canvas');
@@ -74,6 +75,7 @@ function BaseItem() {
             let name = gemlist[i];
             gems.push(new Promise((resolve, reject) => {
                 let img = new Image();
+				img.crossOrigin = "anonymous";
                 img.src = "https://blizzhackers.github.io/ItemScreenshot/assets/gfx/" + name + "/21.png";
                 img.onload = () => {
                     let newGem = document.createElement('canvas');
@@ -142,6 +144,7 @@ function BaseItem() {
             let name = "jew" + (i+1).toString();
             jewels.push(new Promise((resolve, reject) => {
                 let img = new Image();
+				img.crossOrigin = "anonymous";
                 img.src = "https://blizzhackers.github.io/ItemScreenshot/assets/gfx/" + name + "/21.png";
                 img.onload = () => {
                     let newJewel = document.createElement('canvas');
