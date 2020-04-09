@@ -147,12 +147,12 @@ td {
 }
 
 .form-filter-label {
-    align-self: center;
-    padding-right: 10px;
-    margin-bottom: 4px;
-    min-width: 120px;
-    text-align: right;
-    font-size: 0.85rem;
+  align-self: center;
+  padding-right: 10px;
+  margin-bottom: 4px;
+  min-width: 120px;
+  text-align: right;
+  font-size: 0.85rem;
 }
 
 .form-filter {
@@ -182,7 +182,7 @@ td {
   padding-top: 0px;
   padding-bottom: 0px;
   height: 30px;
-  background-color: #141619;
+  background-color: #191919;
 }
 
 .container-fluid {
@@ -333,6 +333,7 @@ td {
   border-radius: 5px;
   margin: auto;
 }
+
 .styled-item-menu select:focus:se {
   border: none;
   align-content: center;
@@ -367,7 +368,7 @@ td {
   margin: 0px;
 }
 
-.styled-counter:hover{
+.styled-counter:hover {
   font-size: 12px;
   font-family: inherit;
   display: block;
@@ -424,6 +425,7 @@ h6.drop-queue-styled {
     height: 300px;
   }
 }
+
 .card button {
   flex: auto;
 }
@@ -458,19 +460,23 @@ h6.drop-queue-styled {
 }
 
 .styled-search-menu {
-    position: absolute;
-    padding: 5px;
-    padding-top: 15px;
-    top: -3px;
-    right: -32px;
-    width: 100%;
-    z-index: 1060;
-    background-color: #292929;
-    border: 2px solid;
-    box-shadow: -2px 2px 7px #292929;
+  position: absolute;
+  padding: 5px;
+  padding-top: 15px;
+  top: -3px;
+  right: -32px;
+  width: 100%;
+  z-index: 1060;
+  background-color: #292929;
+  border: 2px solid;
+  box-shadow: -2px 2px 7px #292929;
 }
 
 .search-group {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+}
+
+.side-nav {
+  background-color: #292929;
 }

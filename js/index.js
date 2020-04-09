@@ -4,7 +4,7 @@ var LimeConfig = require(["LimeConfig"]);
 
 try {
   window.socket = window.io();
-} catch (e) {}
+} catch (e) { }
 
 var cookie = {
   data: {},
@@ -26,7 +26,7 @@ var cookie = {
       p +
       ";expires=" +
       d.toUTCString();
-  },
+  }
 };
 
 require(["D2Bot"], function (D2BOTAPI) {
@@ -43,10 +43,10 @@ require(["D2Bot"], function (D2BOTAPI) {
   (function enableBackToTop() {
     var backToTop = $("<a>", {
       id: "back-to-top",
-      href: "#top",
+      href: "#top"
     });
     var icon = $("<i>", {
-      class: "icon-chevron-up",
+      class: "icon-chevron-up"
     });
 
     backToTop.appendTo("body");
@@ -65,10 +65,9 @@ require(["D2Bot"], function (D2BOTAPI) {
     backToTop.click(function (e) {
       e.preventDefault();
 
-      $("body, html").animate(
-        {
-          scrollTop: 0,
-        },
+      $("body, html").animate({
+        scrollTop: 0
+      },
         600
       );
     });
@@ -116,7 +115,7 @@ require(["D2Bot"], function (D2BOTAPI) {
       for (var entry in data.regex) {
         regex.push([
           new RegExp(data.regex[entry][0], "g"),
-          data.regex[entry][1],
+          data.regex[entry][1]
         ]);
       }
       $formFilter.data("regex", regex);
@@ -189,7 +188,7 @@ require(["D2Bot"], function (D2BOTAPI) {
       for (var entry in data.regex) {
         regex.push([
           new RegExp(data.regex[entry][0], "g"),
-          data.regex[entry][1],
+          data.regex[entry][1]
         ]);
       }
       $formFilter.data("regex", regex);
@@ -226,7 +225,7 @@ require(["D2Bot"], function (D2BOTAPI) {
         var next = {
           checked: "unchecked",
           unchecked: "indeterminate",
-          indeterminate: "checked",
+          indeterminate: "checked"
         };
         var value = data[next[$(this).data("state")]];
 
@@ -265,7 +264,7 @@ require(["D2Bot"], function (D2BOTAPI) {
       for (var entry in data.regex) {
         regex.push([
           new RegExp(data.regex[entry][0], "g"),
-          data.regex[entry][1],
+          data.regex[entry][1]
         ]);
       }
       $formFilter.data("regex", regex);
@@ -278,10 +277,10 @@ require(["D2Bot"], function (D2BOTAPI) {
       for (var option in optionList) {
         $("#search-data-" + name).append(
           `<option value="` +
-            optionList[option] +
-            `">` +
-            optionList[option] +
-            `</option>`
+          optionList[option] +
+          `">` +
+          optionList[option] +
+          `</option>`
         );
       }
 
@@ -314,7 +313,7 @@ require(["D2Bot"], function (D2BOTAPI) {
         placeholder_text_multiple: "Select " + name,
         display_selected_options: false,
         hide_results_on_select: false,
-        width: "100% !important",
+        width: "100% !important"
       });
       $("#search-data-" + name).trigger("change");
     }
@@ -426,20 +425,20 @@ require(["D2Bot"], function (D2BOTAPI) {
       `<a class="` +
       (perm ? `always-there ` : "") +
       `ld-notify-card link" style="border-top:1px solid #3c3c3c">
-		<div class="d-flex no-block align-items-center p-10">
-			<span class="btn btn-success btn-circle">
-				<i class="ti-calendar"></i>
-			</span>
-			<div class="m-l-10">
-				<h5 class="m-b-0">` +
+    <div class="d-flex no-block align-items-center p-10">
+      <span class="btn btn-success btn-circle">
+        <i class="ti-calendar"></i>
+      </span>
+      <div class="m-l-10">
+        <h5 class="m-b-0">` +
       head +
       `</h5>
-				<span class="mail-desc">` +
+        <span class="mail-desc">` +
       text +
       `</span>
-			</div>
-		</div>
-		</a>`;
+      </div>
+    </div>
+    </a>`;
 
     $("#ldNotify").append($(template));
     $("#ldNotifyDrop").click();
@@ -556,25 +555,25 @@ require(["D2Bot"], function (D2BOTAPI) {
       itemUID;
     var htmlTemplate =
       `
-		<div class="d-flex flex-row comment-row hidden p-l-0 m-t-0 m-b-0" id="` +
+    <div class="d-flex flex-row comment-row hidden p-l-0 m-t-0 m-b-0" id="` +
       itemUID +
       `">
-			<div class="p-2 ld-img-col" id="png-` +
+      <div class="p-2 ld-img-col" id="png-` +
       itemUID +
       `">
-				image
-			</div>
-			<div class="comment-text w-100">
-				<h6 class="-medium">` +
+        image
+      </div>
+      <div class="comment-text w-100">
+        <h6 class="-medium">` +
       title +
       `</h6>
-				<span class="m-b-15 d-block">` +
+        <span class="m-b-15 d-block">` +
       description +
       `
-				</span>
-				<div class="comment-footer">
-					<div class="flex">
-						<span class="text-muted float-right">` +
+        </span>
+        <div class="comment-footer">
+          <div class="flex">
+            <span class="text-muted float-right">` +
       CurrentRealm +
       "/" +
       result.account +
@@ -584,12 +583,12 @@ require(["D2Bot"], function (D2BOTAPI) {
       itemUID +
       "}" +
       `</span>
-						<!--<button type="button" class="btn btn-cyan btn-sm">Helm</button>
-						<button type="button" class="btn btn-success btn-sm">Armor</button>-->
-					</div>
-				</div>
-			</div>
-		</div>`;
+            <!--<button type="button" class="btn btn-cyan btn-sm">Helm</button>
+            <button type="button" class="btn btn-success btn-sm">Armor</button>-->
+          </div>
+        </div>
+      </div>
+    </div>`;
 
     // Todo: try using DOM operations instead of jQuery
     var $item = $(htmlTemplate);
@@ -616,7 +615,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                 image: tmp.code,
                 itemColor: tmp.color,
                 sockets: tmp.sockets,
-                description: result.description,
+                description: result.description
               });
               result.itemImage.onload = () => {
                 result.itemImage.getItem().then((canvas) => {
@@ -647,7 +646,7 @@ require(["D2Bot"], function (D2BOTAPI) {
     let observer = new IntersectionObserver(handleIntersect, {
       root: null,
       rootMargin: "100px",
-      threshold: 0.4,
+      threshold: 0.4
     });
 
     $item.data("itemData", result);
@@ -666,7 +665,7 @@ require(["D2Bot"], function (D2BOTAPI) {
             $("#account-select").val() === $(this).data("itemData").account) &&
           ($("#character-select").val().split(".")[0] === "Show All" ||
             $("#character-select").val().split(".")[0] ===
-              $(this).data("itemData").character)
+            $(this).data("itemData").character)
         ) {
           // Yes, then check if it is a group item
           var itemGroup = $(this).data("itemData");
@@ -780,37 +779,38 @@ require(["D2Bot"], function (D2BOTAPI) {
       description = description.join("<br/>");
       var htmlTemplate =
         `
-			<div class="d-flex align-items-start hidden p-l-0 m-t-0 m-b-0" aria-haspopup="true" id="` +
+      <div class="d-flex align-items-start hidden p-l-0 m-t-0 m-b-0" aria-haspopup="true" id="` +
         groupId +
         `">
-				<div class="pt-3 pl-3 pb-2 pr-0" id="png-` +
+        <div class="pt-3 pl-3 pb-2 pr-0" id="png-` +
         groupId +
         `">image</div>
-					<span class="badge badge-secondary mt-2"><div id="item-menu-count-` +
+          <span class="badge badge-secondary mt-2"><div id="item-menu-count-` +
         groupId +
         `">` +
-        /*(count?" ["+*/ count /*+"]":"")*/ +
+        /*(count?" ["+*/
+        count /*+"]":"")*/ +
         `</div></span>
-						<div class="styled-item-menu" id="item-menu-` +
+            <div class="styled-item-menu" id="item-menu-` +
         groupId +
         `">
-							<input type="number" placeholder="0"  id="item-menu-input-` +
+              <input type="number" placeholder="0"  id="item-menu-input-` +
         groupId +
         `"/>
-							<select multiple="multiple" size='10'  id="item-menu-select-` +
+              <select multiple="multiple" size='10'  id="item-menu-select-` +
         groupId +
         `"></select>
-						</div>
-				<div class="p-2 comment-text w-100">
-					<h6 class="-medium">` +
+            </div>
+        <div class="p-2 comment-text w-100">
+          <h6 class="-medium">` +
         title +
         `</h6>
-					<span class="m-b-15 d-block">` +
+          <span class="m-b-15 d-block">` +
         description +
         `</span>
-					<div class="comment-footer">
-						<div class="flex">
-							<span class="text-muted">` +
+          <div class="comment-footer">
+            <div class="flex">
+              <span class="text-muted">` +
         result.realm +
         "/" +
         result.account +
@@ -820,12 +820,12 @@ require(["D2Bot"], function (D2BOTAPI) {
         result.itemid +
         "}" +
         `</span>
-							<!--<button type="button" class="btn btn-cyan btn-sm">Helm</button>
-							<button type="button" class="btn btn-success btn-sm">Armor</button>-->
-						</div>
-					</div>
-				</div>
-			</div>`;
+              <!--<button type="button" class="btn btn-cyan btn-sm">Helm</button>
+              <button type="button" class="btn btn-success btn-sm">Armor</button>-->
+            </div>
+          </div>
+        </div>
+      </div>`;
 
       var $itemGroup = $(htmlTemplate);
 
@@ -851,7 +851,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                   image: tmp.code,
                   itemColor: tmp.color,
                   sockets: tmp.sockets,
-                  description: result.description,
+                  description: result.description
                 });
                 result.itemImage.onload = () => {
                   result.itemImage.getItem().then((canvas) => {
@@ -882,7 +882,7 @@ require(["D2Bot"], function (D2BOTAPI) {
       let observer = new IntersectionObserver(handleIntersect, {
         root: null,
         rootMargin: "100px",
-        threshold: 0.4,
+        threshold: 0.4
       });
 
       $itemGroup.data("itemData", result);
@@ -974,9 +974,9 @@ require(["D2Bot"], function (D2BOTAPI) {
       API.emit(
         "query",
         "^" +
-          regex[1].toLocaleLowerCase() +
-          buildregex($("#search-bar").val().toLocaleLowerCase()) +
-          ".*$",
+        regex[1].toLocaleLowerCase() +
+        buildregex($("#search-bar").val().toLocaleLowerCase()) +
+        ".*$",
         CurrentRealm,
         $account,
         $character,
@@ -1001,7 +1001,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                 uid: results[i].description.split("$")[1],
                 location: results[i].description.split("$")[1].split(":")[2],
                 x: results[i].description.split("$")[1].split(":")[3],
-                y: results[i].description.split("$")[1].split(":")[4],
+                y: results[i].description.split("$")[1].split(":")[4]
               };
               var itemID = results[i].description.split("$")[1].split(":")[1];
               results[i].group = regex[0];
@@ -1101,7 +1101,7 @@ require(["D2Bot"], function (D2BOTAPI) {
       start: new Date().getTime(),
       elapsed: new Date().getTime(),
       groups: 0,
-      total: 0,
+      total: 0
     };
 
     accountListid = 0;
@@ -1119,8 +1119,8 @@ require(["D2Bot"], function (D2BOTAPI) {
         if (!ended) {
           $footer =
             `
-		<div><p>End of Items on all Accounts</p>
-			<span class="m-b-15 d-block">` +
+    <div><p>End of Items on all Accounts</p>
+      <span class="m-b-15 d-block">` +
             itemCount +
             ` Items in total.<br>
                 ` +
@@ -1130,7 +1130,7 @@ require(["D2Bot"], function (D2BOTAPI) {
             ` seconds. ` +
             groupItemCount +
             ` items were grouped.<br>
-				Saved ` +
+        Saved ` +
             savedEntryCount +
             ` list entries with ` +
             groupEntryCount +
@@ -1138,8 +1138,8 @@ require(["D2Bot"], function (D2BOTAPI) {
                 After ` +
             (roundTime.total / 1000).toFixed(3) +
             ` seconds in total.
-			</span>
-		</div>`;
+      </span>
+    </div>`;
           $("#load-more").html($footer);
           ended = true;
           window.loadMoreItem = false;
@@ -1153,11 +1153,11 @@ require(["D2Bot"], function (D2BOTAPI) {
       doQuery(
         accList[accountListid++],
         chr,
-        itemCount > MAX_ITEM
-          ? limit
-            ? false
-            : window.loadMoreItem
-          : window.loadMoreItem
+        itemCount > MAX_ITEM ?
+          limit ?
+            false :
+            window.loadMoreItem :
+          window.loadMoreItem
       );
     };
 
@@ -1199,11 +1199,11 @@ require(["D2Bot"], function (D2BOTAPI) {
           doQuery(
             accList[accountListid++],
             chr,
-            itemCount > MAX_ITEM
-              ? limit
-                ? false
-                : window.loadMoreItem
-              : window.loadMoreItem
+            itemCount > MAX_ITEM ?
+              limit ?
+                false :
+                window.loadMoreItem :
+              window.loadMoreItem
           );
         }
 
@@ -1217,18 +1217,19 @@ require(["D2Bot"], function (D2BOTAPI) {
         groupList[groupListid++]
       );
     };
-    
-    if(Object.keys(AccountsMap).length === 0) {
-        console.warn("No accounts found. Appending dummy data..");
-        var items = Items;
-    
-        for (var key in items) {
-            console.log(items[key]);
-            $addItem(items[key]);
-        }
+
+    if (Object.keys(AccountsMap).length === 0) {
+      console.warn("No accounts found. Appending dummy data..");
+      var items = Items;
+
+      for (var key in items) {
+        console.log(items[key]);
+        $addItem(items[key]);
+      }
     } else {
-        queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);    
+      queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
     }
+    loader.hidden = true;
   }
 
   function pupulateAccountCharSelect(realm, core, type, ladder) {
@@ -1255,13 +1256,13 @@ require(["D2Bot"], function (D2BOTAPI) {
         var checks = {
           ladder: CurrentGameClass == "Ladder" ? true : false,
           lod: CurrentGameType == "Expansion" ? true : false,
-          sc: CurrentGameMode == "Softcore" ? true : false,
+          sc: CurrentGameMode == "Softcore" ? true : false
         };
 
         var charCheck = {
           ladder: charkey[2] == "l" ? true : false,
           lod: charkey[1] == "e" ? true : false,
-          sc: charkey[0] == "s" ? true : false,
+          sc: charkey[0] == "s" ? true : false
         };
 
         if (
@@ -1297,8 +1298,8 @@ require(["D2Bot"], function (D2BOTAPI) {
       $(".logged-in-out").fadeToggle("hide");
       $(".current-user-btn").html(
         "<i class='font-24 mdi mdi-account-circle current-user-btn'></i>" +
-          cookie.data.username +
-          "</a>"
+        cookie.data.username +
+        "</a>"
       );
     }
 
@@ -1434,19 +1435,19 @@ require(["D2Bot"], function (D2BOTAPI) {
       setInterval(function () {
         /*var pos;
 
-				var pageTopToDivBottom = $("#load-more").offset().top + $("#load-more")[0].scrollHeight;
-				var scrolledPlusViewable = $(window).scrollTop() + $(window).height();
+var pageTopToDivBottom = $("#load-more").offset().top + $("#load-more")[0].scrollHeight;
+var scrolledPlusViewable = $(window).scrollTop() + $(window).height();
 
-				if ($(window).scrollTop() > pageTopToDivBottom)
-					pos = "up";
-				else if (scrolledPlusViewable < $("#load-more").offset().top)
-					pos = "down";
-				else
-					pos = "see";
+if ($(window).scrollTop() > pageTopToDivBottom)
+  pos = "up";
+else if (scrolledPlusViewable < $("#load-more").offset().top)
+  pos = "down";
+else
+  pos = "see";
 
-				if (pos == "see") {
-					if (window.loadMoreItem) window.loadMoreItem();
-				}*/
+if (pos == "see") {
+  if (window.loadMoreItem) window.loadMoreItem();
+}*/
         var scrollHeight = $(document).height();
         var scrollPosition = $(window).height() + $(window).scrollTop();
         if (
@@ -1515,7 +1516,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
         API.emit("put", "secure", hash + ".txt", pass, apipass, function (
           err
-        ) {});
+        ) { });
 
         var GameInfo = {
           hash: hash,
@@ -1524,11 +1525,11 @@ require(["D2Bot"], function (D2BOTAPI) {
           data: JSON.stringify({
             realm: realm,
             account: acc,
-            chars: chars,
-          }),
+            chars: chars
+          })
         };
 
-        API.emit("gameaction", GameInfo, function (err) {});
+        API.emit("gameaction", GameInfo, function (err) { });
 
         document.getElementsByName("acc" + i)[0].value = "";
         document.getElementsByName("pass" + i)[0].value = "";
@@ -1578,11 +1579,11 @@ require(["D2Bot"], function (D2BOTAPI) {
             data: JSON.stringify({
               gameName: gamename,
               gamePass: gamepass,
-              items: drops[d],
-            }),
+              items: drops[d]
+            })
           };
 
-          API.emit("gameaction", GameInfo, function (err) {});
+          API.emit("gameaction", GameInfo, function (err) { });
         }
       }
     });
@@ -1590,19 +1591,19 @@ require(["D2Bot"], function (D2BOTAPI) {
     $(".logout-btn").off("click");
     $(".logout-btn").click(function () {
       $(".logged-in-out").fadeToggle("hide");
-      login("public", "public", cookie.data.server, function (loggedin) {});
+      login("public", "public", cookie.data.server, function (loggedin) { });
     });
   }
 
   /*$(window).on("scroll", function() {
-		var scrollHeight = $(document).height();
-		var scrollPosition = $(window).height() + $(window).scrollTop();
-		if ((scrollHeight - scrollPosition) / scrollHeight < 0.4 && itemCount > 100) {
-			if (window.loadMoreItem) {
-				window.loadMoreItem();
-			}
-		}
-	});*/
+    var scrollHeight = $(document).height();
+    var scrollPosition = $(window).height() + $(window).scrollTop();
+    if ((scrollHeight - scrollPosition) / scrollHeight < 0.4 && itemCount > 100) {
+      if (window.loadMoreItem) {
+        window.loadMoreItem();
+      }
+    }
+  });*/
 
   $(".add-acc-btn").click(function () {
     $("#add-accounts-modal").modal("show");
@@ -1615,14 +1616,14 @@ require(["D2Bot"], function (D2BOTAPI) {
   $("#add-row").click(function () {
     $("#addr" + add_row_index).html(
       "<td data-label='Realm' class='ld-modal-col0'><select class='ld-select-add' name='realm" +
-        add_row_index +
-        "'><option>USEast</option><option>USWest</option><option>Europe</option><option>Asia</option></select></td><td data-label='Account' class='ld-modal-col1'><input class='ld-input-add' type='text' name='acc" +
-        add_row_index +
-        "' placeholder='Account' /></td><td data-label='Password' class='ld-modal-col2'><input class='ld-input-add' type='text' name='pass" +
-        add_row_index +
-        "' placeholder='Password'/></td><td data-label='Character(s)' class='ld-modal-col3'><input class='ld-input-add' type='text' name='chars" +
-        add_row_index +
-        "' placeholder='a, b, c or empty'/></td>"
+      add_row_index +
+      "'><option>USEast</option><option>USWest</option><option>Europe</option><option>Asia</option></select></td><td data-label='Account' class='ld-modal-col1'><input class='ld-input-add' type='text' name='acc" +
+      add_row_index +
+      "' placeholder='Account' /></td><td data-label='Password' class='ld-modal-col2'><input class='ld-input-add' type='text' name='pass" +
+      add_row_index +
+      "' placeholder='Password'/></td><td data-label='Character(s)' class='ld-modal-col3'><input class='ld-input-add' type='text' name='chars" +
+      add_row_index +
+      "' placeholder='a, b, c or empty'/></td>"
     );
     $("#tab-logic").append('<tr id="addr' + (add_row_index + 1) + '"></tr>');
     add_row_index++;
@@ -1665,29 +1666,25 @@ require(["D2Bot"], function (D2BOTAPI) {
       $("#login-ok-btn").trigger("click");
     }
   });
-  
+
   $("#imgur-upload-btn").click(function () {
     $("#upload-imgur-modal").modal("show");
     var queuedItems = document.getElementById("dropQueueList").children;
-	var itemList = {};
+    var itemList = {};
     for (var i = 0; i < queuedItems.length; i++) {
-		var item = $(queuedItems[i]).data("itemData");
-		if(item.itemImage)
-			item.image = item.itemImage.image;
-		else
-			item.image = JSON.parse(item.image).code;
-		itemList[i] = item;
+      var item = $(queuedItems[i]).data("itemData");
+      if (item.itemImage) item.image = item.itemImage.image;
+      else item.image = JSON.parse(item.image).code;
+      itemList[i] = item;
     }
-	
-	var container = document.getElementById("itemScreenshot");
-	window.ItemScreenshot.drawCompilation(itemList).then((image) => {
-		container.innerHTML = `<img src="` + image.toDataURL() + `"/>`;
-	});
-	
-	
+
+    var container = document.getElementById("itemScreenshot");
+    window.ItemScreenshot.drawCompilation(itemList).then((image) => {
+      container.innerHTML = `<img src="` + image.toDataURL() + `"/>`;
+    });
   });
 
   initialize();
   showNotification("Notification", "Welcome to Lime Drop!", true);
-  API.emit("poll", function () {});
+  API.emit("poll", function () { });
 });
