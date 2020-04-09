@@ -1684,6 +1684,10 @@ if (pos == "see") {
     });
   });
 
+  $(".custom-footer").hover(function () {
+    $(this.children).show();
+  });
+
   initialize();
   showNotification("Notification", "Welcome to Lime Drop!", true);
   API.emit("poll", function () { });
