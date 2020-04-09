@@ -1217,11 +1217,8 @@ require(["D2Bot"], function (D2BOTAPI) {
         groupList[groupListid++]
       );
     };
-
-    queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
     
-    
-    if($("#account-select").length <= 1) {
+    if(Object.keys(AccountsMap).length === 0) {
         console.warn("No accounts found. Appending dummy data..");
         var items = Items;
     
@@ -1229,8 +1226,9 @@ require(["D2Bot"], function (D2BOTAPI) {
             console.log(items[key]);
             $addItem(items[key]);
         }
+    } else {
+        queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);    
     }
-    
   }
 
   function pupulateAccountCharSelect(realm, core, type, ladder) {
