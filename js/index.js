@@ -384,7 +384,7 @@ require(["D2Bot"], function (D2BOTAPI) {
       });
     }
 
-    $(".search-filter").toggle(0);
+    //$(".search-filter").toggle(0);
 
     //refreshList();
   }

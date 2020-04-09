@@ -412,7 +412,6 @@ h6.drop-queue-styled {
 .card.drop-queue {
   position: fixed;
   right: 20px;
-  overflow-y: scroll;
   left: calc((100% - 250px) * 0.667 + 260px);
   height: calc(80% - 104px);
   animation: fadeInRight 0.2s ease-in;
@@ -421,12 +420,15 @@ h6.drop-queue-styled {
 @media (max-width: 1120px) {
   .card.drop-queue {
     position: unset;
-    overflow-y: scroll;
     height: 300px;
   }
 }
 .card button {
   width: 100%;
+}
+
+.dropQueueList {
+    overflow-y: scroll;
 }
 
 .dropQueueList .comment-footer {

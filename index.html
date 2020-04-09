@@ -555,12 +555,17 @@
             </div>
             <!-- column -->
             <div class="col-lg-4">
-              <button class="ml-1 mb-1 btn btn-success" id="imgur-upload-btn">
-                Imgur Upload <i class="ml-1 far fa-images"></i>
-              </button>
               <div class="card">
                 <div class="card drop-queue">
-                  <h4 class="card-title ld-title-indent">Drop Queue</h4>
+                  <h4 class="card-title ld-title-indent">Queue</h4>
+                  <div style="display:inline-flex">
+                    <button class="btn btn-success" id="imgur-upload-btn">Upload To Imgur<i class="ml-1 far fa-images"></i>
+                    </button>
+                    <button class="btn btn-success" id="imgur-upload-btn">Save For Later<i class="ml-1 far fa-arrow-alt-circle-up"></i>
+                    </button>
+                    <button class="btn btn-success" id="imgur-upload-btn">Restore From Cookie<i class="ml-1 far fa-arrow-alt-circle-down"></i>
+                    </button>
+                  </div>
                   <div class="dropQueueList p-2" id="dropQueueList"></div>
                   <!-- Comment Row -->
                   <!--<div class="d-flex flex-row comment-row m-t-0">-->
