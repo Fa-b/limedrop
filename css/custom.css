@@ -481,32 +481,24 @@ h6.drop-queue-styled {
   background-color: #292929;
 }
 
-.custom-footer {
+.custom-footer,
+.custom-footer a {
   position: fixed;
-  display: inline-flex;
   height: 30px;
   bottom: 10px;
-  right: 2%;
+  right: 1%;
   color: #0b8300;
   cursor: pointer;
 }
-.custom-footer h6 {
+.custom-footer #show {
   visibility: hidden;
-  padding-left: 5px;
 }
-.custom-footer:hover {
-  color: #17d406;
-}
-.custom-footer a {
-  color: #17d406;
-}
-.custom-footer:hover a {
-  color: #17d406;
-}
-.custom-footer:hover h6 {
-  margin: 0px !important;
+.custom-footer:hover a,
+.custom-footer:hover #show {
+  margin-bottom: 0px !important;
+  visibility: visible;
   display: inline-flex;
   align-self: center;
-  visibility: visible;
+  padding-left: 5px;
   color: #17d406;
 }
