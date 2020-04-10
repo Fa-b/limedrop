@@ -520,13 +520,6 @@ h6.drop-queue-styled {
   border-radius: 15px;
 }
 
-.rev-list-item p {
-  font-size: small;
-  grid-row: 2;
-  grid-column: 2 / 4;
-  color: #f0f0f0;
-}
-
 .rev-list-item h6 {
   font-size: medium;
   grid-row: 1;
@@ -534,17 +527,23 @@ h6.drop-queue-styled {
   color: #1aff00;
 }
 
+.rev-list-item p {
+  font-size: small;
+  grid-row: 2;
+  grid-column: 2 / 4;
+  color: #f0f0f0;
+}
+
+.rev-list-item img {
+  grid-row: 2;
+  grid-column: 1;
+}
+
 .rev-list-item-num {
   font-size: x-large;
   grid-row: 1;
   grid-column: 1;
   color: aqua;
-}
-
-.rev-list-item img {
-  color: #d08420;
-  grid-row: 2;
-  grid-column: 1;
 }
 
 .rev-list-item-price {
