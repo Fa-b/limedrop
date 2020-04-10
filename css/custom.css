@@ -490,9 +490,11 @@ h6.drop-queue-styled {
   color: #0b8300;
   cursor: pointer;
 }
+
 .custom-footer #show {
   visibility: hidden;
 }
+
 .custom-footer:hover a,
 .custom-footer:hover #show {
   margin-bottom: 0px !important;
@@ -504,23 +506,50 @@ h6.drop-queue-styled {
 }
 
 .rev-list-item {
-  display: grid;
+  float: left;
+  margin: 3px;
+  text-align: center;
+  display: inline-grid;
+  justify-items: center;
+  padding: 20px;
+  width: auto;
+  grid-template-columns: auto auto auto auto;
   grid-row: auto;
-  grid-column: auto;
+  grid-column: 4;
   background-color: #141619 !important;
   border-radius: 15px;
 }
 
-.rev-list-item span {
-  grid-row: 2 / 2;
-  grid-column: 2 / 3;
-  justify-items: center;
-  color: #11c501;
+.rev-list-item p {
+  font-size: small;
+  grid-row: 2;
+  grid-column: 2 / 4;
+  color: #f0f0f0;
 }
 
 .rev-list-item h6 {
-  grid-row: 1 / 2;
-  grid-column: 2 / 3;
-  justify-items: center;
+  font-size: medium;
+  grid-row: 1;
+  grid-column: 2 / 4;
   color: #1aff00;
+}
+
+.rev-list-item-num {
+  font-size: x-large;
+  grid-row: 1;
+  grid-column: 1;
+  color: aqua;
+}
+
+.rev-list-item img {
+  color: #d08420;
+  grid-row: 2;
+  grid-column: 1;
+}
+
+.rev-list-item-price {
+  color: #d08420;
+  font-size: x-large;
+  grid-row: 1;
+  grid-column: 4;
 }
