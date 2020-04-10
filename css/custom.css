@@ -502,3 +502,25 @@ h6.drop-queue-styled {
   padding-left: 5px;
   color: #17d406;
 }
+
+.rev-list-item {
+  display: grid;
+  grid-row: auto;
+  grid-column: auto;
+  background-color: #141619 !important;
+  border-radius: 15px;
+}
+
+.rev-list-item span {
+  grid-row: 2 / 2;
+  grid-column: 2 / 3;
+  justify-items: center;
+  color: #11c501;
+}
+
+.rev-list-item h6 {
+  grid-row: 1 / 2;
+  grid-column: 2 / 3;
+  justify-items: center;
+  color: #1aff00;
+}
