@@ -258,7 +258,7 @@ function ItemImage(itemData) {
             //var iStart = Date.now();
             var image = new Image();
 			image.crossOrigin = "anonymous";
-            image.src = "https://blizzhackers.github.io/ItemScreenshot/assets/gfx/" + this.image + "/" + (this.itemColor === -1?21:this.itemColor) + ".png";
+            image.src = (this.image.length < 15)?"https://blizzhackers.github.io/ItemScreenshot/assets/gfx/" + this.image + "/" + (this.itemColor === -1?21:this.itemColor) + ".png":"data:image/png;base64," + this.image;
             
             image.onload = () => {
                 this.width = image.width;

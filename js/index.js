@@ -604,7 +604,7 @@ require(["D2Bot"], function (D2BOTAPI) {
           //$item.addClass("hidden");
         } else if (entry.intersectionRatio >= 0.1) {
           $item.removeClass("hidden");
-          if (!result.itemImage) {
+          if (!result.itemImage || result.groupId) {
             try {
               var tmp = JSON.parse(result.image);
             } catch (e) {
@@ -630,7 +630,7 @@ require(["D2Bot"], function (D2BOTAPI) {
               };
             } else {
               var imageTemplate =
-                `<img src="data:image/jpeg;base64,` +
+                `<img src="` + ((result.image.indexOf("data") != -1)?"":"data:image/jpeg;base64,") + 
                 result.image +
                 `" alt="user" class="ld-item">`;
               var imgDiv = document.getElementById("png-" + itemUID);
@@ -866,7 +866,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                 };
               } else {
                 var imageTemplate =
-                  `<img src="data:image/jpeg;base64,` +
+                  `<img src="` + ((result.image.indexOf("data") != -1)?"":"data:image/jpeg;base64,") + 
                   result.image +
                   `" alt="user" class="ld-item">`;
                 var imgDiv = document.getElementById("png-" + groupId);
@@ -1056,7 +1056,7 @@ require(["D2Bot"], function (D2BOTAPI) {
           }
 
           $(window).scrollTop(y);
-          loader.hidden = true;
+          //loader.hidden = true;
 
           roundTime.elapsed = new Date().getTime();
           if (loadMoreItem) {
@@ -1673,8 +1673,12 @@ if (pos == "see") {
     var itemList = {};
     for (var i = 0; i < queuedItems.length; i++) {
       var item = $(queuedItems[i]).data("itemData");
-      if (item.itemImage) item.image = item.itemImage.image;
-      else item.image = JSON.parse(item.image).code;
+      if (!item.itemImage) 
+		try {
+		  item.itemImage = JSON.parse(item.image);
+		} catch (e) {
+		  console.warn("Old D2Bot# version active.. please update");
+		}
       itemList[i] = item;
     }
 

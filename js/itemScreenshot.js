@@ -307,9 +307,8 @@ window.ItemScreenshot = {
         
         screenshots = [];
         for (var idx in items) {
-			//var img = items[idx].itemImage;
-			//if(!img)
-				var img = new ItemImage(items[idx]);
+			var img = items[idx].itemImage;
+			img = new ItemImage(img?items[idx].itemImage:items[idx]);
 			screenshots.push(ItemScreenshot.drawScreenshot(img));
         }
         
