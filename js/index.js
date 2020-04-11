@@ -741,8 +741,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 					$("#item-menu-select-"+groupId).on("change mousedown mousemove", function() {
 						updateSelectCount($(this));
 					});
-					$("#item-menu-select-"+groupId).on('keypress', function(e){
-						var key = e.which;
+					$("#item-menu-select-" + groupId).on("keydown", function (e) {
+						var key = window.event?window.event.keyCode:e.which;
 						if(key == 13)// the enter key code
 						{
 							list = $(this).val();
