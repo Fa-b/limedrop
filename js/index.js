@@ -656,6 +656,8 @@ require(["D2Bot"], function (D2BOTAPI) {
         $("#dropQueueList").append($(this));
         var itemDiv = document.getElementById(itemUID);
         observer.observe(itemDiv);
+		
+		$("#dropQueueList").animate({scrollTop:$("#dropQueueList")[0].scrollHeight}, 10);
       } else {
         // Unselecting an item in the queue should place it back to inventory
         // First check if currently selected account location is same or ALL, then check if selected character location is the same or ALL
@@ -683,8 +685,6 @@ require(["D2Bot"], function (D2BOTAPI) {
           $(this).remove();
         }
       }
-	  
-	  $("#dropQueueList").animate({scrollTop:$("#dropQueueList")[0].scrollHeight}, 10);
     });
 
     if (!result.groupId) {
@@ -811,7 +811,7 @@ require(["D2Bot"], function (D2BOTAPI) {
         `</span>
           <div class="comment-footer">
             <div class="flex">
-              <span class="text-muted">` +
+              <!--<span class="text-muted">` +
         result.realm +
         "/" +
         result.account +
@@ -820,7 +820,7 @@ require(["D2Bot"], function (D2BOTAPI) {
         "/{" +
         result.itemid +
         "}" +
-        `</span>
+        `</span>-->
               <!--<button type="button" class="btn btn-cyan btn-sm">Helm</button>
               <button type="button" class="btn btn-success btn-sm">Armor</button>-->
             </div>
