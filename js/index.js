@@ -652,7 +652,6 @@ require(["D2Bot"], function (D2BOTAPI) {
     $item.data("itemData", result);
     $item.click(function () {
       $(this).toggleClass("selected");
-
       if ($(this).hasClass("selected")) {
         $("#dropQueueList").append($(this));
         var itemDiv = document.getElementById(itemUID);
@@ -684,6 +683,8 @@ require(["D2Bot"], function (D2BOTAPI) {
           $(this).remove();
         }
       }
+	  
+	  $("#dropQueueList").animate({scrollTop:$("#dropQueueList")[0].scrollHeight}, 10);
     });
 
     if (!result.groupId) {
