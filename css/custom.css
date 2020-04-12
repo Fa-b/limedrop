@@ -307,13 +307,17 @@ td {
 /* Changes to style from here */
 
 .styled-item-menu {
-  display: none;
-  width: min-content;
-  padding-left: 10px;
-  padding-right: 20px;
+  display: grid;
+  grid-template-columns: auto;
+  grid-row: 2;
+  grid-column: 2;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .styled-item-menu input {
+  grid-row: 1;
+  grid-column: 1;
   padding: 5px;
   font-size: 15px;
   border: none;
@@ -321,13 +325,28 @@ td {
   background-color: transparent;
   align-items: center;
   margin: auto;
+  width: auto;
 }
-
+.styled-item-menu input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+.styled-item-menu i {
+  grid-row: 1;
+  grid-column: 1/2;
+  padding: 5px;
+  border: none;
+  color: #15b403;
+  background-color: transparent;
+  align-items: center;
+  margin: auto;
+}
 .styled-item-menu select {
+  grid-row: 2;
+  grid-column: 1/2;
   border: none;
   align-content: center;
   color: white;
-  width: 100%;
   padding: 5px;
   background-color: #505050;
   border-radius: 5px;
@@ -338,7 +357,6 @@ td {
   border: none;
   align-content: center;
   color: rgb(199, 0, 0);
-  width: 100%;
   padding: 5px;
   background-color: #505050;
   border-radius: 5px;
@@ -509,46 +527,19 @@ h6.drop-queue-styled {
   float: left;
   margin: 3px;
   text-align: center;
-  display: inline-grid;
+  display: grid;
   justify-items: center;
   padding: 20px;
   width: auto;
   grid-template-columns: auto auto auto auto;
   grid-row: auto;
-  grid-column: 4;
+  grid-column: auto;
   background-color: #141619 !important;
   border-radius: 15px;
 }
 
-.rev-list-item h6 {
-  font-size: medium;
-  grid-row: 1;
-  grid-column: 2 / 4;
-  color: #1aff00;
-}
-
-.rev-list-item p {
-  font-size: small;
-  grid-row: 2;
-  grid-column: 2 / 4;
-  color: #f0f0f0;
-}
-
-.rev-list-item img {
-  grid-row: 2;
-  grid-column: 1;
-}
-
-.rev-list-item-num {
-  font-size: x-large;
-  grid-row: 1;
-  grid-column: 1;
-  color: aqua;
-}
-
-.rev-list-item-price {
-  color: #d08420;
-  font-size: x-large;
-  grid-row: 1;
-  grid-column: 4;
+.rev-list-item div {
+  grid-row: auto;
+  grid-column: auto;
+  border-radius: 15px;
 }
