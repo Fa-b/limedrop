@@ -1685,8 +1685,53 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
 
 		var container = document.getElementById("itemScreenshot");
-		window.ItemScreenshot.drawCompilation(itemList).then((image) => {
-			container.innerHTML = `<img src="` + image.toDataURL() + `"/>`;
+		window.ItemScreenshot.drawCompilation(itemList).then((template) => {
+			container.innerHTML = template;
+			let width = container.firstChild.style.width.split("px")[0];
+			$("#imgurContainer").css("max-width", width + "px");
+			/*setTimeout(function(){
+				html2canvas(container.firstChild).then(canvas => {
+					container.appendChild(canvas)
+				});
+			}, 500);*/
+		});
+	});
+	
+	$(".start-upload-btn").click(function () {
+		// Begin file upload
+		console.log("Uploading file to Imgur..");
+
+		var settings = {
+			async: true,
+			crossDomain: true,
+			processData: false,
+			contentType: false,
+			type: 'POST',
+			url: "https://api.imgur.com/3/image",
+			headers: {
+				Authorization: 'Client-ID 24d18153402171f',
+				Accept: 'application/json'
+			},
+			mimeType: 'multipart/form-data',
+		    error: function(jqXHR, textStatus, errorMessage) {
+				console.err(jqXHR,textStatus,errorMessage); // Optional
+		    }
+		};
+		
+		var container = document.getElementById("itemScreenshot");
+		
+		html2canvas(container.firstChild).then(canvas => {
+			var formData = new FormData();
+			formData.append("image", canvas.toDataURL().split("data:image/png;base64,")[1]);
+			settings.data = formData;
+			// Response contains stringified JSON
+			// Image URL available at response.data.link
+			$.ajax(settings).done(function(response) {
+				$('#upload-imgur-modal').modal('hide');
+				var imgurResponse = JSON.parse(response);
+				console.log(imgurResponse);
+				showNotification("Uploaded Image to Imgur", `<a target='_blank' rel='noopener noreferrer' href='` + imgurResponse.data.link + `' style='color:#2962ff'>` + imgurResponse.data.link + `</a>`, false);
+			});
 		});
 	});
 

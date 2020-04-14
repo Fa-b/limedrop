@@ -479,6 +479,13 @@ h6.drop-queue-styled {
   background-color: #292929;
 }
 
+.start-upload-btn {
+  align-self: right;
+  position: relative;
+  cursor: pointer;
+  left: -20px;
+}
+
 .custom-footer,
 .custom-footer a {
   position: fixed;
