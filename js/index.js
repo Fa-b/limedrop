@@ -795,12 +795,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 			<div class="styled-item-menu" id="item-menu-` +
 				groupId +
 				`">
-			  <input type="number" placeholder="0"  id="item-menu-input-` +
-				groupId +
-				`"/><i class="fas fa-share-square fa-2x" id="group-list-btn"></i>
-			  <select multiple="multiple" size='10'  id="item-menu-select-` +
-				groupId +
-				`"></select>
+				<div>
+					<div>
+					  <input type="number" placeholder="0"  id="item-menu-input-` + groupId + `"/>
+					  <i class="fas fa-share-square fa-2x" id="group-list-btn"></i>
+					</div>
+					<select multiple="multiple" size='10'  id="item-menu-select-` + groupId + `"></select>
+				</div>
 			</div>
 		<div class="p-2 comment-text">
 		  <h6 class="-medium">` +
