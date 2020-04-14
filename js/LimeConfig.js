@@ -1,25 +1,139 @@
 LimeConfig = {
     "ItemGroup": {
-		"Runes": ["(?=.+?:6([1-3][0-9]|4[0-2]):[37]:\\d:\\d$)"],
-		"Gems": ["(?=.+?:(5([6-7][0-9]|5[7-9]|8[0-6]|9[7-9])|60[0-1]):[37]:\\d:\\d$)"],
-		"Keys": ["(?=.+?:64[7-9]:[37]:\\d:\\d$)"],
-		"Organs": ["(?=.+?:65[0-2]:[37]:\\d:\\d$)"],
-		"Token": ["(?=.+?:653:[37]:\\d:\\d$)"],
-		"Essences": ["(?=.+?:65[4-7]:[37]:\\d:\\d$)"],
-		"Standards": ["(?=.+?:658:[37]:\\d:\\d$)"],
-		"Sojs": ["(?=ÿc4the stone of jordan.+?:522:[37]:\\d:\\d$)"],
-		"BulKathos": ["(?=ÿc4bul-kathos'.+?5\\%.+?:522:[37]:\\d:\\d$)"],
-		"Maras": ["(?=ÿc4Mara.+?30\\$.+?:520:[37]:\\d:\\d$)"],
-		"ColdRbfUp": ["(?=ÿc4rainbow.+?level-up.+?5\\% to cold.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)"],
-		"ColdRbfDie": ["(?=ÿc4rainbow.+?die.+?5\\% to cold.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)"],
-		"FireRbfUp": ["(?=ÿc4rainbow.+?level-up.+?5\\% to enemy fire.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)"],
-		"FireRbfDie": ["(?=ÿc4rainbow.+?die.+?5\\% to enemy fire.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)"],
-		"LightRbfUp": ["(?=ÿc4rainbow.+?level-up.+?5\\% to enemy light.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)"],
-		"LightRbfDie": ["(?=ÿc4rainbow.+?die.+?5\\% to enemy light.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)"],
-		"PoisonRbfUp": ["(?=ÿc4rainbow.+?level-up.+?5\\% to poison.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)"],
-		"PoisonRbfDie": ["(?=ÿc4rainbow.+?die.+?5\\% to poison.+?5\\%.+?\\$.+?:643:[37]:\\d:\\d$)"],
-		"NonEthUnid": ["(?=.+?unidentified.+?[37]:\\d:\\d$)"],
-		"EthUnid": ["(?=.+?unidentified.+?[37]:\\d:\\d:eth$)"]
+		"Runes": {
+			"regex": "(?=.+?:6([1-3][0-9]|4[0-2]):[37]:\\d:\\d$)",
+		},
+		"Gems": {
+			"regex": "(?=.+?:(5([6-7][0-9]|5[7-9]|8[0-6]|9[7-9])|60[0-1]):[37]:\\d:\\d$)",
+		},
+		"Keys": {
+			"regex": "(?=.+?:64[7-9]:[37]:\\d:\\d$)",
+		},
+		"Organs": {
+			"regex": "(?=.+?:65[0-2]:[37]:\\d:\\d$)",
+		},
+		"Token": {
+			"regex": "(?=.+?:653:[37]:\\d:\\d$)",
+		},
+		"Essences": {
+			"regex": "(?=.+?:65[4-7]:[37]:\\d:\\d$)",
+		},
+		"Standards": {
+			"regex": "(?=.+?:658:[37]:\\d:\\d$)",
+		},
+		"Annis" : {
+			"regex": "(?=ÿc4anni.+?:603:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d\\d) to.+resistances \\+(\\d\\d).+\\+(\\d+)\\%.+$", "$1/$2/$3"]
+			]
+		},
+		"SorcTorches" : {
+			"regex": "(?=ÿc4hellfire.+?sorc.+?:604:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d\\d) to.+resistances \\+(\\d\\d).+$", "$1/$2"]
+			]
+		},
+		"PalaTorches" : {
+			"regex": "(?=ÿc4hellfire.+?pala.+?:604:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d\\d) to.+resistances \\+(\\d\\d).+$", "$1/$2"]
+			]
+		},
+		"NecTorches" : {
+			"regex": "(?=ÿc4hellfire.+?nec.+?:604:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d\\d) to.+resistances \\+(\\d\\d).+$", "$1/$2"]
+			]
+		},
+		"AmaTorches" : {
+			"regex": "(?=ÿc4hellfire.+?ama.+?:604:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d\\d) to.+resistances \\+(\\d\\d).+$", "$1/$2"]
+			]
+		},
+		"BarbTorches" : {
+			"regex": "(?=ÿc4hellfire.+?barb.+?:604:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d\\d) to.+resistances \\+(\\d\\d).+$", "$1/$2"]
+			]
+		},
+		"AssaTorches" : {
+			"regex": "(?=ÿc4hellfire.+?assa.+?:604:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d\\d) to.+resistances \\+(\\d\\d).+$", "$1/$2"]
+			]
+		},
+		"DruidTorches" : {
+			"regex": "(?=ÿc4hellfire.+?druid.+?:604:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d\\d) to.+resistances \\+(\\d\\d).+$", "$1/$2"]
+			]
+		},
+		"Sojs": {
+			"regex": "(?=ÿc4the stone of jordan.+?:522:[37]:\\d:\\d$)",
+		},
+		"BulKathos": {
+			"regex": "(?=ÿc4bul-kathos'.+?:522:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+(\\d)\\% life.+$", "$1ll"]
+			]
+		},
+		"Manald": {
+			"regex": "(?=ÿc4manald.+?:522:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+(\\d)\\% mana.+life \\+(\\d).+$", "$1ml, $2rpl"]
+			]
+		},
+		"Nagel": {
+			"regex": "(?=ÿc4nagel.+?:522:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+(\\d\\d) to attack.+(\\d\\d)%.+$", "$1ar, $2mf"]
+			]
+		},
+		"Raven": {
+			"regex": "(?=ÿc4raven.+?:522:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+(\\d\\d\\d) to attack.+(\\d\\d) to dex.+$", "$1ar, $2dex"]
+			]
+		},
+		"Dwarf": {
+			"regex": "(?=ÿc4dwarf.+?:522:[37]:\\d:\\d$)"
+		},
+		"Maras": {
+			"regex": "(?=ÿc4mara.+?:520:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d\\d)\\$.+$", "$1@"]
+			]
+		},
+		"Highlord": {
+			"regex": "(?=ÿc4highlord.+?:520:[37]:\\d:\\d$)"
+		},
+		"CatsEye": {
+			"regex": "(?=ÿc4the cat.+?:520:[37]:\\d:\\d$)"
+		},
+		"Rbf": {
+			"regex": "(?=ÿc4rainbow.+?:643:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+(.\\d)\\%.+(.\\d)\\%.+\\$.+$", "$1/$2"],
+				["^.+((fire)|(cold)|(light)|(poison)).+$", "$1"],
+				["^.+((level)|(die)).+$", "$1"]
+			]
+		},
+		"ArchonPlate": {
+			"regex": "(?=.+?archon plate.+?:443:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d\\d)\\% enhanced.+$", "$1ed"],
+				["^.+durability (\\d\\d)\\%.+$", "$1dur"],
+				["^.+socketed \\((\\d).+$", "$1soc"],
+				["^.+:eth$", "Eth"],
+			]
+		},
+		"NonEthUnid": {
+			"regex": "(?=.+?unidentified.+?[37]:\\d:\\d$)",
+		},
+		"EthUnid": {
+			"regex": "(?=.+?unidentified.+?[37]:\\d:\\d:eth$)",
+		}
 	},
     "SearchFilter": {
         "Sockets": {
