@@ -845,7 +845,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 							try {
 								var tmp = JSON.parse(result.image);
 							} catch (e) {
-								console.warn("Old D2Bot# version active.. please update");
+								//console.warn("Old D2Bot# version active.. please update");
 							}
 							if (tmp) {
 								result.itemImage = new ItemImage({
@@ -1025,7 +1025,7 @@ require(["D2Bot"], function (D2BOTAPI) {
             var regex = "^"+itemGroup.value.regex.toLocaleLowerCase()+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$";
             
             if(!dummyData) {
-                API.emit("query", regex, CurrentRealm, $account, $character, callback);
+                API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
             } else {
                 console.warn("No accounts found. Appending dummy group items..");
                 setTimeout(() => {
@@ -1080,7 +1080,7 @@ require(["D2Bot"], function (D2BOTAPI) {
             var regex = "^"+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$";
             
             if(!dummyData) {
-                API.emit("query", regex, CurrentRealm, $account, $character, callback);
+                API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
             } else {
                 console.warn("No accounts found. Appending dummy items..");
                 setTimeout(() => {
@@ -1680,7 +1680,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				try {
 					item.itemImage = JSON.parse(item.image);
 				} catch (e) {
-					console.warn("Old D2Bot# version active.. please update");
+					//console.warn("Old D2Bot# version active.. please update");
 				}
 			itemList[i] = item;
 		}

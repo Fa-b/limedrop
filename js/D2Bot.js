@@ -13,7 +13,8 @@ define(["events"],function (events) {
         
         var d2botConfig = {
             host: "http://localhost:8080",
-            username: "public"
+            username: "public",
+			fastQuery: true
         };
         
         var makePostRequest;
@@ -156,6 +157,29 @@ define(["events"],function (events) {
                 }
                 else {
                     console.log("status: " + msg);//done(null,msg);
+                }
+            }, function (textStatus) {
+                done(textStatus);
+            });
+        });
+		
+		D2BotAPI.on("fastQuery",function(item, realm, account, charname, done){
+            var args = [];
+            if (item) args.push(item);
+            else args.push("");
+            if (realm) args.push(realm);
+            else args.push("");
+            if (account) args.push(account); //else args.push("");
+            if (charname) args.push(charname); //else args.push("");
+            $get({ func: d2botConfig.fastQuery?"fastQuery":"query", args: args }, function (msg) {
+                if (msg.status == "success") {
+                    done(null, JSON.parse(msg.body));
+                }
+                else {
+                    console.log("status: " + JSON.stringify(msg));//done(null,msg);
+					console.warn("Old D2Bot# version active or no API server running..","Using deprecated API.");
+					d2botConfig.fastQuery = false;
+					D2BotAPI.emit("query", item, realm, account, charname, done);
                 }
             }, function (textStatus) {
                 done(textStatus);
