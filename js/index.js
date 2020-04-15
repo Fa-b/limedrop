@@ -704,11 +704,9 @@ require(["D2Bot"], function (D2BOTAPI) {
 	function updateItemCount(groupId) {
 		var count = $("#item-menu-select-" + groupId + " option").length;
 		var countTemplate =
-			`<h6 class="styled-counter" if="item-menu-count-` +
-			groupId +
-			`">` +
-			count +
-			`</h6>`;
+`<span class="badge badge-secondary animated wobble mt-2" style="webkit-animation-duration: 0.3s; animation-duration: 0.3s;">
+    <h6 class="styled-counter" if="item-menu-count-` + groupId + `">` + count + `</h6>
+</span>`;
 		$("#item-menu-count-" + groupId).html(countTemplate);
 	}
 
@@ -787,19 +785,19 @@ require(["D2Bot"], function (D2BOTAPI) {
 		<div class="pt-3 pl-3 pb-2 pr-0" id="png-` +
 				groupId +
 				`">image</div>
-		  <span class="badge badge-secondary mt-2"><div id="item-menu-count-` +
+                <div id="item-menu-count-` +
 				groupId +
 				`">` +
 				/*(count?" ["+*/
 				count /*+"]":"")*/ +
-				`</div></span>
+				`</div>
 			<div class="styled-item-menu" id="item-menu-` +
 				groupId +
 				`">
 				<div>
 					<div>
-					  <input type="number" placeholder="0"  id="item-menu-input-` + groupId + `"/>
-					  <i class="fas fa-share-square fa-2x" id="group-list-btn"></i>
+					  <input type="text" disabled placeholder="0"  id="item-menu-input-` + groupId + `"/>
+					  <i class="fas fa-share-square fa-2x" id="group-list-btn-` + groupId + `"></i>
 					</div>
 					<select multiple="multiple" size='10'  id="item-menu-select-` + groupId + `"></select>
 				</div>
@@ -899,38 +897,42 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 				$("#item-menu-input-" + groupId).val(i);
 			}
-
+            
 			$(document).on("click", function (event) {
+                let selectBox = $("#item-menu-select-"+groupId);
+                let groupMenu = $("#item-menu-" + groupId);
+                
 				if ($(event.target).closest($itemGroup).length) {
 					// Show dropdown item selection
-					$("#item-menu-" + groupId).show();
+					groupMenu.show();
 					// Using mousedown & move might be good for checking the change events in the input box :)
-					$("#item-menu-select-"+groupId).on("change mousedown mousemove", function() {
+					selectBox.on("change mousedown mousemove", function() {
 						updateSelectCount($(this));
 					});
-					$("#item-menu-select-" + groupId).on("keydown", function (e) {
+                    
+                    var selectList = () => {
+                        list = selectBox.val();
+                        for (var item in list) {
+                            selectBox.find("option[value='" + list[item] + "']").each(function () {
+                                var item = $addItem($(this).data("itemData"));
+                                item.trigger("click");
+                                $(this).remove();
+                                updateItemCount(groupId);
+                            });
+                        }
+					};
+                    
+					selectBox.on("keydown", function (e) {
 						var key = window.event?window.event.keyCode:e.which;
 						if(key == 13)// the enter key code
-						{
-							list = $(this).val();
-							for (var item in list) {
-								$(this)
-									.find("option[value='" + list[item] + "']")
-									.each(function () {
-										var item = $addItem($(this).data("itemData"));
-										item.trigger("click");
-										$(this).remove();
-										updateItemCount(groupId);
-									});
-							}
-						}
-					});
-				} else if (
-					!$(event.target).closest("#item-menu-select-" + groupId).length
-				) {
+                            selectList();
+                    });
+                    
+                    $("#group-list-btn-" + groupId).on("click", selectList);
+				} else if (!$(event.target).closest("#item-menu-select-" + groupId).length) {
 					// Close the dropdown item selection if the user clicks outside of it
-					$("#item-menu-select-" + groupId).off();
-					$("#item-menu-" + groupId).hide();
+					selectBox.off();
+					groupMenu.hide();
 				}
 			});
 
