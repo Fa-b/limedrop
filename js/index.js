@@ -1221,9 +1221,11 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 		if (Object.keys(AccountsMap).length === 0) {
 			console.warn("No accounts found. Appending dummy data..");
-			var items = Items;
-
-			for (var key in items) {
+			var items = JSON.parse(JSON.stringify(Items));
+            var idx = 0;
+			for (var key in Items) {
+                //items[key].description = items[key].description.replace(/\x92\x92/gmi, '\x92');
+                items[key].description = items[key].description.replace(/\$(\d+):/gmi, "$" + (idx++).toString().padStart(8, '0') + ":");
 				console.log(items[key]);
 				$addItem(items[key]);
 			}
