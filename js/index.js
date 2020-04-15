@@ -439,9 +439,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 	  </div>
 	</div>
 	</a>`;
+    
+        $("#ldNotify").append($(template));
 
-		$("#ldNotify").append($(template));
-		$("#ldNotifyDrop").click();
+        var expanded = $("#ldNotifyDrop").attr("aria-expanded");
+        $("#ldNotifyDrop").click();
+        if(expanded === "true")
+            $("#ldNotifyDrop").click();
 
 		$(".ld-notify-card").off("click");
 		$(".ld-notify-card").click(function (event) {
@@ -958,11 +962,21 @@ require(["D2Bot"], function (D2BOTAPI) {
 		return retRegex;
 	}
 
-	function addItemstoList(limit=true, itemGroups=[]) {
+	function addItemstoList(limit=true, itemGroups=[], dummyData=(Object.keys(AccountsMap).length===0)) {
 		var loader = document.getElementById("loader");
+        loader.hidden = false;
+        
+        if(dummyData) {
+            showNotification("Dummy Output", "No accounts found, dummy data will be used!", true);
+            var items = JSON.parse(JSON.stringify(Items));
+            var idx = 0;
+            for (var key in Items) {
+                items[key].description = items[key].description.replace(/\$(\d+):/gmi, "$" + (idx++).toString().padStart(8, '0') + ":");
+            }
+        }
 		
 		function queryCountables($account, $character, loadMoreItem, itemGroup={key: "all", value: { regex: "" } }) {
-			API.emit("query", "^"+itemGroup.value.regex.toLocaleLowerCase()+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$", CurrentRealm, $account, $character, function (err, results) {
+            var callback = function (err, results) {
 				if (err) { console.log(err); return false; };
 				var y = $(window).scrollTop();
 				
@@ -1003,49 +1017,80 @@ require(["D2Bot"], function (D2BOTAPI) {
 				if (loadMoreItem) {
 					loadMoreItem();
 				}
-			});
+			}
+            
+            var regex = "^"+itemGroup.value.regex.toLocaleLowerCase()+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$";
+            
+            if(!dummyData) {
+                API.emit("query", regex, CurrentRealm, $account, $character, callback);
+            } else {
+                console.warn("No accounts found. Appending dummy group items..");
+                setTimeout(() => {
+                    var re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
+                    var list = [];
+                    for (var key in items) {
+                        if(re.exec(items[key].description)) {
+                            list.push(items[key]);
+                        }
+                    }
+                    
+                    callback(null, list);
+                }, 0);
+            }
 		}
 
 		function doQuery($account, $character, loadMoreItem) {
-			API.emit(
-				"query",
-				"^" + buildregex($("#search-bar").val().toLocaleLowerCase()) + ".*$",
-				CurrentRealm,
-				$account,
-				$character,
-				function (err, results) {
-					if (err) {
-						console.log(err);
-						return;
-					}
-					var y = $(window).scrollTop();
+            var callback = function (err, results) {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                var y = $(window).scrollTop();
 
-					var item;
-					var ladder = CurrentGameClass == "Ladder";
-					var sc = CurrentGameMode == "Softcore";
-					var lod = CurrentGameType == "Expansion";
+                var item;
+                var ladder = CurrentGameClass == "Ladder";
+                var sc = CurrentGameMode == "Softcore";
+                var lod = CurrentGameType == "Expansion";
 
-					for (var i in results) {
-						if (results[i].description) {
-							//if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
-							var itemID = results[i].description.split("$")[1].split(":")[1];
-							// Only the first countable item will be used
-							item = $addItem(results[i]);
+                for (var i in results) {
+                    if (results[i].description) {
+                        //if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
+                        var itemID = results[i].description.split("$")[1].split(":")[1];
+                        // Only the first countable item will be used
+                        item = $addItem(results[i]);
 
-							itemCount += 1;
-							//}
-						}
-					}
+                        itemCount += 1;
+                        //}
+                    }
+                }
 
-					$(window).scrollTop(y);
-					//loader.hidden = true;
+                $(window).scrollTop(y);
+                //loader.hidden = true;
 
-					roundTime.elapsed = new Date().getTime();
-					if (loadMoreItem) {
-						loadMoreItem();
-					}
-				}
-			);
+                roundTime.elapsed = new Date().getTime();
+                if (loadMoreItem) {
+                    loadMoreItem();
+                }
+            }
+            
+            var regex = "^"+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$";
+            
+            if(!dummyData) {
+                API.emit("query", regex, CurrentRealm, $account, $character, callback);
+            } else {
+                console.warn("No accounts found. Appending dummy items..");
+                setTimeout(() => {
+                    var re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
+                    var list = [];
+                    for (var key in items) {
+                        if(re.exec(items[key].description)) {
+                            list.push(items[key]);
+                        }
+                    }
+
+                    return callback(null, list);
+                }, 0);
+            }
 		}
 
 		var ended;
@@ -1068,6 +1113,9 @@ require(["D2Bot"], function (D2BOTAPI) {
 			for (var i in AccountsMap) {
 				accList.push(i);
 			}
+            
+            if(accList.length === 0)
+                accList.push("");
 		} else {
 			accList.push(account);
 		}
@@ -1134,15 +1182,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				return;
 			}
 
-			doQuery(
-				accList[accountListid++],
-				chr,
-				itemCount > MAX_ITEM ?
-					limit ?
-						false :
-						window.loadMoreItem :
-					window.loadMoreItem
-			);
+			doQuery(accList[accountListid++], chr, itemCount > MAX_ITEM ? limit ? false : window.loadMoreItem : window.loadMoreItem);
 		};
 
 		window.loadAllCountable = function () {
@@ -1180,15 +1220,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 					roundTime.total += roundTime.groups;
 
-					doQuery(
-						accList[accountListid++],
-						chr,
-						itemCount > MAX_ITEM ?
-							limit ?
-								false :
-								window.loadMoreItem :
-							window.loadMoreItem
-					);
+					doQuery(accList[accountListid++], chr, itemCount > MAX_ITEM ? limit ? false : window.loadMoreItem : window.loadMoreItem);
 				}
 
 				return;
@@ -1197,7 +1229,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
 		};
 
-		if (Object.keys(AccountsMap).length === 0) {
+		/*if (Object.keys(AccountsMap).length === 0) {
 			console.warn("No accounts found. Appending dummy data..");
 			var items = JSON.parse(JSON.stringify(Items));
             var idx = 0;
@@ -1207,10 +1239,10 @@ require(["D2Bot"], function (D2BOTAPI) {
 				console.log(items[key]);
 				$addItem(items[key]);
 			}
-		} else {
+		} else {*/
 			queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
-		}
-		loader.hidden = true;
+		//}
+		//loader.hidden = true;
 	}
 
 	function pupulateAccountCharSelect(realm, core, type, ladder) {
