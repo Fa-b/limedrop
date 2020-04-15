@@ -307,24 +307,17 @@ td {
 /* Changes to style from here */
 
 .styled-item-menu {
-  display: grid;
-  grid-template-columns: auto;
-  grid-row: 2;
-  grid-column: 2;
+  display: none;
   padding-left: 5px;
   padding-right: 5px;
 }
 
 .styled-item-menu input {
-  grid-row: 1;
-  grid-column: 1;
   padding: 5px;
   font-size: 15px;
   border: none;
   color: #15b403;
   background-color: transparent;
-  align-items: center;
-  margin: auto;
   width: auto;
 }
 .styled-item-menu input::-webkit-outer-spin-button,
@@ -332,35 +325,22 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
 .styled-item-menu i {
-  grid-row: 1;
-  grid-column: 1/2;
   padding: 5px;
   border: none;
   color: #15b403;
   background-color: transparent;
-  align-items: center;
-  margin: auto;
 }
 .styled-item-menu select {
-  grid-row: 2;
-  grid-column: 1/2;
-  border: none;
-  align-content: center;
-  color: white;
-  padding: 5px;
-  background-color: #505050;
-  border-radius: 5px;
-  margin: auto;
+    border: none;
+    color: white;
+    width: 100%;
+    padding: 5px;
+    background-color: #505050;
+    border-radius: 5px;
 }
 
 .styled-item-menu select:focus:se {
-  border: none;
-  align-content: center;
   color: rgb(199, 0, 0);
-  padding: 5px;
-  background-color: #505050;
-  border-radius: 5px;
-  margin: auto;
 }
 
 .styled-item-menu select::-webkit-scrollbar {
@@ -497,6 +477,13 @@ h6.drop-queue-styled {
 
 .side-nav {
   background-color: #292929;
+}
+
+.start-upload-btn {
+  align-self: right;
+  position: relative;
+  cursor: pointer;
+  left: -20px;
 }
 
 .custom-footer,

@@ -299,13 +299,12 @@ window.ItemScreenshot = {
 	},
 		
     drawCompilation: function (items) {
-        var packer = new GrowingPacker();
+        var packer = new GrowingPacker(window.innerWidth * 0.8);
         var blocks = [];
-        var canvas = document.createElement('canvas');
-        canvas.width = 0;
-        canvas.height = 0;
-        
-        screenshots = [];
+		var padding = 10;//parseInt($("#itemList").css("padding"));
+		
+        var screenshots = [];
+		
         for (var idx in items) {
 			var img = items[idx].itemImage;
 			img = new ItemImage(img?items[idx].itemImage:items[idx]);
@@ -314,30 +313,31 @@ window.ItemScreenshot = {
         
         return Promise.all(screenshots).then(results => {
             results.forEach(item => {
-                var padding = 10;//parseInt($("#itemList").css("padding"));
                 blocks.push({item: $(item.canvas), w: item.canvas.width + padding, h: item.canvas.height + padding});
             });
             
             blocks.sort(function(a,b) { return (b.h - a.h); });
             packer.fit(blocks);
-            
-            canvas.width += packer.root.w;
-            canvas.height += packer.root.h;
 
-            var container = canvas.getContext('2d');
-            
+			var htmlTemplate = `<div style="
+									display:inline-flex;
+									align-items:start;
+									justify-content:center;
+									flex-wrap:wrap;
+									width:` + packer.root.w + `px">`;
+			
             for(var n = 0 ; n < blocks.length ; n++) {
                 var block = blocks[n];
                 if (block.fit) {
-                    container.drawImage(block.item[0], block.fit.x, block.fit.y);
+					htmlTemplate += `<img src="` + block.item[0].toDataURL() + `" style="padding:`+ padding + `px; border-radius: 20px"/>`;
                 } else {
                     console.error("Couldn't pack image to canvas (Width Height):", block.w, block.h, "max. allowed size (Width Height):", packer.root.w, packer.root.h);
                 }
             }
+			
+			htmlTemplate += `</div>`;
 
-            //$("#itemList").empty();
-            //document.getElementById("itemList").append(canvas); 
-			return canvas;			
+			return htmlTemplate;			
         });
 		
     }

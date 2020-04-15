@@ -725,20 +725,17 @@ require(["D2Bot"], function (D2BOTAPI) {
 		// But more likely, the requested item is already listed in the queue
 		if (!itemUID) return undefined;
 
+		var specs = itemUID.split(":")[0] + " - ";
+		if(result.groupData.specs) {
+			var desc = result.description.replace(/\n|\r/gm, "");
+			specs = "";
+			result.groupData.specs.forEach((entry) => {
+				if(desc.match(new RegExp(entry[0], 'gi')))
+					specs += desc.replace(new RegExp(entry[0], 'gi'), entry[1]) + " - ";
+			});
+		}
 		result.groupId = $group.attr("id");
-		var optionTemplate =
-			`<option value="` +
-			itemUID +
-			`" id="item-menu-option-` +
-			result.groupId +
-			`">` +
-			itemUID.split(":")[0] +
-			" - " +
-			result.account +
-			"/" +
-			result.character +
-			`</option>`;
-
+		var optionTemplate =`<option value="` + itemUID + `" id="item-menu-option-` + result.groupId + `">` + specs + result.account+"/"+result.character + `</option>`;
 		var $itemOption = $(optionTemplate);
 		$itemOption.data("itemData", result);
 
@@ -795,12 +792,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 			<div class="styled-item-menu" id="item-menu-` +
 				groupId +
 				`">
-			  <input type="number" placeholder="0"  id="item-menu-input-` +
-				groupId +
-				`"/><i class="fas fa-share-square fa-2x" id="group-list-btn"></i>
-			  <select multiple="multiple" size='10'  id="item-menu-select-` +
-				groupId +
-				`"></select>
+				<div>
+					<div>
+					  <input type="number" placeholder="0"  id="item-menu-input-` + groupId + `"/>
+					  <i class="fas fa-share-square fa-2x" id="group-list-btn"></i>
+					</div>
+					<select multiple="multiple" size='10'  id="item-menu-select-` + groupId + `"></select>
+				</div>
 			</div>
 		<div class="p-2 comment-text">
 		  <h6 class="-medium">` +
@@ -903,16 +901,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 					// Show dropdown item selection
 					$("#item-menu-" + groupId).show();
 					// Using mousedown & move might be good for checking the change events in the input box :)
-					$("#item-menu-select-" + groupId).on(
-						"change mousedown mousemove",
-						function () {
-							updateSelectCount($(this));
-						}
-					);
+					$("#item-menu-select-"+groupId).on("change mousedown mousemove", function() {
+						updateSelectCount($(this));
+					});
 					$("#item-menu-select-" + groupId).on("keydown", function (e) {
-						var key = window.event ? window.event.keyCode : e.which;
-						if (key == 13) {
-							// the enter key code
+						var key = window.event?window.event.keyCode:e.which;
+						if(key == 13)// the enter key code
+						{
 							list = $(this).val();
 							for (var item in list) {
 								$(this)
@@ -963,40 +958,23 @@ require(["D2Bot"], function (D2BOTAPI) {
 		return retRegex;
 	}
 
-	function addItemstoList(limit = true, group = []) {
+	function addItemstoList(limit=true, itemGroups=[]) {
 		var loader = document.getElementById("loader");
-
-		function queryCountables(
-			$account,
-			$character,
-			loadMoreItem,
-			regex = ["all", ""]
-		) {
-			API.emit(
-				"query",
-				"^" +
-				regex[1].toLocaleLowerCase() +
-				buildregex($("#search-bar").val().toLocaleLowerCase()) +
-				".*$",
-				CurrentRealm,
-				$account,
-				$character,
-				function (err, results) {
-					if (err) {
-						console.log(err);
-						return false;
-					}
-					var y = $(window).scrollTop();
-
-					var ladder = CurrentGameClass == "Ladder";
-					var sc = CurrentGameMode == "Softcore";
-					var lod = CurrentGameType == "Expansion";
-
-					// Here go the countable items by RegEx.. to extend the list simply append another entry to LimeConfig.js.
-					// Countable items will receive an additional number field in the view (upper right corner of item box).
-					for (var i in results) {
-						if (results[i].description) {
-							//if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
+		
+		function queryCountables($account, $character, loadMoreItem, itemGroup={key: "all", value: { regex: "" } }) {
+			API.emit("query", "^"+itemGroup.value.regex.toLocaleLowerCase()+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$", CurrentRealm, $account, $character, function (err, results) {
+				if (err) { console.log(err); return false; };
+				var y = $(window).scrollTop();
+				
+				var ladder = CurrentGameClass == "Ladder";
+				var sc = CurrentGameMode == "Softcore";
+				var lod = CurrentGameType == "Expansion";
+				
+				// Here go the countable items by RegEx.. to extend the list simply append another entry to LimeConfig.js.
+				// Countable items will receive an additional number field in the view (upper right corner of item box).
+				for (var i in results) {
+					if(results[i].description) {
+						//if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
 							var item = {
 								classid: results[i].description.split("$")[1].split(":")[1],
 								uid: results[i].description.split("$")[1],
@@ -1005,24 +983,27 @@ require(["D2Bot"], function (D2BOTAPI) {
 								y: results[i].description.split("$")[1].split(":")[4]
 							};
 							var itemID = results[i].description.split("$")[1].split(":")[1];
-							results[i].group = regex[0];
-							if (!countables[item.uid]) countables[item.uid] = [];
-							if (!countables[item.uid][regex[0]])
-								countables[item.uid][regex[0]] = $addItemGroup(results[i]);
+							results[i].group = itemGroup.key;
+							results[i].groupData = itemGroup.value;
+							if(!countables[item.uid])
+								countables[item.uid] = []
+							if(!countables[item.uid][itemGroup.key])
+								countables[item.uid][itemGroup.key] = $addItemGroup(results[i]);
+								
 
-							$updateItemGroup(countables[item.uid][regex[0]], results[i]);
-							//}
-						}
-					}
-
-					$(window).scrollTop(y);
-
-					roundTime.elapsed = new Date().getTime();
-					if (loadMoreItem) {
-						loadMoreItem();
+							$updateItemGroup(countables[item.uid][itemGroup.key], results[i]);
+						//}
 					}
 				}
-			);
+				
+				$(window).scrollTop(y);
+				//loader.hidden = true;
+
+				roundTime.elapsed = new Date().getTime();
+				if (loadMoreItem) {
+					loadMoreItem();
+				}
+			});
 		}
 
 		function doQuery($account, $character, loadMoreItem) {
@@ -1090,9 +1071,11 @@ require(["D2Bot"], function (D2BOTAPI) {
 		} else {
 			accList.push(account);
 		}
-
-		for (var i in group) {
-			groupList.push([i, group[i][0]]);
+		
+		console.log(itemGroups);
+		
+		for (var group in itemGroups) {
+			groupList.push({ key: group, value: itemGroups[group] });
 		}
 
 		var groupCount = 0;
@@ -1211,12 +1194,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				return;
 			}
 
-			queryCountables(
-				"",
-				chr,
-				window.loadAllCountable,
-				groupList[groupListid++]
-			);
+			queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
 		};
 
 		if (Object.keys(AccountsMap).length === 0) {
@@ -1686,8 +1664,53 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
 
 		var container = document.getElementById("itemScreenshot");
-		window.ItemScreenshot.drawCompilation(itemList).then((image) => {
-			container.innerHTML = `<img src="` + image.toDataURL() + `"/>`;
+		window.ItemScreenshot.drawCompilation(itemList).then((template) => {
+			container.innerHTML = template;
+			let width = container.firstChild.style.width.split("px")[0];
+			$("#imgurContainer").css("max-width", width + "px");
+			/*setTimeout(function(){
+				html2canvas(container.firstChild).then(canvas => {
+					container.appendChild(canvas)
+				});
+			}, 500);*/
+		});
+	});
+	
+	$(".start-upload-btn").click(function () {
+		// Begin file upload
+		console.log("Uploading file to Imgur..");
+
+		var settings = {
+			async: true,
+			crossDomain: true,
+			processData: false,
+			contentType: false,
+			type: 'POST',
+			url: "https://api.imgur.com/3/image",
+			headers: {
+				Authorization: 'Client-ID 24d18153402171f',
+				Accept: 'application/json'
+			},
+			mimeType: 'multipart/form-data',
+		    error: function(jqXHR, textStatus, errorMessage) {
+				console.err(jqXHR,textStatus,errorMessage); // Optional
+		    }
+		};
+		
+		var container = document.getElementById("itemScreenshot");
+		
+		html2canvas(container.firstChild).then(canvas => {
+			var formData = new FormData();
+			formData.append("image", canvas.toDataURL().split("data:image/png;base64,")[1]);
+			settings.data = formData;
+			// Response contains stringified JSON
+			// Image URL available at response.data.link
+			$.ajax(settings).done(function(response) {
+				$('#upload-imgur-modal').modal('hide');
+				var imgurResponse = JSON.parse(response);
+				console.log(imgurResponse);
+				showNotification("Uploaded Image to Imgur", `<a target='_blank' rel='noopener noreferrer' href='` + imgurResponse.data.link + `' style='color:#2962ff'>` + imgurResponse.data.link + `</a>`, false);
+			});
 		});
 	});
 
