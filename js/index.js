@@ -976,6 +976,7 @@ require(["D2Bot"], function (D2BOTAPI) {
         }
 		
 		function queryCountables($account, $character, loadMoreItem, itemGroup={key: "all", value: { regex: "" } }) {
+            loader.hidden = false;
             var callback = function (err, results) {
 				if (err) { console.log(err); return false; };
 				var y = $(window).scrollTop();
@@ -1040,6 +1041,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
 
 		function doQuery($account, $character, loadMoreItem) {
+            loader.hidden = false;
             var callback = function (err, results) {
                 if (err) {
                     console.log(err);
@@ -1146,7 +1148,6 @@ require(["D2Bot"], function (D2BOTAPI) {
 			roundTime.start = new Date().getTime();
 
 			//console.log("Found Account:", accList[accountListid - 1], "After:", (time_ms / 1000).toFixed(3),"seconds");
-			loader.hidden = false;
 			if (accountListid == accList.length) {
 				if (!ended) {
 					$footer =
@@ -1191,7 +1192,6 @@ require(["D2Bot"], function (D2BOTAPI) {
 			roundTime.start = new Date().getTime();
 
 			//console.log("Found Group:", groupList[groupListid - 1], "After:", (time_ms / 1000).toFixed(3),"seconds");
-			loader.hidden = false;
 			//if (accountListid == accList.length) {
 			if (groupListid == groupList.length) {
 				if (!ended) {
