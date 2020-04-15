@@ -468,7 +468,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		countables = [];
 
 		console.log("refresh");
-		addItemstoList(limit, LimeConfig["ItemGroup"]);
+		addItemstoList(limit, LimeConfig["ItemGroup"], false);
 	}
 
 	function getItemDesc(desc) {
@@ -1229,20 +1229,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 			queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
 		};
 
-		/*if (Object.keys(AccountsMap).length === 0) {
-			console.warn("No accounts found. Appending dummy data..");
-			var items = JSON.parse(JSON.stringify(Items));
-            var idx = 0;
-			for (var key in Items) {
-                //items[key].description = items[key].description.replace(/\x92\x92/gmi, '\x92');
-                items[key].description = items[key].description.replace(/\$(\d+):/gmi, "$" + (idx++).toString().padStart(8, '0') + ":");
-				console.log(items[key]);
-				$addItem(items[key]);
-			}
-		} else {*/
-			queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
-		//}
-		//loader.hidden = true;
+		queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
+		loader.hidden = true;
 	}
 
 	function pupulateAccountCharSelect(realm, core, type, ladder) {
