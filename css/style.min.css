@@ -5562,12 +5562,8 @@ input[type="submit"].btn-block {
 }
 .close {
   float: right;
-  font-size: 1.3125rem;
-  font-weight: 800;
   line-height: 1;
-  color: #000;
-  text-shadow: 0 1px 0 #fff;
-  opacity: 0.5;
+  color: #19cc05;
 }
 .close:focus,
 .close:hover {
@@ -5650,9 +5646,9 @@ button.close {
   flex-direction: column;
   width: 100%;
   pointer-events: auto;
-  background-color: #fff;
+  background-color: #2c2c2e;
   background-clip: padding-box;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 2px solid #19cc05;
   border-radius: 15px;
   outline: 0;
 }
@@ -5682,7 +5678,7 @@ button.close {
   -ms-flex-pack: justify;
   justify-content: space-between;
   padding: 1rem;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid #19cc05;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 }
@@ -5691,6 +5687,7 @@ button.close {
   margin: -1rem -1rem -1rem auto;
 }
 .modal-title {
+  color: #19cc05;
   margin-bottom: 0;
   line-height: 1.5;
 }
@@ -5712,7 +5709,7 @@ button.close {
   -ms-flex-pack: end;
   justify-content: flex-end;
   padding: 1rem;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid #19cc05;
 }
 .modal-footer > :not(:first-child) {
   margin-left: 0.25rem;

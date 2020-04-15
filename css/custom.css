@@ -530,3 +530,7 @@ h6.drop-queue-styled {
   grid-column: auto;
   border-radius: 15px;
 }
+
+.navbar-icons{
+  font-size: 20px;
+}
