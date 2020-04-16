@@ -5581,6 +5581,32 @@ button.close {
   border: 0;
   -webkit-appearance: none;
 }
+.icon {
+  float: right;
+  line-height: 1;
+  color: #19cc05;
+}
+.icon:focus,
+.icon:hover {
+  color: #19cc05;
+  text-decoration: none;
+  opacity: 0.75;
+}
+
+.icon:disabled {
+  opacity: 0.65;
+  cursor: default;
+  pointer-events: none;
+}
+.icon:not(:disabled):not(.disabled) {
+  cursor: pointer;
+}
+button.icon {
+  padding: 0;
+  background-color: transparent;
+  border: 0;
+  -webkit-appearance: none;
+}
 .modal-open {
   overflow: hidden;
 }
@@ -10065,11 +10091,9 @@ ul.list-style-none li a:hover {
   border-color: transparent;
 }
 .search-box .app-search .srh-btn {
-  z-index: 1080;
-  padding-top: 10px;
-  padding-right: 15px;
-  cursor: pointer;
-  color: #15b403;
+    z-index: 1080;
+    margin-top: -15px;
+    padding-right: 10px;
 }
 .topbar .dropdown-menu {
   padding-top: 0px;

@@ -151,6 +151,7 @@ td {
 .form-filter-element {
   display: inline-flex;
   min-width: 280px;
+  cursor: pointer;
   justify-content: flex-start;
 }
 
@@ -474,13 +475,6 @@ h6.drop-queue-styled {
 
 .side-nav {
   background-color: #292929;
-}
-
-.start-upload-btn {
-  align-self: right;
-  position: relative;
-  cursor: pointer;
-  left: -20px;
 }
 
 .custom-footer,

@@ -20,7 +20,7 @@ window.ItemScreenshot = {
     drawCursor          : "rnd",	// Draw the cursor ("rnd" is random cursor position)
     drawSockets         : true,		// Draw sockets and socketed items
     drawEthereal        : true,		// Draw ethereal item gfx
-    forceItemVisible    : false,    // Expand the background to fully show items when the description does not fit
+    forceItemVisible    : true,    // Expand the background to fully show items when the description does not fit
 
     // ------ No touchy ------
 

@@ -1581,8 +1581,9 @@ require(["D2Bot"], function (D2BOTAPI) {
 		});
 	});
 	
-	$(".start-upload-btn").click(function () {
+	$("#begin-upload-btn").click(function () {
 		// Begin file upload
+        $(this).attr("disabled", true);
 		console.log("Uploading file to Imgur..");
 
 		var settings = {
@@ -1603,15 +1604,15 @@ require(["D2Bot"], function (D2BOTAPI) {
 		};
 		
 		var container = document.getElementById("itemScreenshot");
-		
-		html2canvas(container.firstChild).then(canvas => {
+        
+        html2canvas(container.firstChild).then(canvas => {
+            $(this).removeAttr("disabled");
+            $('#upload-imgur-modal').modal('hide');
 			var formData = new FormData();
 			formData.append("image", canvas.toDataURL().split("data:image/png;base64,")[1]);
 			settings.data = formData;
-			// Response contains stringified JSON
-			// Image URL available at response.data.link
 			$.ajax(settings).done(function(response) {
-				$('#upload-imgur-modal').modal('hide');
+                $('#upload-imgur-modal').modal('hide');
 				var imgurResponse = JSON.parse(response);
 				console.log(imgurResponse);
 				showNotification("Uploaded Image to Imgur", `<a target='_blank' rel='noopener noreferrer' href='` + imgurResponse.data.link + `' style='color:#2962ff'>` + imgurResponse.data.link + `</a>`, false);
