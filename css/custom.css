@@ -133,6 +133,14 @@ td {
   cursor: pointer;
 }
 
+.comment-footer {
+  position: absolute;
+  display: flex;
+  align-self: flex-end;
+  justify-content: flex-end;
+  padding-right: 20px;
+}
+
 .grp-btn {
   align-self: center;
   position: relative;
@@ -430,10 +438,6 @@ h6.drop-queue-styled {
 
 .dropQueueList {
   overflow-y: scroll;
-}
-
-.dropQueueList .comment-footer {
-  display: none;
 }
 
 .app-search {

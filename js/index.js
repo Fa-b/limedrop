@@ -90,24 +90,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
 
 		function appendTextField(name, data) {
-			var htmlTemplate =
-				`
-			<span class="form-filter-element">
-				<label class="form-filter-label" for="search-data-` +
-				name +
-				`" id="label-` +
-				name +
-				`">` +
-				name +
-				`:</label>
-				<div class="form-filter">
-					<input class="form-filter-input" type="text" id="search-data-` +
-				name +
-				`" name="search-data-` +
-				name +
-				`"/>
-				</div>
-			</span>`;
+			var htmlTemplate = `
+<span class="form-filter-element">
+	<label class="form-filter-label" for="search-data-` + name + `" id="label-` + name + `">` + name + `:</label>
+		<div class="form-filter">
+			<input class="form-filter-input" type="text" id="search-data-` + name + `" name="search-data-` + name + `"/>
+		</div>
+</span>`;
 
 			var $formFilter = $(htmlTemplate);
 			var mask = new RegExp(data.mask);
@@ -164,24 +153,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
 
 		function appendCheckBox(name, data) {
-			var htmlTemplate =
-				`
-			<span class="form-filter-element">
-				<label class="form-filter-label" for="search-data-` +
-				name +
-				`" id="label-` +
-				name +
-				`">` +
-				name +
-				`:</label>
-				<div class="form-filter">
-					<input type="checkbox" id="search-data-` +
-				name +
-				`" name="search-data-` +
-				name +
-				`"/>
-				</div>
-			</span>`;
+			var htmlTemplate = `
+<span class="form-filter-element">
+	<label class="form-filter-label" for="search-data-` + name + `" id="label-` + name + `">` + name + `:</label>
+	<div class="form-filter">
+		<input type="checkbox" id="search-data-` + name + `" name="search-data-` + name + `"/>
+	</div>
+</span>`;
 
 			var $formFilter = $(htmlTemplate);
 			var regex = [];
@@ -239,24 +217,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
 
 		function appendSelectBox(name, data) {
-			var htmlTemplate =
-				`
-			<span class="form-filter-element">
-				<label class="form-filter-label" for="search-data-` +
-				name +
-				`" id="label-` +
-				name +
-				`">` +
-				name +
-				`:</label>
-				<div class="form-filter">
-					<select multiple id="search-data-` +
-				name +
-				`" name="search-data-` +
-				name +
-				`"/>
-				</div>
-			</span>`;
+			var htmlTemplate = `
+<span class="form-filter-element">
+    <label class="form-filter-label" for="search-data-` + name + `" id="label-` + name + `">` + name + `:</label>
+	<div class="form-filter">
+		<select multiple id="search-data-` + name + `" name="search-data-` + name + `"/>
+	</div>
+</span>`;
 
 			var $formFilter = $(htmlTemplate);
 			var mask = new RegExp(data.mask);
@@ -275,13 +242,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 			var optionList = $formFilter.data("values");
 			for (var option in optionList) {
-				$("#search-data-" + name).append(
-					`<option value="` +
-					optionList[option] +
-					`">` +
-					optionList[option] +
-					`</option>`
-				);
+				$("#search-data-" + name).append(`<option value="` + optionList[option] + `">` + optionList[option] + `</option>`);
 			}
 
 			$("#search-data-" + name).on("change", function (e, param) {
@@ -421,24 +382,18 @@ require(["D2Bot"], function (D2BOTAPI) {
 	var AccountsMap = {};
 
 	function showNotification(head, text, perm) {
-		var template =
-			`<a class="` +
-			(perm ? `always-there ` : "") +
-			`ld-notify-card link" style="border-top:1px solid #3c3c3c">
+		var template = `
+<a class="` + (perm ? `always-there ` : "") + `ld-notify-card link" style="border-top:1px solid #3c3c3c">
 	<div class="d-flex no-block align-items-center p-10">
-	  <span class="btn btn-success btn-circle">
-		<i class="ti-calendar"></i>
-	  </span>
-	  <div class="m-l-10">
-		<h5 class="m-b-0">` +
-			head +
-			`</h5>
-		<span class="mail-desc">` +
-			text +
-			`</span>
-	  </div>
+        <span class="btn btn-success btn-circle">
+            <i class="ti-calendar"></i>
+        </span>
+        <div class="m-l-10">
+            <h5 class="m-b-0">` + head + `</h5>
+            <span class="mail-desc">` + text + `</span>
+        </div>
 	</div>
-	</a>`;
+</a>`;
     
         $("#ldNotify").append($(template));
 
@@ -557,42 +512,21 @@ require(["D2Bot"], function (D2BOTAPI) {
 			result.character +
 			"-" +
 			itemUID;
-		var htmlTemplate =
-			`
-	<div class="d-flex flex-row comment-row hidden p-l-0 m-t-0 m-b-0" id="` +
-			itemUID +
-			`">
-	  <div class="p-2 ld-img-col" id="png-` +
-			itemUID +
-			`">
-		image
-	  </div>
-	  <div class="comment-text w-100">
-		<h6 class="-medium">` +
-			title +
-			`</h6>
-		<span class="m-b-15 d-block">` +
-			description +
-			`
-		</span>
-		<div class="comment-footer">
-		  <div class="flex">
-			<span class="text-muted float-right">` +
-			CurrentRealm +
-			"/" +
-			result.account +
-			"/" +
-			result.character +
-			"/{" +
-			itemUID +
-			"}" +
-			`</span>
-			<!--<button type="button" class="btn btn-cyan btn-sm">Helm</button>
-			<button type="button" class="btn btn-success btn-sm">Armor</button>-->
-		  </div>
-		</div>
-	  </div>
-	</div>`;
+		var htmlTemplate =`
+<div class="d-flex flex-row comment-row p-l-0 m-t-0 m-b-0" id="` + itemUID + `">
+    <div class="p-2 ld-img-col" style="position:relative; display: flex; align-self: center; justify-content: center;">
+        <div style="position:relative">
+            <div id="png-` + itemUID + `"><i>image</i></div>
+        </div>
+    </div>
+    <div class="p-2 comment-text">
+		<h6 class="-medium">` + title + `</h6>
+		<span class="m-b-15 d-block">` + description + `</span>
+	</div>
+    <div class="comment-footer w-100">
+        <span class="text-muted float-right">` + CurrentRealm + "/" + result.account + "/" + result.character + "/{" + itemUID + "}" + `</span>
+    </div>
+</div>`;
 
 		// Todo: try using DOM operations instead of jQuery
 		var $item = $(htmlTemplate);
@@ -624,19 +558,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 							result.itemImage.onload = () => {
 								result.itemImage.getItem().then((canvas) => {
 									result.image = canvas.toDataURL();
-									var imageTemplate =
-										`<img src="` +
-										result.image +
-										`" alt="user" class="ld-item">`;
+									var imageTemplate = `<img src="` + result.image + `" alt="user" class="ld-item">`;
 									var imgDiv = document.getElementById("png-" + itemUID);
 									imgDiv.innerHTML = imageTemplate;
 								});
 							};
 						} else {
-							var imageTemplate =
-								`<img src="` + ((result.image.indexOf("data") != -1) ? "" : "data:image/jpeg;base64,") +
-								result.image +
-								`" alt="user" class="ld-item">`;
+							var imageTemplate = `<img src="` + ((result.image.indexOf("data") != -1) ? "" : "data:image/jpeg;base64,") + result.image + `" alt="user" class="ld-item">`;
 							var imgDiv = document.getElementById("png-" + itemUID);
 							imgDiv.innerHTML = imageTemplate;
 						}
@@ -703,8 +631,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 	function updateItemCount(groupId) {
 		var count = $("#item-menu-select-" + groupId + " option").length;
-		var countTemplate =
-`<span class="badge badge-secondary animated wobble mt-2" style="webkit-animation-duration: 0.3s; animation-duration: 0.3s;">
+		var countTemplate =`
+<span class="badge badge-dark animated wobble" style="webkit-animation-duration: 0.3s; animation-duration: 0.3s; border: 1px solid #464646; box-shadow: 0px 0px 5px #00000066;">
     <h6 class="styled-counter" if="item-menu-count-` + groupId + `">` + count + `</h6>
 </span>`;
 		$("#item-menu-count-" + groupId).html(countTemplate);
@@ -777,56 +705,31 @@ require(["D2Bot"], function (D2BOTAPI) {
 			var title = description.shift();
 			var count = 0;
 			description = description.join("<br/>");
-			var htmlTemplate =
-				`
-	  <div class="d-flex align-items-start hidden p-l-0 m-t-0 m-b-0" aria-haspopup="true" id="` +
-				groupId +
-				`">
-		<div class="pt-3 pl-3 pb-2 pr-0" id="png-` +
-				groupId +
-				`">image</div>
-                <div id="item-menu-count-` +
-				groupId +
-				`">` +
-				/*(count?" ["+*/
-				count /*+"]":"")*/ +
-				`</div>
-			<div class="styled-item-menu" id="item-menu-` +
-				groupId +
-				`">
-				<div>
-					<div>
-					  <input type="text" disabled placeholder="0"  id="item-menu-input-` + groupId + `"/>
-					  <i class="fas fa-share-square fa-2x" id="group-list-btn-` + groupId + `"></i>
-					</div>
-					<select multiple="multiple" size='10'  id="item-menu-select-` + groupId + `"></select>
-				</div>
-			</div>
-		<div class="p-2 comment-text">
-		  <h6 class="-medium">` +
-				title +
-				`</h6>
-		  <span class="m-b-15 d-block">` +
-				description +
-				`</span>
-		  <div class="comment-footer">
-			<div class="flex">
-			  <!--<span class="text-muted">` +
-				result.realm +
-				"/" +
-				result.account +
-				"/" +
-				result.character +
-				"/{" +
-				result.itemid +
-				"}" +
-				`</span>-->
-			  <!--<button type="button" class="btn btn-cyan btn-sm">Helm</button>
-			  <button type="button" class="btn btn-success btn-sm">Armor</button>-->
-			</div>
-		  </div>
-		</div>
-	  </div>`;
+			var htmlTemplate =`
+<div class="d-flex flex-row comment-row hidden p-l-0 m-t-0 m-b-0" aria-haspopup="true" id="` + groupId + `">
+    <div class="p-2 ld-img-col" style="position:relative; display: flex; align-self: center; justify-content: center;">
+        <div style="position:relative">
+            <div id="png-` + groupId + `"><i>image</i></div>
+            <div id="item-menu-count-` + groupId + `" style="position: absolute; top: -10px; right: calc(100% - 10px);">` + count + `</div>
+        </div>
+    </div>
+    <div class="styled-item-menu" id="item-menu-` + groupId + `">
+        <div>
+            <div>
+                <input type="text" disabled placeholder="0"  id="item-menu-input-` + groupId + `"/>
+                <i class="fas fa-share-square fa-2x" id="group-list-btn-` + groupId + `"></i>
+            </div>
+            <select multiple="multiple" size='10'  id="item-menu-select-` + groupId + `"></select>
+        </div>
+    </div>
+    <div class="p-2 comment-text">
+        <h6 class="-medium">` + title + `</h6>
+        <span class="m-b-15 d-block">` + description + `</span>
+    </div>
+    <div class="comment-footer w-100" hidden>
+        <span class="text-muted float-right">` + CurrentRealm + "/" + result.account + "/" + result.character + "/{" + itemUID + "}" + `</span>
+    </div>
+</div>`;
 
 			var $itemGroup = $(htmlTemplate);
 
@@ -857,19 +760,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 								result.itemImage.onload = () => {
 									result.itemImage.getItem().then((canvas) => {
 										result.image = canvas.toDataURL();
-										var imageTemplate =
-											`<img src="` +
-											result.image +
-											`" alt="user" class="ld-item">`;
+										var imageTemplate = `<img src="` + result.image + `" alt="user" class="ld-item">`;
 										var imgDiv = document.getElementById("png-" + groupId);
 										imgDiv.innerHTML = imageTemplate;
 									});
 								};
 							} else {
-								var imageTemplate =
-									`<img src="` + ((result.image.indexOf("data") != -1) ? "" : "data:image/jpeg;base64,") +
-									result.image +
-									`" alt="user" class="ld-item">`;
+								var imageTemplate = `<img src="` + ((result.image.indexOf("data") != -1) ? "" : "data:image/jpeg;base64,") + result.image + `" alt="user" class="ld-item">`;
 								var imgDiv = document.getElementById("png-" + groupId);
 								imgDiv.innerHTML = imageTemplate;
 							}
@@ -1152,29 +1049,15 @@ require(["D2Bot"], function (D2BOTAPI) {
 			//console.log("Found Account:", accList[accountListid - 1], "After:", (time_ms / 1000).toFixed(3),"seconds");
 			if (accountListid == accList.length) {
 				if (!ended) {
-					$footer =
-						`
-	<div><p>End of Items on all Accounts</p>
-	  <span class="m-b-15 d-block">` +
-						itemCount +
-						` Items in total.<br>
-				` +
-						groupCount +
-						` item groups sorted after ` +
-						(roundTime.groups / 1000).toFixed(3) +
-						` seconds. ` +
-						groupItemCount +
-						` items were grouped.<br>
-		Saved ` +
-						savedEntryCount +
-						` list entries with ` +
-						groupEntryCount +
-						` group entries<br>
-				After ` +
-						(roundTime.total / 1000).toFixed(3) +
-						` seconds in total.
-	  </span>
-	</div>`;
+					$footer = `
+<div>
+    <p>End of Items on all Accounts</p>
+	<span class="m-b-15 d-block">` + itemCount + ` Items in total.
+        <br>` + groupCount + ` item groups sorted after ` + (roundTime.groups / 1000).toFixed(3) + ` seconds. ` + groupItemCount + ` items were grouped.
+        <br>Saved ` + savedEntryCount + ` list entries with ` + groupEntryCount +` group entries
+        <br>After ` + (roundTime.total / 1000).toFixed(3) + ` seconds in total.
+	</span>
+</div>`;
 					$("#load-more").html($footer);
 					ended = true;
 					window.loadMoreItem = false;

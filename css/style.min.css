@@ -4943,14 +4943,14 @@ input[type="submit"].btn-block {
 }
 .badge {
   display: inline-block;
-  padding: 0.25em 0.4em;
+  padding: 0.25em 0.5em;
   font-size: 75%;
   font-weight: 800;
   line-height: 1;
   text-align: center;
   white-space: nowrap;
   vertical-align: baseline;
-  border-radius: 2px;
+  border-radius: 50%;
 }
 .badge:empty {
   display: none;
