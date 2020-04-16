@@ -341,10 +341,14 @@ input::-webkit-inner-spin-button {
 .styled-item-menu select {
     border: none;
     color: white;
-    width: 100%;
     padding: 5px;
     background-color: #505050;
     border-radius: 5px;
+}
+
+.styled-item-menu select[size] {
+    width: 100%;
+    height: calc(100% - 50px);
 }
 
 .styled-item-menu select:focus:se {
@@ -370,17 +374,6 @@ input::-webkit-inner-spin-button {
   border: none;
   padding-left: -10px;
   color: #19cc05;
-  background-color: transparent;
-  margin: 0px;
-}
-
-.styled-counter:hover {
-  font-size: 12px;
-  font-family: inherit;
-  display: block;
-  border: none;
-  padding-left: -10px;
-  color: #1aff00;
   background-color: transparent;
   margin: 0px;
 }

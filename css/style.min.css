@@ -2478,6 +2478,7 @@ select.form-control-lg:not([size]):not([multiple]) {
 .btn.disabled,
 .btn:disabled {
   opacity: 0.65;
+  cursor: default;
 }
 .btn:not(:disabled):not(.disabled) {
   cursor: pointer;

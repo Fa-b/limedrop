@@ -714,12 +714,12 @@ require(["D2Bot"], function (D2BOTAPI) {
         </div>
     </div>
     <div class="styled-item-menu" id="item-menu-` + groupId + `">
-        <div>
+        <div style="height:100%;">
             <div>
                 <input type="text" disabled placeholder="0"  id="item-menu-input-` + groupId + `"/>
                 <i class="fas fa-share-square fa-2x" id="group-list-btn-` + groupId + `"></i>
             </div>
-            <select multiple="multiple" size='10'  id="item-menu-select-` + groupId + `"></select>
+            <select multiple="multiple" id="item-menu-select-` + groupId + `" size></select>
         </div>
     </div>
     <div class="p-2 comment-text">
@@ -866,7 +866,7 @@ require(["D2Bot"], function (D2BOTAPI) {
         loader.hidden = false;
         
         if(dummyData) {
-            showNotification("Dummy Output", "No accounts found, dummy data will be used!", true);
+            showNotification("Dummy Output", "No accounts found, dummy data will be used!", false);
             var items = JSON.parse(JSON.stringify(Items));
             var idx = 0;
             for (var key in Items) {
