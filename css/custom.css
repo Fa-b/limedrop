@@ -133,6 +133,14 @@ td {
   cursor: pointer;
 }
 
+.comment-footer {
+  position: absolute;
+  display: flex;
+  align-self: flex-end;
+  justify-content: flex-end;
+  padding-right: 20px;
+}
+
 .grp-btn {
   align-self: center;
   position: relative;
@@ -143,6 +151,7 @@ td {
 .form-filter-element {
   display: inline-flex;
   min-width: 280px;
+  cursor: pointer;
   justify-content: flex-start;
 }
 
@@ -333,10 +342,14 @@ input::-webkit-inner-spin-button {
 .styled-item-menu select {
     border: none;
     color: white;
-    width: 100%;
     padding: 5px;
     background-color: #505050;
     border-radius: 5px;
+}
+
+.styled-item-menu select[size] {
+    width: 100%;
+    height: calc(100% - 50px);
 }
 
 .styled-item-menu select:focus:se {
@@ -362,17 +375,6 @@ input::-webkit-inner-spin-button {
   border: none;
   padding-left: -10px;
   color: #19cc05;
-  background-color: transparent;
-  margin: 0px;
-}
-
-.styled-counter:hover {
-  font-size: 12px;
-  font-family: inherit;
-  display: block;
-  border: none;
-  padding-left: -10px;
-  color: #1aff00;
   background-color: transparent;
   margin: 0px;
 }
@@ -432,10 +434,6 @@ h6.drop-queue-styled {
   overflow-y: scroll;
 }
 
-.dropQueueList .comment-footer {
-  display: none;
-}
-
 .app-search {
   background-color: #292929;
   color: #15b403;
@@ -477,13 +475,6 @@ h6.drop-queue-styled {
 
 .side-nav {
   background-color: #292929;
-}
-
-.start-upload-btn {
-  align-self: right;
-  position: relative;
-  cursor: pointer;
-  left: -20px;
 }
 
 .custom-footer,
@@ -529,4 +520,8 @@ h6.drop-queue-styled {
   grid-row: auto;
   grid-column: auto;
   border-radius: 15px;
+}
+
+.navbar-icons{
+  font-size: 20px;
 }

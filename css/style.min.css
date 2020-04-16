@@ -2478,6 +2478,7 @@ select.form-control-lg:not([size]):not([multiple]) {
 .btn.disabled,
 .btn:disabled {
   opacity: 0.65;
+  cursor: default;
 }
 .btn:not(:disabled):not(.disabled) {
   cursor: pointer;
@@ -4943,14 +4944,14 @@ input[type="submit"].btn-block {
 }
 .badge {
   display: inline-block;
-  padding: 0.25em 0.4em;
+  padding: 0.25em 0.5em;
   font-size: 75%;
   font-weight: 800;
   line-height: 1;
   text-align: center;
   white-space: nowrap;
   vertical-align: baseline;
-  border-radius: 2px;
+  border-radius: 50%;
 }
 .badge:empty {
   display: none;
@@ -5562,12 +5563,8 @@ input[type="submit"].btn-block {
 }
 .close {
   float: right;
-  font-size: 1.3125rem;
-  font-weight: 800;
   line-height: 1;
-  color: #000;
-  text-shadow: 0 1px 0 #fff;
-  opacity: 0.5;
+  color: #19cc05;
 }
 .close:focus,
 .close:hover {
@@ -5579,6 +5576,32 @@ input[type="submit"].btn-block {
   cursor: pointer;
 }
 button.close {
+  padding: 0;
+  background-color: transparent;
+  border: 0;
+  -webkit-appearance: none;
+}
+.icon {
+  float: right;
+  line-height: 1;
+  color: #19cc05;
+}
+.icon:focus,
+.icon:hover {
+  color: #19cc05;
+  text-decoration: none;
+  opacity: 0.75;
+}
+
+.icon:disabled {
+  opacity: 0.65;
+  cursor: default;
+  pointer-events: none;
+}
+.icon:not(:disabled):not(.disabled) {
+  cursor: pointer;
+}
+button.icon {
   padding: 0;
   background-color: transparent;
   border: 0;
@@ -5650,9 +5673,9 @@ button.close {
   flex-direction: column;
   width: 100%;
   pointer-events: auto;
-  background-color: #fff;
+  background-color: #2c2c2e;
   background-clip: padding-box;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 2px solid #19cc05;
   border-radius: 15px;
   outline: 0;
 }
@@ -5682,7 +5705,7 @@ button.close {
   -ms-flex-pack: justify;
   justify-content: space-between;
   padding: 1rem;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid #19cc05;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 }
@@ -5691,6 +5714,7 @@ button.close {
   margin: -1rem -1rem -1rem auto;
 }
 .modal-title {
+  color: #19cc05;
   margin-bottom: 0;
   line-height: 1.5;
 }
@@ -5712,7 +5736,7 @@ button.close {
   -ms-flex-pack: end;
   justify-content: flex-end;
   padding: 1rem;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid #19cc05;
 }
 .modal-footer > :not(:first-child) {
   margin-left: 0.25rem;
@@ -10067,11 +10091,9 @@ ul.list-style-none li a:hover {
   border-color: transparent;
 }
 .search-box .app-search .srh-btn {
-  z-index: 1080;
-  padding-top: 10px;
-  padding-right: 15px;
-  cursor: pointer;
-  color: #15b403;
+    z-index: 1080;
+    margin-top: -15px;
+    padding-right: 10px;
 }
 .topbar .dropdown-menu {
   padding-top: 0px;

@@ -154,7 +154,7 @@
 				  class="nav-link waves-effect waves-dark"
 				  href="javascript:void(0)"
 				>
-				  <i class="ti-search"></i>
+				  <i class="fas fa-search"></i>
 				</a>
 				<form
 				  class="app-search position-fixed"
@@ -169,9 +169,9 @@
 					  id="search-bar"
 					/>
 					<div class="grp-btn" title="Filter search results">
-					  <a class="waves-effect waves-dark"
-						><i class="ti-filter"></i
-					  ></a>
+					  <button type="button" class="btn icon">
+                        <i class="fa fa-filter"></i>
+                      </button>
 					</div>
 				  </div>
 
@@ -182,9 +182,9 @@
 					  <div class="search-group" id="search-group"></div>
 					</div>
 				  </div>
-				  <a class="srh-btn waves-effect waves-dark">
-					<i class="ti-close"></i>
-				  </a>
+				  <button class="srh-btn close" type="button" aria-label="close">
+					<i class="navbar-icons far fa-times-circle"></i>
+				  </button>
 				</form>
 			  </li>
 			</ul>
@@ -203,7 +203,7 @@
 				  aria-haspopup="true"
 				  aria-expanded="false"
 				>
-				  <i class="font-24 mdi mdi-comment-processing"></i>
+				  <i class="navbar-icons far fa-bell"></i>
 				</a>
 				<div
 				  class="dropdown-menu dropdown-menu-right mailbox animated bounceInDown p-b-0"
@@ -230,7 +230,7 @@
 				  aria-haspopup="true"
 				  aria-expanded="false"
 				>
-				  <i class="font-24 mdi mdi-account-circle"></i>
+				<i class="navbar-icons fas fa-user"></i>
 				</a>
 				<div
 				  class="dropdown-menu dropdown-menu-right user-dd animated p-b-0"
@@ -276,7 +276,7 @@
 					  />
 					</a>
 					<a
-					  class="dropdown-item"
+					  class="btn btn-dark dropdown-item waves-effect waves-dark"
 					  id="login-ok-btn"
 					  href="javascript:void(0)"
 					>
@@ -286,7 +286,7 @@
 				  </form>
 				  <form class="logged-in-out hide">
 					<a
-					  class="dropdown-item current-user-btn"
+					  class="disabled btn btn-dark dropdown-item current-user-btn waves-effect waves-dark"
 					  href="javascript:void(0)"
 					>
 					  <i
@@ -295,22 +295,22 @@
 					  Public
 					</a>
 					<a
-					  class="dropdown-item add-acc-btn"
+					  class="btn btn-dark dropdown-item add-acc-btn waves-effect waves-dark"
 					  href="javascript:void(0)"
 					>
 					  <i class="ti-view-list-alt m-r-5 m-l-5 ld-btn-icon"></i>
 					  Add Accounts
 					</a>
-					<a class="dropdown-item" href="javascript:void(0)">
+					<a class="disabled btn btn-dark dropdown-item waves-effect waves-dark" href="javascript:void(0)">
 					  <i class="ti-user m-r-5 m-l-5 ld-btn-icon"></i> View
 					  Profiles
 					</a>
-					<a class="dropdown-item" href="javascript:void(0)">
+					<a class="disabled btn btn-dark dropdown-item waves-effect waves-dark" href="javascript:void(0)">
 					  <i class="ti-settings m-r-5 m-l-5 ld-btn-icon"></i>
 					  Settings
 					</a>
 					<a
-					  class="dropdown-item logout-btn"
+					  class="btn btn-dark dropdown-item logout-btn waves-effect waves-dark"
 					  href="javascript:void(0)"
 					>
 					  <i class="fa fa-power-off m-r-5 m-l-5 ld-btn-icon"></i>
@@ -341,19 +341,12 @@
 			  <!-- <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link" href="index.html" aria-expanded="false"><i class="mdi mdi-view-dashboard"></i><span class="hide-menu">Inventory Manager</span></a></li> -->
 			  <!-- <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link" href="charts.html" aria-expanded="false"><i class="mdi mdi-chart-bar"></i><span class="hide-menu">Profile Status</span></a></li> -->
 			  <li class="sidebar-item">
-				<a
-				  class="sidebar-link ld-pad-top waves-effect waves-dark"
-				  aria-expanded="true"
-				>
-				  <div class="btn-group" id="game-type">
-					<button
-					  class="btn btn-secondary ld-btn-side game-type game-type-Expansion"
-					>
+				<a class="sidebar-link ld-pad-top" aria-expanded="true">
+				  <div disabled class="btn-group" id="game-type">
+					<button disabled class="btn btn-secondary ld-btn-side game-type game-type-Expansion waves-effect waves-dark">
 					  Expansion
 					</button>
-					<button
-					  class="btn btn-secondary ld-btn-side game-type game-type-Classic"
-					>
+					<button disabled class="btn btn-secondary ld-btn-side game-type game-type-Classic waves-effect waves-dark">
 					  Classic
 					</button>
 				  </div>
@@ -362,19 +355,12 @@
 				</a>
 			  </li>
 			  <li class="sidebar-item">
-				<a
-				  class="sidebar-link ld-sidebar-link waves-effect waves-dark"
-				  aria-expanded="true"
-				>
+				<a class="sidebar-link ld-sidebar-link" aria-expanded="true">
 				  <div class="btn-group" id="game-type">
-					<button
-					  class="btn btn-secondary ld-btn-side game-mode game-mode-Softcore"
-					>
+					<button disabled class="btn btn-secondary ld-btn-side game-mode game-mode-Softcore waves-effect waves-dark">
 					  Softcore
 					</button>
-					<button
-					  class="btn btn-secondary ld-btn-side game-mode game-mode-Hardcore"
-					>
+					<button disabled class="btn btn-secondary ld-btn-side game-mode game-mode-Hardcore waves-effect waves-dark">
 					  Hardcore
 					</button>
 				  </div>
@@ -383,19 +369,12 @@
 				</a>
 			  </li>
 			  <li class="sidebar-item">
-				<a
-				  class="sidebar-link ld-sidebar-link waves-effect waves-dark"
-				  aria-expanded="true"
-				>
+				<a class="sidebar-link ld-sidebar-link" aria-expanded="true">
 				  <div class="btn-group" id="game-type">
-					<button
-					  class="btn btn-secondary ld-btn-side game-class game-class-Ladder"
-					>
+					<button disabled class="btn btn-secondary ld-btn-side game-class game-class-Ladder waves-effect waves-dark">
 					  Ladder
 					</button>
-					<button
-					  class="btn btn-secondary ld-btn-side game-class game-class-NonLadder"
-					>
+					<button disabled class="btn btn-secondary ld-btn-side game-class game-class-NonLadder waves-effect waves-dark">
 					  Non Ladder
 					</button>
 				  </div>
@@ -465,7 +444,7 @@
 			  <div class="logged-in-out hide">
 				<li class="sidebar-item">
 				  <a
-					class="sidebar-link ld-sidebar-link waves-effect waves-dark"
+					class="sidebar-link ld-sidebar-link"
 					href="javascript:void(0)"
 					aria-expanded="true"
 				  >
@@ -485,7 +464,7 @@
 				</li>
 				<li class="sidebar-item">
 				  <a
-					class="sidebar-link ld-sidebar-link waves-effect waves-dark"
+					class="sidebar-link ld-sidebar-link"
 					aria-expanded="true"
 				  >
 					<div class="block">
@@ -504,10 +483,10 @@
 				</li>
 				<li class="sidebar-item">
 				  <a
-					class="sidebar-link ld-sidebar-link waves-effect waves-dark"
+					class="sidebar-link ld-sidebar-link"
 					aria-expanded="true"
 				  >
-					<button class="btn btn-secondary ld-btn-wide launch-btn">
+					<button class="btn btn-secondary ld-btn-wide launch-btn waves-effect waves-dark">
 					  Launch
 					</button>
 					<br />
@@ -561,26 +540,18 @@
 			  <div class="card">
 				<div class="card drop-queue">
 				  <h4 class="card-title ld-title-indent">Queue</h4>
-				  <div
-					style="
-					  display: flex;
-					  flex-direction: row;
-					  flex-wrap: wrap;
-					  min-height: 40px;
-					"
-				  >
-					<button class="btn btn-success" id="imgur-upload-btn">
-					  Trade List Image<i class="ml-1 far fa-images"></i>
+				  <div style="display: flex; flex-direction: row; flex-wrap: wrap;">
+					<button class="btn btn-success waves-effect waves-dark" id="imgur-upload-btn">
+                        Capture
+                        <i class="ml-1 far fa-images"></i>
 					</button>
-					<button class="btn btn-success" id="imgur-upload-btn">
-					  Save For Later<i
-						class="ml-1 far fa-arrow-alt-circle-up"
-					  ></i>
+					<button disabled class="btn btn-success waves-effect waves-dark" id="imgur-upload-btn">
+                        Save
+                        <i class="ml-1 far fa-arrow-alt-circle-up"></i>
 					</button>
-					<button class="btn btn-success" id="imgur-upload-btn">
-					  Restore From Cookie<i
-						class="ml-1 far fa-arrow-alt-circle-down"
-					  ></i>
+					<button disabled class="btn btn-success waves-effect waves-dark" id="imgur-upload-btn">
+                        Restore
+                        <i class="ml-1 far fa-arrow-alt-circle-down"></i>
 					</button>
 				  </div>
 				  <div
@@ -612,7 +583,7 @@
 		  <div class="custom-footer">
 			<a target="_blank" href="https://github.com/Fa-b/limedrop">
 			  <i class="fab fa-github fa-2x"></i>
-			  <h6 id="show">Share me!</h6>
+			  <h6 id="show">Report Issues</h6>
 			</a>
 		  </div>
 		</div>
@@ -660,7 +631,7 @@
 			  data-dismiss="modal"
 			  aria-label="Close"
 			>
-			  <span aria-hidden="true">&times;</span>
+			<i class="far fa-times-circle fa-2x"></i>
 			</button>
 		  </div>
 		  <div class="modal-body">
@@ -755,7 +726,7 @@
 	>
 	  <div class="modal-dialog" role="document">
 		<div class="modal-content">
-		  <div class="modal-header">
+		  <div class="modal-header waves-effect waves-dark">
 			<h5 class="modal-title" id="template-login">Login</h5>
 			<button
 			  type="button"
@@ -763,7 +734,7 @@
 			  data-dismiss="modal"
 			  aria-label="Close"
 			>
-			  <span aria-hidden="true">&times;</span>
+			<i class="far fa-times-circle fa-2x"></i>
 			</button>
 		  </div>
 		  <div class="modal-body"></div>
@@ -802,19 +773,16 @@
 			  data-dismiss="modal"
 			  aria-label="Close"
 			>
-			  <span aria-hidden="true">&times;</span>
+				<i class="far fa-times-circle fa-2x"></i>
 			</button>
 		  </div>
 		  <div class="modal-body" style="padding:0px">
 			<div style="text-align: center;" id="itemScreenshot"></div>
 		  </div>
 		  <div class="modal-footer">
-			<div class="start-upload-btn" title="Upload image to Imgur">
-			  <a class="waves-effect waves-dark"
-				><i class="ti-upload"></i
-			  ></a>
-			</div>
-		  </div>
+            <button title="Upload Image to Imgur" type="button" class="icon" id="begin-upload-btn">
+                <i class="fas fa-upload fa-2x"></i>
+            </button>
 		</div>
 	  </div>
 	</div>
