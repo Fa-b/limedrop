@@ -385,22 +385,22 @@ require(["D2Bot"], function (D2BOTAPI) {
 		var template = `
 <a class="` + (perm ? `always-there ` : "") + `ld-notify-card link" style="border-top:1px solid #3c3c3c">
 	<div class="d-flex no-block align-items-center p-10">
-        <span class="btn btn-success btn-circle">
-            <i class="ti-calendar"></i>
-        </span>
+	<span class="p-2">
+		<i class="far fa-flag"></i>
+			</span>
         <div class="m-l-10">
             <h5 class="m-b-0">` + head + `</h5>
             <span class="mail-desc">` + text + `</span>
         </div>
 	</div>
 </a>`;
-    
-        $("#ldNotify").append($(template));
 
-        var expanded = $("#ldNotifyDrop").attr("aria-expanded");
-        $("#ldNotifyDrop").click();
-        if(expanded === "true")
-            $("#ldNotifyDrop").click();
+		$("#ldNotify").append($(template));
+
+		var expanded = $("#ldNotifyDrop").attr("aria-expanded");
+		$("#ldNotifyDrop").click();
+		if (expanded === "true")
+			$("#ldNotifyDrop").click();
 
 		$(".ld-notify-card").off("click");
 		$(".ld-notify-card").click(function (event) {
@@ -512,7 +512,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			result.character +
 			"-" +
 			itemUID;
-		var htmlTemplate =`
+		var htmlTemplate = `
 <div class="d-flex flex-row comment-row p-l-0 m-t-0 m-b-0" id="` + itemUID + `">
     <div class="p-2 ld-img-col" style="position:relative; display: flex; align-self: center; justify-content: center;">
         <div style="position:relative">
@@ -631,7 +631,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 	function updateItemCount(groupId) {
 		var count = $("#item-menu-select-" + groupId + " option").length;
-		var countTemplate =`
+		var countTemplate = `
 <span class="badge badge-dark animated wobble" style="webkit-animation-duration: 0.3s; animation-duration: 0.3s; border: 1px solid #464646; box-shadow: 0px 0px 5px #00000066;">
     <h6 class="styled-counter" if="item-menu-count-` + groupId + `">` + count + `</h6>
 </span>`;
@@ -656,16 +656,16 @@ require(["D2Bot"], function (D2BOTAPI) {
 		if (!itemUID) return undefined;
 
 		var specs = itemUID.split(":")[0] + " - ";
-		if(result.groupData.specs) {
+		if (result.groupData.specs) {
 			var desc = result.description.replace(/\n|\r/gm, "");
 			specs = "";
 			result.groupData.specs.forEach((entry) => {
-				if(desc.match(new RegExp(entry[0], 'gi')))
+				if (desc.match(new RegExp(entry[0], 'gi')))
 					specs += desc.replace(new RegExp(entry[0], 'gi'), entry[1]) + " - ";
 			});
 		}
 		result.groupId = $group.attr("id");
-		var optionTemplate =`<option value="` + itemUID + `" id="item-menu-option-` + result.groupId + `">` + specs + result.account+"/"+result.character + `</option>`;
+		var optionTemplate = `<option value="` + itemUID + `" id="item-menu-option-` + result.groupId + `">` + specs + result.account + "/" + result.character + `</option>`;
 		var $itemOption = $(optionTemplate);
 		$itemOption.data("itemData", result);
 
@@ -705,7 +705,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			var title = description.shift();
 			var count = 0;
 			description = description.join("<br/>");
-			var htmlTemplate =`
+			var htmlTemplate = `
 <div class="d-flex flex-row comment-row hidden p-l-0 m-t-0 m-b-0" aria-haspopup="true" id="` + groupId + `">
     <div class="p-2 ld-img-col" style="position:relative; display: flex; align-self: center; justify-content: center;">
         <div style="position:relative">
@@ -794,38 +794,38 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 				$("#item-menu-input-" + groupId).val(i);
 			}
-            
+
 			$(document).on("click", function (event) {
-                let selectBox = $("#item-menu-select-"+groupId);
-                let groupMenu = $("#item-menu-" + groupId);
-                
+				let selectBox = $("#item-menu-select-" + groupId);
+				let groupMenu = $("#item-menu-" + groupId);
+
 				if ($(event.target).closest($itemGroup).length) {
 					// Show dropdown item selection
 					groupMenu.show();
 					// Using mousedown & move might be good for checking the change events in the input box :)
-					selectBox.on("change mousedown mousemove", function() {
+					selectBox.on("change mousedown mousemove", function () {
 						updateSelectCount($(this));
 					});
-                    
-                    var selectList = () => {
-                        list = selectBox.val();
-                        for (var item in list) {
-                            selectBox.find("option[value='" + list[item] + "']").each(function () {
-                                var item = $addItem($(this).data("itemData"));
-                                item.trigger("click");
-                                $(this).remove();
-                                updateItemCount(groupId);
-                            });
-                        }
+
+					var selectList = () => {
+						list = selectBox.val();
+						for (var item in list) {
+							selectBox.find("option[value='" + list[item] + "']").each(function () {
+								var item = $addItem($(this).data("itemData"));
+								item.trigger("click");
+								$(this).remove();
+								updateItemCount(groupId);
+							});
+						}
 					};
-                    
+
 					selectBox.on("keydown", function (e) {
-						var key = window.event?window.event.keyCode:e.which;
-						if(key == 13)// the enter key code
-                            selectList();
-                    });
-                    
-                    $("#group-list-btn-" + groupId).on("click", selectList);
+						var key = window.event ? window.event.keyCode : e.which;
+						if (key == 13)// the enter key code
+							selectList();
+					});
+
+					$("#group-list-btn-" + groupId).on("click", selectList);
 				} else if (!$(event.target).closest("#item-menu-select-" + groupId).length) {
 					// Close the dropdown item selection if the user clicks outside of it
 					selectBox.off();
@@ -861,55 +861,55 @@ require(["D2Bot"], function (D2BOTAPI) {
 		return retRegex;
 	}
 
-	function addItemstoList(limit=true, itemGroups=[], dummyData=(Object.keys(AccountsMap).length===0)) {
+	function addItemstoList(limit = true, itemGroups = [], dummyData = (Object.keys(AccountsMap).length === 0)) {
 		var loader = document.getElementById("loader");
-        loader.hidden = false;
-        
-        if(dummyData) {
-            showNotification("Dummy Output", "No accounts found, dummy data will be used!", false);
-            var items = JSON.parse(JSON.stringify(Items));
-            var idx = 0;
-            for (var key in Items) {
-                items[key].description = items[key].description.replace(/\$(\d+):/gmi, "$" + (idx++).toString().padStart(8, '0') + ":");
-            }
-        }
-		
-		function queryCountables($account, $character, loadMoreItem, itemGroup={key: "all", value: { regex: "" } }) {
-            loader.hidden = false;
-            var callback = function (err, results) {
+		loader.hidden = false;
+
+		if (dummyData) {
+			showNotification("Dummy Output", "No accounts found, dummy data will be used!", false);
+			var items = JSON.parse(JSON.stringify(Items));
+			var idx = 0;
+			for (var key in Items) {
+				items[key].description = items[key].description.replace(/\$(\d+):/gmi, "$" + (idx++).toString().padStart(8, '0') + ":");
+			}
+		}
+
+		function queryCountables($account, $character, loadMoreItem, itemGroup = { key: "all", value: { regex: "" } }) {
+			loader.hidden = false;
+			var callback = function (err, results) {
 				if (err) { console.log(err); return false; };
 				var y = $(window).scrollTop();
-				
+
 				var ladder = CurrentGameClass == "Ladder";
 				var sc = CurrentGameMode == "Softcore";
 				var lod = CurrentGameType == "Expansion";
-				
+
 				// Here go the countable items by RegEx.. to extend the list simply append another entry to LimeConfig.js.
 				// Countable items will receive an additional number field in the view (upper right corner of item box).
 				for (var i in results) {
-					if(results[i].description) {
+					if (results[i].description) {
 						//if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
-							var item = {
-								classid: results[i].description.split("$")[1].split(":")[1],
-								uid: results[i].description.split("$")[1],
-								location: results[i].description.split("$")[1].split(":")[2],
-								x: results[i].description.split("$")[1].split(":")[3],
-								y: results[i].description.split("$")[1].split(":")[4]
-							};
-							var itemID = results[i].description.split("$")[1].split(":")[1];
-							results[i].group = itemGroup.key;
-							results[i].groupData = itemGroup.value;
-							if(!countables[item.uid])
-								countables[item.uid] = []
-							if(!countables[item.uid][itemGroup.key])
-								countables[item.uid][itemGroup.key] = $addItemGroup(results[i]);
-								
+						var item = {
+							classid: results[i].description.split("$")[1].split(":")[1],
+							uid: results[i].description.split("$")[1],
+							location: results[i].description.split("$")[1].split(":")[2],
+							x: results[i].description.split("$")[1].split(":")[3],
+							y: results[i].description.split("$")[1].split(":")[4]
+						};
+						var itemID = results[i].description.split("$")[1].split(":")[1];
+						results[i].group = itemGroup.key;
+						results[i].groupData = itemGroup.value;
+						if (!countables[item.uid])
+							countables[item.uid] = []
+						if (!countables[item.uid][itemGroup.key])
+							countables[item.uid][itemGroup.key] = $addItemGroup(results[i]);
 
-							$updateItemGroup(countables[item.uid][itemGroup.key], results[i]);
+
+						$updateItemGroup(countables[item.uid][itemGroup.key], results[i]);
 						//}
 					}
 				}
-				
+
 				$(window).scrollTop(y);
 				//loader.hidden = true;
 
@@ -918,80 +918,80 @@ require(["D2Bot"], function (D2BOTAPI) {
 					loadMoreItem();
 				}
 			}
-            
-            var regex = "^"+itemGroup.value.regex.toLocaleLowerCase()+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$";
-            
-            if(!dummyData) {
-                API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
-            } else {
-                console.warn("No accounts found. Appending dummy group items..");
-                setTimeout(() => {
-                    var re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
-                    var list = [];
-                    for (var key in items) {
-                        if(re.exec(items[key].description)) {
-                            list.push(items[key]);
-                        }
-                    }
-                    
-                    callback(null, list);
-                }, 0);
-            }
+
+			var regex = "^" + itemGroup.value.regex.toLocaleLowerCase() + buildregex($("#search-bar").val().toLocaleLowerCase()) + ".*$";
+
+			if (!dummyData) {
+				API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
+			} else {
+				console.warn("No accounts found. Appending dummy group items..");
+				setTimeout(() => {
+					var re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
+					var list = [];
+					for (var key in items) {
+						if (re.exec(items[key].description)) {
+							list.push(items[key]);
+						}
+					}
+
+					callback(null, list);
+				}, 0);
+			}
 		}
 
 		function doQuery($account, $character, loadMoreItem) {
-            loader.hidden = false;
-            var callback = function (err, results) {
-                if (err) {
-                    console.log(err);
-                    return;
-                }
-                var y = $(window).scrollTop();
+			loader.hidden = false;
+			var callback = function (err, results) {
+				if (err) {
+					console.log(err);
+					return;
+				}
+				var y = $(window).scrollTop();
 
-                var item;
-                var ladder = CurrentGameClass == "Ladder";
-                var sc = CurrentGameMode == "Softcore";
-                var lod = CurrentGameType == "Expansion";
+				var item;
+				var ladder = CurrentGameClass == "Ladder";
+				var sc = CurrentGameMode == "Softcore";
+				var lod = CurrentGameType == "Expansion";
 
-                for (var i in results) {
-                    if (results[i].description) {
-                        //if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
-                        var itemID = results[i].description.split("$")[1].split(":")[1];
-                        // Only the first countable item will be used
-                        item = $addItem(results[i]);
+				for (var i in results) {
+					if (results[i].description) {
+						//if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
+						var itemID = results[i].description.split("$")[1].split(":")[1];
+						// Only the first countable item will be used
+						item = $addItem(results[i]);
 
-                        itemCount += 1;
-                        //}
-                    }
-                }
+						itemCount += 1;
+						//}
+					}
+				}
 
-                $(window).scrollTop(y);
-                //loader.hidden = true;
+				$(window).scrollTop(y);
+				//loader.hidden = true;
 
-                roundTime.elapsed = new Date().getTime();
-                if (loadMoreItem) {
-                    loadMoreItem();
-                }
-            }
-            
-            var regex = "^"+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$";
-            
-            if(!dummyData) {
-                API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
-            } else {
-                console.warn("No accounts found. Appending dummy items..");
-                setTimeout(() => {
-                    var re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
-                    var list = [];
-                    for (var key in items) {
-                        if(re.exec(items[key].description)) {
-                            list.push(items[key]);
-                        }
-                    }
+				roundTime.elapsed = new Date().getTime();
+				if (loadMoreItem) {
+					loadMoreItem();
+				}
+			}
 
-                    return callback(null, list);
-                }, 0);
-            }
+			var regex = "^" + buildregex($("#search-bar").val().toLocaleLowerCase()) + ".*$";
+
+			if (!dummyData) {
+				API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
+			} else {
+				console.warn("No accounts found. Appending dummy items..");
+				setTimeout(() => {
+					var re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
+					var list = [];
+					for (var key in items) {
+						if (re.exec(items[key].description)) {
+							list.push(items[key]);
+						}
+					}
+
+					return callback(null, list);
+				}, 0);
+			}
 		}
 
 		var ended;
@@ -1014,15 +1014,15 @@ require(["D2Bot"], function (D2BOTAPI) {
 			for (var i in AccountsMap) {
 				accList.push(i);
 			}
-            
-            if(accList.length === 0)
-                accList.push("");
+
+			if (accList.length === 0)
+				accList.push("");
 		} else {
 			accList.push(account);
 		}
-		
+
 		console.log(itemGroups);
-		
+
 		for (var group in itemGroups) {
 			groupList.push({ key: group, value: itemGroups[group] });
 		}
@@ -1054,7 +1054,7 @@ require(["D2Bot"], function (D2BOTAPI) {
     <p>End of Items on all Accounts</p>
 	<span class="m-b-15 d-block">` + itemCount + ` Items in total.
         <br>` + groupCount + ` item groups sorted after ` + (roundTime.groups / 1000).toFixed(3) + ` seconds. ` + groupItemCount + ` items were grouped.
-        <br>Saved ` + savedEntryCount + ` list entries with ` + groupEntryCount +` group entries
+        <br>Saved ` + savedEntryCount + ` list entries with ` + groupEntryCount + ` group entries
         <br>After ` + (roundTime.total / 1000).toFixed(3) + ` seconds in total.
 	</span>
 </div>`;
@@ -1114,7 +1114,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
 		};
 
-        queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
+		queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
 		loader.hidden = true;
 	}
 
@@ -1183,7 +1183,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		if (loggedin) {
 			$(".logged-in-out").fadeToggle("hide");
 			$(".current-user-btn").html(
-				"<i class='font-24 mdi mdi-account-circle current-user-btn'></i>" +
+				"<i class='font-24 mdi mdi-account current-user-btn'></i>" +
 				cookie.data.username +
 				"</a>"
 			);
@@ -1429,6 +1429,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		$(".launch-btn").click(function () {
 			var gamename = $("#gamename").val();
 			var gamepass = $("#gamepass").val();
+			showNotification("Dropping at", `Game name: ${gamename} <br> Password: ${gamepass} <br> Date: ${d = new Date().toLocaleString()}`, false);
 			var drops = {};
 
 			if (!gamename || gamename == "") {
@@ -1580,10 +1581,10 @@ require(["D2Bot"], function (D2BOTAPI) {
 			}, 500);*/
 		});
 	});
-	
+
 	$("#begin-upload-btn").click(function () {
 		// Begin file upload
-        $(this).attr("disabled", true);
+		$(this).attr("disabled", true);
 		console.log("Uploading file to Imgur..");
 
 		var settings = {
@@ -1598,28 +1599,27 @@ require(["D2Bot"], function (D2BOTAPI) {
 				Accept: 'application/json'
 			},
 			mimeType: 'multipart/form-data',
-		    error: function(jqXHR, textStatus, errorMessage) {
-				console.err(jqXHR,textStatus,errorMessage); // Optional
-		    }
+			error: function (jqXHR, textStatus, errorMessage) {
+				console.err(jqXHR, textStatus, errorMessage); // Optional
+			}
 		};
-		
+
 		var container = document.getElementById("itemScreenshot");
-        
-        html2canvas(container.firstChild).then(canvas => {
-            $(this).removeAttr("disabled");
-            $('#upload-imgur-modal').modal('hide');
+
+		html2canvas(container.firstChild).then(canvas => {
+			$(this).removeAttr("disabled");
+			$('#upload-imgur-modal').modal('hide');
 			var formData = new FormData();
 			formData.append("image", canvas.toDataURL().split("data:image/png;base64,")[1]);
 			settings.data = formData;
-			$.ajax(settings).done(function(response) {
-                $('#upload-imgur-modal').modal('hide');
+			$.ajax(settings).done(function (response) {
+				$('#upload-imgur-modal').modal('hide');
 				var imgurResponse = JSON.parse(response);
 				console.log(imgurResponse);
 				showNotification("Uploaded Image to Imgur", `<a target='_blank' rel='noopener noreferrer' href='` + imgurResponse.data.link + `' style='color:#2962ff'>` + imgurResponse.data.link + `</a>`, false);
 			});
 		});
 	});
-
 	initialize();
 	showNotification("Notification", "Welcome to Lime Drop!", true);
 	API.emit("poll", function () { });
