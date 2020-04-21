@@ -525,3 +525,21 @@ h6.drop-queue-styled {
 .navbar-icons{
   font-size: 20px;
 }
+/* Mobile media querys Rev patches, such an awfull way to make things. */
+
+@media (max-width: 600px) {
+  :root h6,span{
+    font-size: 10px;
+  }
+  .page-wrapper .container-fluid {
+    padding: 0px !important;
+  }
+  .comment-footer{
+    font-size: 7px;
+    width: auto !important;
+  }
+  .styled-search-menu {
+    width: auto;
+    top: calc(100% - -5px);
+  }
+}
