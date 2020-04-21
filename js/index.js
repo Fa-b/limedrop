@@ -39,6 +39,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 	var groupEntryCount = 0;
 	var MAX_ITEM = 1000;
 	var countables = [];
+	var drops = {};
 
 	(function enableBackToTop() {
 		var backToTop = $("<a>", {
@@ -1359,7 +1360,65 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 						for (var i = 0; i < msg.body.length; i++) {
 							var data = JSON.parse(msg.body[i].body);
-							showNotification("Game Action", data.data, false);
+							drops[data.hash].forEach(itemData => {
+								console.log(itemData.itemid);
+								//$("#" + itemData.itemid).remove();
+								var item = document.getElementById(itemData.itemid);
+								item.parentNode.removeChild(item);
+							});
+							
+						}
+						
+						
+						var itemTitles = [];
+						
+						drops[data.hash].forEach(itemData => {
+							var description = cleanDecription(itemData.description).split("<br/>");
+							itemTitles.push(description.shift());
+						});
+						
+						// TODO: add data to logfile
+						
+						delete drops[data.hash];
+						
+						if(itemTitles.length > 0) {
+							var titles = itemTitles.join("<br/>")
+							if(data.data == "GameAction has completed task") {
+								showNotification(data.data, "Items Dropped:<br/>" + titles, false);
+							} else if(data.status) {
+								if(data.status == "error" || data.status == "failed") {
+									showNotification("<span class='color1'>" + data.data + "</span><br/>", "<span class='color1'>Not Dropped:</span><br/>" + titles, false);
+								} else {
+									showNotification(data.data, "Happy to be back :-)" , false);
+								}
+							} else {
+								showNotification("<span class='color1'>" + data.data + "</span><br/>", "<span class='color1'>Not Dropped:</span><br/>" + titles, false);
+							}
+						} else {
+							showNotification(data.data, "Happy to be back :-)" , false);
+						}
+						
+						// Check our queue list if it is empty yet
+						var queuedItems = document.getElementById("dropQueueList").children;
+						// Queue is empty, so we finished :-)
+						if(queuedItems.length == 0) {
+							// TODO: store and link logfile
+							var keys = Object.keys(drops);
+							if(keys.length === 0) {
+								showNotification("Finished", "All tasks have completed", false);
+							} else {
+								itemTitles = [];
+								keys.forEach(key => {
+									drops[key].forEach(itemData => {
+										var description = cleanDecription(itemData.description).split("<br/>");
+										itemTitles.push(description.shift());
+									});
+								});
+
+								drops = {};
+								
+								showNotification("<span class='color1'>Fatal</span><br/>", "<span class='color1'>Something went wrong with the following items:</span><br/>" + titles, false);
+							}
 						}
 					});
 				}
@@ -1430,7 +1489,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		$(".launch-btn").click(function () {
 			var gamename = $("#gamename").val();
 			var gamepass = $("#gamepass").val();
-			var drops = {};
+			drops = {};
 
 			if (!gamename || gamename == "") {
 				alert("GameName Required!");
@@ -1440,10 +1499,10 @@ require(["D2Bot"], function (D2BOTAPI) {
 			$(".selected").each(function (i, v) {
 				var $item = $(v);
 				var item = $item.data("itemData");
-				delete item.image;
-				delete item.description;
+				//delete item.image;
+				//delete item.description;
 
-				$item.remove();
+				//$item.remove();
 
 				// It appears this causes issues during realm selection otherwise
 				item.realm = item.realm.toLowerCase();
