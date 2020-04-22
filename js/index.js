@@ -1516,6 +1516,9 @@ require(["D2Bot"], function (D2BOTAPI) {
 				drops[hash].push(item);
 			});
 
+			var idx = 0;
+			const start = Date.now();
+			
 			for (var d in drops) {
 				if (drops.hasOwnProperty(d)) {
 					var GameInfo = {
@@ -1529,7 +1532,11 @@ require(["D2Bot"], function (D2BOTAPI) {
 						})
 					};
 
-					API.emit("gameaction", GameInfo, function (err) { });
+					setTimeout((i) => {
+						console.log("Scheduled drop", i, "after", ((Date.now() - start)/1000).toFixed(3),"seconds");
+						API.emit("gameaction", GameInfo, function (err) { });
+					}, idx * 1000, idx++);
+					
 				}
 			}
 		});
