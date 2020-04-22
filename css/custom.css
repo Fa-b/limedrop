@@ -329,7 +329,8 @@ td {
   background-color: transparent;
   width: auto;
 }
-.styled-item-menu input::-webkit-outer-spin-button,
+.styled-item-menu
+  input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
@@ -340,16 +341,16 @@ input::-webkit-inner-spin-button {
   background-color: transparent;
 }
 .styled-item-menu select {
-    border: none;
-    color: white;
-    padding: 5px;
-    background-color: #505050;
-    border-radius: 5px;
+  border: none;
+  color: white;
+  padding: 5px;
+  background-color: #505050;
+  border-radius: 5px;
 }
 
 .styled-item-menu select[size] {
-    width: 100%;
-    height: calc(100% - 50px);
+  width: 100%;
+  height: calc(100% - 50px);
 }
 
 .styled-item-menu select:focus:se {
@@ -362,7 +363,8 @@ input::-webkit-inner-spin-button {
   border-radius: 20px;
 }
 
-.styled-item-menu select::-webkit-scrollbar-thumb {
+.styled-item-menu
+  select::-webkit-scrollbar-thumb {
   width: 5px;
   background-color: #11c501;
   border-radius: 20px;
@@ -522,19 +524,20 @@ h6.drop-queue-styled {
   border-radius: 15px;
 }
 
-.navbar-icons{
+.navbar-icons {
   font-size: 20px;
 }
 /* Mobile media querys Rev patches, such an awfull way to make things. */
 
 @media (max-width: 600px) {
-  :root h6,span{
+  :root h6,
+  span {
     font-size: 10px;
   }
   .page-wrapper .container-fluid {
     padding: 0px !important;
   }
-  .comment-footer{
+  .comment-footer {
     font-size: 7px;
     width: auto !important;
   }
