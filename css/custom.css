@@ -3,54 +3,70 @@
   color: Black;
 }
 
+/* WHITE */
 .color0 {
   color: #c4c4c4;
 }
 
-/* WHITE */
+/* RED */
 .color1 {
   color: #b04434;
 }
 
-/* RED */
+/* SET */
 .color2 {
   color: #18fc00;
 }
 
-/* SET */
+/* MAGIC */
 .color3 {
   color: #787ce7;
 }
 
-/* MAGIC */
+/* UNIQUE */
 .color4 {
   color: #948064;
 }
 
-/* UNIQUE */
+/* DARK GRAY */
 .color5 {
   color: #505050;
 }
 
-/* DARK GRAY */
+/* BLACK */
 .color6 {
-  color: WhiteSmoke;
+  color: #000000;
 }
 
+/* OCHER */
 .color7 {
-  color: WhiteSmoke;
+  color: #ac9c64;
 }
 
+/* CRAFT */
 .color8 {
   color: #d08420;
 }
 
-/* CRAFT */
+/* RARE */
 .color9 {
   color: #d8b864;
 }
 
-/* RARE */
+/* DARK GREEN */
+.color10 {
+  color: #186408;
+}
+
+/* PURPLE */
+.color11 {
+  color: #a420fc;
+}
+
+/* GREEN */
+.color12 {
+  color: #287c14;
+}
 
 .ld-select-add {
   width: 100% !important;

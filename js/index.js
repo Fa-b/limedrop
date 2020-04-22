@@ -660,8 +660,9 @@ require(["D2Bot"], function (D2BOTAPI) {
 			var desc = result.description.replace(/\n|\r/gm, "");
 			specs = "";
 			result.groupData.specs.forEach((entry) => {
-				if (desc.match(new RegExp(entry[0], 'gi')))
-					specs += desc.replace(new RegExp(entry[0], 'gi'), entry[1]) + " - ";
+                var regex = new RegExp(entry[0], 'gi');
+				if (desc.match(regex))
+					specs += desc.replace(regex, entry[1]) + " - ";
 			});
 		}
 		result.groupId = $group.attr("id");
@@ -698,10 +699,45 @@ require(["D2Bot"], function (D2BOTAPI) {
 		var id = itemUID.split(":")[1];
 
 		var groupId = result.group + id;
+        
+        var highlightSpecs = function(description, specs) {
+            if (!specs)
+                return description;
+
+            specs.forEach((entry, index) => {
+                
+                var lines = description.split('\n');
+                description = lines.join('<br/>');
+                
+                var find = new RegExp(entry[0], 'i');
+                
+                var regex = new MultiRegExp(find);
+                
+                //console.log(description.match(find));
+                var matches = regex.exec(description);
+                var offset = 0;
+                
+                //console.log(regex);
+                //console.log(matches);	
+                
+                Object.keys(matches).forEach(group => {
+                    var replaceStr = "<span class='color11'>#" + index + "</span>";
+                    description = description.slice(0, offset + matches[group].index) + replaceStr + description.slice(offset + matches[group].index + matches[group].text.length);
+                    offset += replaceStr.length - matches[group].text.length;
+                });
+                
+                lines = description.split('<br/>');
+                description = lines.join('\n');
+
+			});
+            
+            return description;
+        }
 
 		if (!document.getElementById(groupId)) {
 			// Group doesn't exist yet.. create it
-			var description = cleanDecription(result.description).split("<br/>");
+            var description = highlightSpecs(result.description, result.groupData.specs);
+			description = cleanDecription(description).split("<br/>");
 			var title = description.shift();
 			var count = 0;
 			description = description.join("<br/>");
@@ -866,7 +902,9 @@ require(["D2Bot"], function (D2BOTAPI) {
 		loader.hidden = false;
 
 		if (dummyData) {
-			showNotification("Dummy Output", "No accounts found, dummy data will be used!", false);
+            var dummyText = "No accounts found, dummy data will be used!";
+            console.warn(dummyText);
+			showNotification("Dummy Output", dummyText, false);
 			var items = JSON.parse(JSON.stringify(Items));
 			var idx = 0;
 			for (var key in Items) {
@@ -924,9 +962,9 @@ require(["D2Bot"], function (D2BOTAPI) {
 			if (!dummyData) {
 				API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
 			} else {
-				console.warn("No accounts found. Appending dummy group items..");
+				//console.warn("No accounts found. Appending dummy group items..");
 				setTimeout(() => {
-					var re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
+					var re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'i');
 					var list = [];
 					for (var key in items) {
 						if (re.exec(items[key].description)) {
@@ -979,7 +1017,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			if (!dummyData) {
 				API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
 			} else {
-				console.warn("No accounts found. Appending dummy items..");
+				//console.warn("No accounts found. Appending dummy items..");
 				setTimeout(() => {
 					var re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
 					var list = [];
