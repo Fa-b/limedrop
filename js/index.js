@@ -1535,7 +1535,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 					setTimeout((i) => {
 						console.log("Scheduled drop", i, "after", ((Date.now() - start)/1000).toFixed(3),"seconds");
 						console.log(GameInfo);
-						//API.emit("gameaction", GameInfo, function (err) { });
+						API.emit("gameaction", GameInfo, function (err) { });
 					}, idx * 1000, idx++);
 					
 				}
