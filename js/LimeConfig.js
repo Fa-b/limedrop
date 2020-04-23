@@ -1,12 +1,30 @@
 LimeConfig = {
     "ItemGroup": {
 /************************************************* MISC *************************************************/
-		"Runes": {
-			"regex": "(?=.+?:6([1-3][0-9]|4[0-2]):[37]:\\d:\\d$)",
+		"HighRunes": {
+			"regex": "(?=.+?:6(3[4-9]|4[0-2]):[37]:\\d:\\d$)",
 		},
-		"Gems": {
-			"regex": "(?=.+?:(5([6-7][0-9]|5[7-9]|8[0-6]|9[7-9])|60[0-1]):[37]:\\d:\\d$)",
+        "MidRunes": {
+			"regex": "(?=.+?:6(2[4-9]|3[0-4]):[37]:\\d:\\d$)",
 		},
+        "LowRunes": {
+			"regex": "(?=.+?:6(1[0-9]|2[0-3]):[37]:\\d:\\d$)",
+		},
+		"PerfectGems": {
+			"regex": "(?=.+?:(5[678][16]|601):[37]:\\d:\\d$)",
+		},
+        /*"FlawlessGems": {
+			"regex": "(?=.+?:(5[678][05]|600):[37]:\\d:\\d$)",
+		},
+        "RegularGems": {
+			"regex": "(?=.+?:5([67][49]|84|[59]9):[37]:\\d:\\d$)",
+		},
+        "FlawedGems": {
+			"regex": "(?=.+?:5([67][38]|83|[59]8):[37]:\\d:\\d$)",
+		},
+        "ChippedGems": {
+			"regex": "(?=.+?:5([67][27]|82|[59]7):[37]:\\d:\\d$)",
+		},*/
 		"Keys": {
 			"regex": "(?=.+?:64[7-9]:[37]:\\d:\\d$)",
 		},
@@ -118,6 +136,311 @@ LimeConfig = {
 				["^.+(.\\d)\\%.+(.\\d)\\%.+$", "$1/$2"],
 				["^.+(\\d\\d meteor|\\d\\d blizzard|\\d\\d chain lightning|\\d\\d venom).+(fire|cold|light|poison).+(fire|cold|light|poison).+(fire|cold|light|poison).+$", "$2"],
 				["^.+(level.up|die).+$", "$1"]
+			]
+		},
+/************************************************* SMALL CHARMS *************************************************/
+// Prefixes:
+        "DefenseSC" : {
+			"regex": "(?=ÿc3(stalwart|burly|stout).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+                ["^.+\\+(\\d+) defense.+$", "$1def"],
+				["^.+\\+(\\d) to max.+$", "$1max"],
+                ["^.+\\+(\\d+) to attack.+$", "$1ar"],
+                ["^.+\\+5\\% faster hit.+$", "5fhr"],
+                ["^.+3(\\d+)\\% extra.+$", "$1gold"],
+                ["^.+3(\\d)\\% better.+$", "$1mf"],
+                ["^.+\\+(\\d+) to life.+$", "$1life"],
+                ["^.+\\+(\\d) to str.+$", "$1str"],
+                ["^.+\\+(\\d) to dex.+$", "$1dex"],
+                ["^.+\\+(\\d)\\% faster.+$", "$1frw"],
+                ["^.+\\+(\\d+) poison.+(\\d+) seconds.+$", "$1pd"],
+                ["^.+Adds (\\d)-(\\d+) (cold|fire|lightning).+$", "$1-$2 $3"],
+			]
+		},
+        "DamageSC" : {
+			"regex": "(?=ÿc3(jagged|red).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+                ["^.+\\+(\\d) to min.+$", "$1min"],
+				["^.+\\+(\\d) to max.+$", "$1max"],
+                ["^.+\\+(\\d+) to attack.+$", "$1ar"],
+                ["^.+\\+5\\% faster hit.+$", "5fhr"],
+                ["^.+3(\\d+)\\% extra.+$", "$1gold"],
+                ["^.+3(\\d)\\% better.+$", "$1mf"],
+                ["^.+\\+(\\d+) to life.+$", "$1life"],
+                ["^.+\\+(\\d) to str.+$", "$1str"],
+                ["^.+\\+(\\d) to dex.+$", "$1dex"],
+                ["^.+\\+(\\d)\\% faster.+$", "$1frw"],
+                ["^.+\\+(\\d+) poison.+(\\d+) seconds.+$", "$1pd"],
+                ["^.+Adds (\\d)-(\\d+) (cold|fire|lightning).+$", "$1-$2 $3"],
+			]
+		},
+        "StaminaSC" : {
+			"regex": "(?=ÿc3rugged.+?:603:[37]:\\d:\\d$)",
+			"specs": [
+                ["^.+\\+(\\d+) maximum stamina.+$", "$1stamina"],
+				["^.+\\+(\\d) to max.+$", "$1max"],
+                ["^.+\\+(\\d+) to attack.+$", "$1ar"],
+                ["^.+\\+5\\% faster hit.+$", "5fhr"],
+                ["^.+3(\\d+)\\% extra.+$", "$1gold"],
+                ["^.+3(\\d)\\% better.+$", "$1mf"],
+                ["^.+\\+(\\d+) to life.+$", "$1life"],
+                ["^.+\\+(\\d) to str.+$", "$1str"],
+                ["^.+\\+(\\d) to dex.+$", "$1dex"],
+                ["^.+\\+(\\d)\\% faster.+$", "$1frw"],
+                ["^.+\\+(\\d+) poison.+(\\d+) seconds.+$", "$1pd"],
+                ["^.+Adds (\\d)-(\\d+) (cold|fire|lightning).+$", "$1-$2 $3"],
+			]
+		},
+        "ARSC" : {
+			"regex": "(?=ÿc3(fine|steel|iron|bronze).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d) to max.+\\+(\\d+) to attack.+$", "$1max"],
+                ["^.+\\+(\\d+) to attack.+$", "$1ar"],
+                ["^.+\\+5\\% faster hit.+$", "5fhr"],
+                ["^.+3(\\d+)\\% extra.+$", "$1gold"],
+                ["^.+3(\\d)\\% better.+$", "$1mf"],
+                ["^.+\\+(\\d+) to life.+$", "$1life"],
+                ["^.+\\+(\\d) to str.+$", "$1str"],
+                ["^.+\\+(\\d) to dex.+$", "$1dex"],
+                ["^.+\\+(\\d)\\% faster.+$", "$1frw"],
+                ["^.+\\+(\\d+) poison.+(\\d+) seconds.+$", "$1pd"],
+                ["^.+Adds (\\d)-(\\d+) (cold|fire|lightning).+$", "$1-$2 $3"],
+			]
+		},
+        "ManaSC" : {
+			"regex": "(?=ÿc3(serpent|snake|lizard).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+                ["^.+\\+(\\d+) to mana.+$", "$1max"],
+				["^.+\\+(\\d) to max.+$", "$1max"],
+                ["^.+\\+(\\d+) to attack.+$", "$1ar"],
+                ["^.+\\+5\\% faster hit.+$", "5fhr"],
+                ["^.+3(\\d+)\\% extra.+$", "$1gold"],
+                ["^.+3(\\d)\\% better.+$", "$1mf"],
+                ["^.+\\+(\\d+) to life.+$", "$1life"],
+                ["^.+\\+(\\d) to str.+$", "$1str"],
+                ["^.+\\+(\\d) to dex.+$", "$1dex"],
+                ["^.+\\+(\\d)\\% faster.+$", "$1frw"],
+                ["^.+\\+(\\d+) poison.+(\\d+) seconds.+$", "$1pd"],
+                ["^.+Adds (\\d)-(\\d+) (cold|fire|lightning).+$", "$1-$2 $3"],
+			]
+		},
+        "AllResSC" : {
+			"regex": "(?=ÿc3shimmering.+?:603:[37]:\\d:\\d$)",
+			"specs": [
+                ["^.+all resistances \\+(\\d).+$", "$1@"],
+				["^.+\\+(\\d) to max.+$", "$1max"],
+                ["^.+\\+(\\d+) to attack.+$", "$1ar"],
+                ["^.+\\+5\\% faster hit.+$", "5fhr"],
+                ["^.+3(\\d+)\\% extra.+$", "$1gold"],
+                ["^.+3(\\d)\\% better.+$", "$1mf"],
+                ["^.+\\+(\\d+) to life.+$", "$1life"],
+                ["^.+\\+(\\d) to str.+$", "$1str"],
+                ["^.+\\+(\\d) to dex.+$", "$1dex"],
+                ["^.+\\+(\\d)\\% faster.+$", "$1frw"],
+                ["^.+\\+(\\d+) poison.+(\\d+) seconds.+$", "$1pd"],
+                ["^.+Adds (\\d)-(\\d+) (cold|fire|lightning).+$", "$1-$2 $3"],
+			]
+		},
+        "ColdResSC" : {
+			"regex": "(?=ÿc3(sapphire|cobalt|lapis|azure).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+                ["^.+resist \\+(\\d+)\\%.+$", "$1 cold res"],
+				["^.+\\+(\\d) to max.+$", "$1max"],
+                ["^.+\\+(\\d+) to attack.+$", "$1ar"],
+                ["^.+\\+5\\% faster hit.+$", "5fhr"],
+                ["^.+3(\\d+)\\% extra.+$", "$1gold"],
+                ["^.+3(\\d)\\% better.+$", "$1mf"],
+                ["^.+\\+(\\d+) to life.+$", "$1life"],
+                ["^.+\\+(\\d) to str.+$", "$1str"],
+                ["^.+\\+(\\d) to dex.+$", "$1dex"],
+                ["^.+\\+(\\d)\\% faster.+$", "$1frw"],
+                ["^.+\\+(\\d+) poison.+(\\d+) seconds.+$", "$1pd"],
+                ["^.+Adds (\\d)-(\\d+) (cold|fire|lightning).+$", "$1-$2 $3"],
+			]
+		},
+        "FireResSC" : {
+			"regex": "(?=ÿc3(ruby|garnet|russet|crimson).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+                ["^.+resist \\+(\\d+)\\%.+$", "$1 fire res"],
+				["^.+\\+(\\d) to max.+$", "$1max"],
+                ["^.+\\+(\\d+) to attack.+$", "$1ar"],
+                ["^.+\\+5\\% faster hit.+$", "5fhr"],
+                ["^.+3(\\d+)\\% extra.+$", "$1gold"],
+                ["^.+3(\\d)\\% better.+$", "$1mf"],
+                ["^.+\\+(\\d+) to life.+$", "$1life"],
+                ["^.+\\+(\\d) to str.+$", "$1str"],
+                ["^.+\\+(\\d) to dex.+$", "$1dex"],
+                ["^.+\\+(\\d)\\% faster.+$", "$1frw"],
+                ["^.+\\+(\\d+) poison.+(\\d+) seconds.+$", "$1pd"],
+                ["^.+Adds (\\d)-(\\d+) (cold|fire|lightning).+$", "$1-$2 $3"],
+			]
+		},
+        "LightResSC" : {
+			"regex": "(?=ÿc3(amber|coral|ocher|tangerine).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+                ["^.+resist \\+(\\d+)\\%.+$", "$1 light res"],
+				["^.+\\+(\\d) to max.+$", "$1max"],
+                ["^.+\\+(\\d+) to attack.+$", "$1ar"],
+                ["^.+\\+5\\% faster hit.+$", "5fhr"],
+                ["^.+3(\\d+)\\% extra.+$", "$1gold"],
+                ["^.+3(\\d)\\% better.+$", "$1mf"],
+                ["^.+\\+(\\d+) to life.+$", "$1life"],
+                ["^.+\\+(\\d) to str.+$", "$1str"],
+                ["^.+\\+(\\d) to dex.+$", "$1dex"],
+                ["^.+\\+(\\d)\\% faster.+$", "$1frw"],
+                ["^.+\\+(\\d+) poison.+(\\d+) seconds.+$", "$1pd"],
+                ["^.+Adds (\\d)-(\\d+) (cold|fire|lightning).+$", "$1-$2 $3"],
+			]
+		},
+        "PoisonResSC" : {
+			"regex": "(?=ÿc3(emerald|jade|viridian|beryl).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+                ["^.+resist \\+(\\d+)\\%.+$", "$1 poison res"],
+				["^.+\\+(\\d) to max.+$", "$1max"],
+                ["^.+\\+(\\d+) to attack.+$", "$1ar"],
+                ["^.+\\+5\\% faster hit.+$", "5fhr"],
+                ["^.+3(\\d+)\\% extra.+$", "$1gold"],
+                ["^.+3(\\d)\\% better.+$", "$1mf"],
+                ["^.+\\+(\\d+) to life.+$", "$1life"],
+                ["^.+\\+(\\d) to str.+$", "$1str"],
+                ["^.+\\+(\\d) to dex.+$", "$1dex"],
+                ["^.+\\+(\\d)\\% faster.+$", "$1frw"],
+                ["^.+\\+(\\d+) poison.+(\\d+) seconds.+$", "$1pd"],
+                ["^.+Adds (\\d)-(\\d+) (cold|fire|lightning).+$", "$1-$2 $3"],
+			]
+		},
+        "ColdDmgSC" : {
+			"regex": "(?=ÿc3(hibernal|boreal|shivering|snowflake).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d) to max.+$", "$1max"],
+                ["^.+\\+(\\d+) to attack.+$", "$1ar"],
+                ["^.+\\+5\\% faster hit.+$", "5fhr"],
+                ["^.+3(\\d+)\\% extra.+$", "$1gold"],
+                ["^.+3(\\d)\\% better.+$", "$1mf"],
+                ["^.+\\+(\\d+) to life.+$", "$1life"],
+                ["^.+\\+(\\d) to str.+$", "$1str"],
+                ["^.+\\+(\\d) to dex.+$", "$1dex"],
+                ["^.+\\+(\\d)\\% faster.+$", "$1frw"],
+                ["^.+\\+(\\d+) poison.+(\\d+) seconds.+$", "$1pd"],
+                ["^.+Adds (\\d+)-(\\d+) cold.+$", "$1-$2 cold"],
+                ["^.+Adds (\\d+)-(\\d+) (fire|lightning).+$", "$1-$2 $3"],
+			]
+		},
+        "FireDmgSC" : {
+			"regex": "(?=ÿc3(flaming|smoking|smoldering|ember).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d) to max.+$", "$1max"],
+                ["^.+\\+(\\d+) to attack.+$", "$1ar"],
+                ["^.+\\+5\\% faster hit.+$", "5fhr"],
+                ["^.+3(\\d+)\\% extra.+$", "$1gold"],
+                ["^.+3(\\d)\\% better.+$", "$1mf"],
+                ["^.+\\+(\\d+) to life.+$", "$1life"],
+                ["^.+\\+(\\d) to str.+$", "$1str"],
+                ["^.+\\+(\\d) to dex.+$", "$1dex"],
+                ["^.+\\+(\\d)\\% faster.+$", "$1frw"],
+                ["^.+\\+(\\d+) poison.+(\\d+) seconds.+$", "$1pd"],
+                ["^.+Adds (\\d+)-(\\d+) fire.+$", "$1-$2 fire"],
+                ["^.+Adds (\\d+)-(\\d+) (cold|lightning).+$", "$1-$2 $3"],
+			]
+		},
+        "LightDmgSC" : {
+			"regex": "(?=ÿc3(shocking|arching|glowing|static).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d) to max.+$", "$1max"],
+                ["^.+\\+(\\d+) to attack.+$", "$1ar"],
+                ["^.+\\+5\\% faster hit.+$", "5fhr"],
+                ["^.+3(\\d+)\\% extra.+$", "$1gold"],
+                ["^.+3(\\d)\\% better.+$", "$1mf"],
+                ["^.+\\+(\\d+) to life.+$", "$1life"],
+                ["^.+\\+(\\d) to str.+$", "$1str"],
+                ["^.+\\+(\\d) to dex.+$", "$1dex"],
+                ["^.+\\+(\\d)\\% faster.+$", "$1frw"],
+                ["^.+\\+(\\d+) poison.+(\\d+) seconds.+$", "$1pd"],
+                ["^.+Adds (\\d+)-(\\d+) lightning.+$", "$1-$2 lightning"],
+                ["^.+Adds (\\d+)-(\\d+) (cold|fire).+$", "$1-$2 $3"],
+			]
+		},
+        "PoisonDmgSC" : {
+			"regex": "(?=ÿc3(pestilent|toxic|foul|septic).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d) to max.+$", "$1max"],
+                ["^.+\\+(\\d+) to attack.+$", "$1ar"],
+                ["^.+\\+5\\% faster hit.+$", "5fhr"],
+                ["^.+3(\\d+)\\% extra.+$", "$1gold"],
+                ["^.+3(\\d)\\% better.+$", "$1mf"],
+                ["^.+\\+(\\d+) to life.+$", "$1life"],
+                ["^.+\\+(\\d) to str.+$", "$1str"],
+                ["^.+\\+(\\d) to dex.+$", "$1dex"],
+                ["^.+\\+(\\d)\\% faster.+$", "$1frw"],
+                ["^.+\\+(\\d+) poison.+(\\d+) seconds.+$", "$1pd"],
+                ["^.+Adds (\\d+)-(\\d+) (cold|fire|lightning).+$", "$1-$2 $3"],
+			]
+		},
+// Suffixes:
+        "CraftmanSC" : {
+			"regex": "(?=ÿc3 small.+?craftsmanship.+?:603:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d) to max.+$", "$1max"],
+			]
+		},
+        "BalanceSC" : {
+			"regex": "(?=ÿc3 small.+?balance.+?:603:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+3(\\d+)\\% extra.+$", "$1gold"],
+			]
+		},
+        "LuckSC" : {
+			"regex": "(?=ÿc3 small.+?(good luck|fortune).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+3(\\d)\\% better.+$", "$1mf"],
+			]
+		},
+        "VitaSC" : {
+			"regex": "(?=ÿc3 small.+?(vita|sustenance|life).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d+) to life.+$", "$1life"],
+			]
+		},
+        "StrengthSC" : {
+			"regex": "(?=ÿc3 small.+?strength.+?:603:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d) to str.+$", "$1str"],
+			]
+		},
+        "DexteritySC" : {
+			"regex": "(?=ÿc3 small.+?dexterity.+?:603:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d) to dex.+$", "$1dex"],
+			]
+		},
+        "FRWSC" : {
+			"regex": "(?=ÿc3 small.+?inertia.+?:603:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d)\\% faster.+$", "$1frw"],
+			]
+		},
+        "PoisonSC" : {
+			"regex": "(?=ÿc3 small.+?(anthrax|pestilence|venom|blight).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+\\+(\\d+) poison.+(\\d+) seconds.+$", "$1pd"],
+			]
+		},
+        "ColdSC" : {
+			"regex": "(?=ÿc3 small.+?(winter|glacier|icicle|frost).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+Adds (\\d+)-(\\d+).+$", "$1-$2 cold"],
+			]
+		},
+        "FireSC" : {
+			"regex": "(?=ÿc3 small.+?(incineration|burning|fire|flame).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+Adds (\\d+)-(\\d+).+$", "$1-$2 fire"],
+			]
+		},
+        "LightSC" : {
+			"regex": "(?=ÿc3 small.+?(storms|thunder|lightning|shock).+?:603:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+Adds (\\d+)-(\\d+).+$", "$1-$2 lightning"],
 			]
 		},
 /************************************************* AXES *************************************************/
@@ -1081,14 +1404,7 @@ LimeConfig = {
 				["^.+socketed \\((\\d).+$", "$1soc"],
 				["^.+:eth$", "Eth"],
 			]
-		},
-        /*,
-		"NonEthUnid": {
-			"regex": "(?=.+?unidentified.+?[37]:\\d:\\d$)",
-		},
-		"EthUnid": {
-			"regex": "(?=.+?unidentified.+?[37]:\\d:\\d:eth$)",
-		}*/
+		}
 	},
 /************************************************* SEARCH FILTERS *************************************************/
     "SearchFilter": {
@@ -1150,5 +1466,30 @@ LimeConfig = {
                         ["(, )", "|"]
                     ]
         }
+    },
+    "ItemSkins": {
+        "cm11": ["Brown", "Football"],
+        "cm12": ["Bear", "Paw"],
+        "cm13": ["M", "Coin"],
+        "cm21": ["Tome", "Paper"],
+        "cm22": ["Horn"],
+        "cm23": ["Tower", "Obelisk", "Latern"],
+        "cm31": ["Eye"],
+        "cm32": ["Spagetti", "DNA", "Lace"],
+        "cm33": ["Monster", "Dragon"],
+        "amu1": ["Orange Stone", "Orange Dot", "Cross", "Dot"],
+        "amu2": ["Pentagon", "Penta", "Star"],
+        "amu3": ["Sun", "A"],
+        "rin1": ["Coral", "Chain", "Purple Stone"],
+        "rin2": ["Sloop", "Small Blue", "Round Blue Stone"],
+        "rin3": ["Bband", "Big Blue", "Square Blue Stone"],
+        "rin4": ["Orange"],
+        "rin5": ["Winged", "Crown", "Eturn"],
+        "jew1": ["Pink"],
+        "jew2": ["Blue"],
+        "jew3": ["Orange", "Peach"],
+        "jew4": ["Green"],
+        "jew5": ["Red"],
+        "jew6": ["White"]
     }
 }

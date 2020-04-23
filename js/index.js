@@ -655,16 +655,17 @@ require(["D2Bot"], function (D2BOTAPI) {
 		// But more likely, the requested item is already listed in the queue
 		if (!itemUID) return undefined;
 
-		var specs = itemUID.split(":")[0] + " - ";
+		var specs = itemUID.split(":")[0] + " / ";
 		if (result.groupData.specs) {
 			var desc = result.description.replace(/\n|\r/gm, "");
 			specs = "";
 			result.groupData.specs.forEach((entry) => {
                 var regex = new RegExp(entry[0], 'gi');
 				if (desc.match(regex))
-					specs += desc.replace(regex, entry[1]) + " - ";
+					specs += desc.replace(regex, entry[1]) + " / ";
 			});
 		}
+        specs = specs.replace(/\/([^\/]*)$/, '-$1')
 		result.groupId = $group.attr("id");
 		var optionTemplate = `<option value="` + itemUID + `" id="item-menu-option-` + result.groupId + `">` + specs + result.account + "/" + result.character + `</option>`;
 		var $itemOption = $(optionTemplate);
