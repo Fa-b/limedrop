@@ -37,7 +37,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 	var itemCount = 0;
 	var savedEntryCount = 0;
 	var groupEntryCount = 0;
-	var MAX_ITEM = 1000;
+	var MAX_ITEM = 1000; // TODO: make this a config
 	var countables = [];
 	var drops = {};
 
@@ -1532,6 +1532,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 						})
 					};
 
+					// TODO: make delay a config
 					setTimeout((i) => {
 						console.log("Scheduled drop", i, "after", ((Date.now() - start)/1000).toFixed(3),"seconds");
 						console.log(GameInfo);
