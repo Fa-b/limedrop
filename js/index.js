@@ -75,6 +75,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 	function initialize() {
 		$(".app-search").toggle(0);
+        
+        console.log("initializing");
 
 		function updateRegEx(filter, regex) {
 			printStr = "";
@@ -85,7 +87,10 @@ require(["D2Bot"], function (D2BOTAPI) {
 					if (filterUpdate[entry]) printStr += filterUpdate[entry];
 				}
 
-				console.log("Generated RegEx:", printStr, "\nPress Enter to confirm");
+				console.log("Generated RegEx:", printStr);
+                // query items
+                regexFilter = JSON.parse(JSON.stringify(filterUpdate));
+                $("#search-bar").trigger("change");
 			}
 		}
 
@@ -112,10 +117,9 @@ require(["D2Bot"], function (D2BOTAPI) {
 			$formFilter.data("inputmask", mask);
 			$formFilter.data("validate", function (value) {
 				$("#search-data-" + name).removeClass("valid");
-
+                var output = value;
 				if ($formFilter.data("inputmask").exec(value)) {
 					$("#search-data-" + name).addClass("valid");
-					var output = value;
 					var regList = $formFilter.data("regex");
 					for (var regex in regList) {
 						output = output.replace(regList[regex][0], regList[regex][1]);
@@ -124,8 +128,9 @@ require(["D2Bot"], function (D2BOTAPI) {
 						"title",
 						$formFilter.data("name") + " is: '" + value + "'\n\t => " + output
 					);
-					updateRegEx(name, output);
 				}
+                
+                return output;
 			});
 
 			$formFilter.on("keypress keyup", function (event) {
@@ -142,7 +147,10 @@ require(["D2Bot"], function (D2BOTAPI) {
 					$("#search-data-" + name).val(str);
 				}
 
-				$(this).data("validate")(str);
+				var output = $(this).data("validate")(str);
+                
+                if(keycode == "13")
+                    updateRegEx(name, output);
 			});
 
 			$("#search-group").append($formFilter);
@@ -199,7 +207,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 				$("#label-" + name).text(state + ":");
 			});
 
-			$formFilter.on("click", function (event) {
+			$formFilter.on("change", function (event) {
+                console.log("clicked");
 				var next = {
 					checked: "unchecked",
 					unchecked: "indeterminate",
@@ -276,6 +285,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				hide_results_on_select: false,
 				width: "100% !important"
 			});
+            
 			$("#search-data-" + name).trigger("change");
 		}
 
@@ -297,17 +307,14 @@ require(["D2Bot"], function (D2BOTAPI) {
 			// Initially up-to-date
 			regexFilter = JSON.parse(JSON.stringify(filterUpdate));
 
-			$("#search-group").on("keypress", function (e) {
+			/*$("#search-group").on("keypress", function (e) {
 				var key = e.which;
-				if (
-					key == 13 &&
-					JSON.stringify(regexFilter) != JSON.stringify(filterUpdate)
-				) {
+				if (key == 13 && JSON.stringify(regexFilter) != JSON.stringify(filterUpdate)) {
 					// the enter key code
 					regexFilter = JSON.parse(JSON.stringify(filterUpdate));
 					$("#search-bar").trigger("change");
 				}
-			});
+			});*/
 		}
 
 		cookie.load();
@@ -497,6 +504,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 		// Check if item is not already listed as a countable, unless it is just
 		// a group list entry
 		if (!result.groupId && countables[itemUID] != undefined) return undefined;
+        // Also if the item is already on the DOM
+        if(document.getElementById(itemUID) != undefined) return undefined;
 
 		var description = cleanDecription(result.description).split("<br/>");
 		var title = description.shift();
@@ -1218,7 +1227,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 	var add_row_index = 1;
 
-	function start(loggedin) {
+	function start(loggedin) {        
 		if (loggedin) {
 			$(".logged-in-out").fadeToggle("hide");
 			$(".current-user-btn").html(

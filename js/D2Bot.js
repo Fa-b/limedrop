@@ -44,7 +44,7 @@ define(["events"],function (events) {
             makePostRequest(d2botConfig, Base64blob, function (err, results) {
                 //console.log(err,results);
                 if (err){
-                    if (done) done(err,results);
+                    if (done) done(err);
                     return fail(err);  
                 } 
                 results = base64decode(results);
@@ -104,13 +104,24 @@ define(["events"],function (events) {
 			d2botConfig.host = server;
 
             D2BotAPI.emit("challenge",function (err, msg) {
-				if (msg === "error") {
-					callback(msg, null);
-                } else if (msg.status != "success") {
-                    callback(msg.status, msg.body);
-                } else {
+				if (err) {
+					callback(err, null);
+                } else if (msg.status == "success") {
                     d2botConfig.session = encrypt(msg.body, password);
-                    callback(err, d2botConfig.session);
+                    callback(null, d2botConfig.session);
+                } else {
+                    let params = `toolbar=no,menubar=no,width=600,height=300,left=100,top=100`;
+                    /*setTimeout(() => {
+                        let popup = window.open(server, "register certificate", params);
+                        popup.focus();
+                        var timer = setInterval(() => {   
+                            if(popup.closed) {  
+                                clearInterval(timer);  
+                                alert('Hope you added certificate to browser..\nPage will be reoladed now!');  
+                                location.reload();
+                            }  
+                        }, 1000); 
+                    }, 200);*/
                 }
             });
         })
@@ -280,16 +291,33 @@ define(["events"],function (events) {
             var $request = {
                 url: d2botConfig.host + "/api",// + Base64blob,
                 type: "POST",
+                timeout: 5000,
 				crossDomain: true,
                 dataType: "text",
                 data:data
             };
             var request = $.ajax($request);
             request.done(function(msg) {
-                if (callback) callback(null,msg);
+                if (callback) callback(null, msg);
             });
-            request.fail(function(jqXHR, textStatus) {
-                if (callback) callback(textStatus);
+            request.fail(function(jqXHR, textStatus, errorThrown) {
+                var msg = '';
+                if (jqXHR.status === 0) {
+                    msg = 'Not connected.\n Verify Network.';
+                } else if (jqXHR.status == 404) {
+                    msg = 'Requested page not found. [404]';
+                } else if (jqXHR.status == 500) {
+                    msg = 'Internal Server Error [500].';
+                } else if (textStatus === 'parsererror') {
+                    msg = 'Requested JSON parse failed.';
+                } else if (textStatus === 'timeout') {
+                    msg = 'Ajax request timed out.';
+                } else if (textStatus === 'abort') {
+                    msg = 'Ajax request aborted.';
+                } else {
+                    msg = 'Uncaught Error.\n' + jqXHR.responseText;
+                }
+                if (callback) callback(msg, null);
             });
         };
 
