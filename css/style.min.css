@@ -10073,7 +10073,7 @@ ul.list-style-none li a:hover {
   background: #141619 !important;
 }
 .search-box .app-search {
-  z-index: 110;
+  z-index: 1010;
   width: 100%;
   top: -1px;
   -webkit-box-shadow: 1px 0px 20px rgba(0, 0, 0, 0.08);

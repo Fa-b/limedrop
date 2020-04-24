@@ -167,7 +167,6 @@ td {
 .form-filter-element {
   display: inline-flex;
   min-width: 280px;
-  cursor: pointer;
   justify-content: flex-start;
 }
 
