@@ -561,3 +561,28 @@ h6.drop-queue-styled {
     top: calc(100% - -5px);
   }
 }
+
+/* Settings Menu New */
+
+.rev-set-menu {
+  justify-content: center;
+  background-color: transparent;
+  color: #11c501;
+}
+.rev-set-menu button {
+  background-color: transparent;
+  padding: 5px;
+  margin: 5px;
+  align-self: center;
+  font-size: large;
+  color: #11c501;
+  border: none;
+  border-bottom: 3px solid transparent;
+}
+
+.rev-set-menu button:hover,
+.rev-set-menu button:focus {
+  outline: none;
+  letter-spacing: 1px;
+  border-bottom: #11c501 3px solid;
+}
