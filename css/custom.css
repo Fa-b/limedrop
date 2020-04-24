@@ -544,11 +544,7 @@ h6.drop-queue-styled {
 }
 /* Mobile media querys Rev patches, such an awfull way to make things. */
 
-@media (max-width: 600px) {
-  :root h6,
-  span {
-    font-size: 10px;
-  }
+@media (max-width: 560px) {
   .page-wrapper .container-fluid {
     padding: 0px !important;
   }
@@ -559,6 +555,14 @@ h6.drop-queue-styled {
   .styled-search-menu {
     width: auto;
     top: calc(100% - -5px);
+  }
+  .flex-row {
+    flex-direction: column !important;
+  }
+  .comment-widgets {
+    padding: 10px;
+    width: 100%;
+    text-align: center;
   }
 }
 
