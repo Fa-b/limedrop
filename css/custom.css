@@ -544,11 +544,7 @@ h6.drop-queue-styled {
 }
 /* Mobile media querys Rev patches, such an awfull way to make things. */
 
-@media (max-width: 600px) {
-  :root h6,
-  span {
-    font-size: 10px;
-  }
+@media (max-width: 500px) {
   .page-wrapper .container-fluid {
     padding: 0px !important;
   }
@@ -560,4 +556,37 @@ h6.drop-queue-styled {
     width: auto;
     top: calc(100% - -5px);
   }
+  .flex-row {
+    flex-direction: column !important;
+  }
+  .comment-widgets {
+    padding: 10px;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Settings Menu New */
+
+.rev-set-menu {
+  justify-content: center;
+  background-color: transparent;
+  color: #11c501;
+}
+.rev-set-menu button {
+  background-color: transparent;
+  padding: 5px;
+  margin: 5px;
+  align-self: center;
+  font-size: large;
+  color: #f3f3f3;
+  border: none;
+  border-bottom: 3px solid transparent;
+}
+
+.rev-set-menu button:hover,
+.rev-set-menu button:focus {
+  outline: none;
+  color: #11c501;
+  border-bottom: #11c501 3px solid;
 }
