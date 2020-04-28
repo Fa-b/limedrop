@@ -507,9 +507,15 @@ require(["D2Bot"], function (D2BOTAPI) {
         // Also if the item is already on the DOM
         if(document.getElementById(itemUID) != undefined) return undefined;
 
-		var description = cleanDecription(result.description).split("<br/>");
-		var title = description.shift();
-		description = description.join("<br/>");
+		var generateItem = () => {
+			var description = cleanDecription(result.description).split("<br/>");
+			var title = description.shift();
+			description = description.join("<br/>");
+			var htmlTemplate = `
+<h6 class="-medium">` + title + `</h6>
+<span class="m-b-15 d-block">` + description + `</span>`;
+			return htmlTemplate;
+		};
 
 		result.realm = CurrentRealm;
 		result.itemid = itemUID;
@@ -528,10 +534,7 @@ require(["D2Bot"], function (D2BOTAPI) {
             <div id="png-` + itemUID + `"><i>image</i></div>
         </div>
     </div>
-    <div class="p-2 comment-text">
-		<h6 class="-medium">` + title + `</h6>
-		<span class="m-b-15 d-block">` + description + `</span>
-	</div>
+    <div class="p-2 comment-text" id="item-desc-` + itemUID + `"><i>Description</i></div>
     <div class="comment-footer w-100">
         <span class="text-muted float-right">` + CurrentRealm + "/" + result.account + "/" + result.character + "/{" + itemUID + "}" + `</span>
     </div>
@@ -550,6 +553,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 					//console.log("Leaving:", elem);
 					//$item.addClass("hidden");
 				} else if (entry.intersectionRatio >= 0.1) {
+					document.getElementById("item-desc-" + itemUID).innerHTML = generateItem();
 					$item.removeClass("hidden");
 					if (!result.itemImage || result.groupId) {
 						try {
@@ -746,11 +750,21 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 		if (!document.getElementById(groupId)) {
 			// Group doesn't exist yet.. create it
-            var description = highlightSpecs(result.description, result.groupData.specs);
-			description = cleanDecription(description).split("<br/>");
-			var title = description.shift();
+			
+			var generateItem = () => {
+				
+				var description = highlightSpecs(result.description, result.groupData.specs);
+				description = cleanDecription(description).split("<br/>");
+				var title = description.shift();
+				description = description.join("<br/>");
+				var htmlTemplate = `
+<h6 class="-medium">` + title + `</h6>
+<span class="m-b-15 d-block">` + description + `</span>`;
+				return htmlTemplate;
+			};
+			
 			var count = 0;
-			description = description.join("<br/>");
+            
 			var htmlTemplate = `
 <div class="d-flex flex-row comment-row hidden p-l-0 m-t-0 m-b-0" aria-haspopup="true" id="` + groupId + `">
     <div class="p-2 ld-img-col" style="position:relative; display: flex; align-self: center; justify-content: center;">
@@ -768,10 +782,7 @@ require(["D2Bot"], function (D2BOTAPI) {
             <select multiple="multiple" id="item-menu-select-` + groupId + `" size></select>
         </div>
     </div>
-    <div class="p-2 comment-text">
-        <h6 class="-medium">` + title + `</h6>
-        <span class="m-b-15 d-block">` + description + `</span>
-    </div>
+    <div class="p-2 comment-text" id="item-desc-` + groupId + `"><i>Description</i></div>
     <div class="comment-footer w-100" hidden>
         <span class="text-muted float-right">` + CurrentRealm + "/" + result.account + "/" + result.character + "/{" + itemUID + "}" + `</span>
     </div>
@@ -789,6 +800,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 						//console.log("Leaving:", elem);
 						//$itemGroup.addClass("hidden");
 					} else if (entry.intersectionRatio >= 0.1) {
+						document.getElementById("item-desc-" + groupId).innerHTML = generateItem();
 						$itemGroup.removeClass("hidden");
 						if (!result.itemImage) {
 							try {
@@ -931,6 +943,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 				var ladder = CurrentGameClass == "Ladder";
 				var sc = CurrentGameMode == "Softcore";
 				var lod = CurrentGameType == "Expansion";
+				
+				console.log("arrived");
 
 				// Here go the countable items by RegEx.. to extend the list simply append another entry to LimeConfig.js.
 				// Countable items will receive an additional number field in the view (upper right corner of item box).
@@ -1045,6 +1059,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		var ended;
 		var accountListid;
 		var groupListid;
+		var groupCallbackCnt;
 		var account = $("#account-select").val();
 		var character = $("#character-select").val();
 
@@ -1087,6 +1102,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 		accountListid = 0;
 		groupListid = 0;
+		groupCallbackCnt = 0;
 		ended = false;
 
 		window.loadMoreItem = function () {
@@ -1123,10 +1139,10 @@ require(["D2Bot"], function (D2BOTAPI) {
 			var time_ms = roundTime.elapsed - roundTime.start;
 			roundTime.groups += time_ms;
 			roundTime.start = new Date().getTime();
-
+			groupCallbackCnt++;
 			//console.log("Found Group:", groupList[groupListid - 1], "After:", (time_ms / 1000).toFixed(3),"seconds");
 			//if (accountListid == accList.length) {
-			if (groupListid == groupList.length) {
+			if (groupCallbackCnt == groupList.length) {
 				if (!ended) {
 					var sortedGroups = [];
 					Object.keys(countables).forEach((uid) => {
@@ -1159,11 +1175,12 @@ require(["D2Bot"], function (D2BOTAPI) {
 				return;
 			}
 
-			queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
+			//queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
 		};
-
-		queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
-		loader.hidden = true;
+		
+		while(groupListid != groupList.length)
+			queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
+		//loader.hidden = true;
 	}
 
 	function pupulateAccountCharSelect(realm, core, type, ladder) {

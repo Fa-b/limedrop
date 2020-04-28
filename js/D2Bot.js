@@ -110,7 +110,7 @@ define(["events"],function (events) {
                     d2botConfig.session = encrypt(msg.body, password);
                     callback(null, d2botConfig.session);
                 } else {
-                    let params = `toolbar=no,menubar=no,width=600,height=300,left=100,top=100`;
+                    let params = `toolbar=no,menubar=no,width=600,height=500,left=100,top=100`;
                     /*setTimeout(() => {
                         let popup = window.open(server, "register certificate", params);
                         popup.focus();
@@ -291,7 +291,10 @@ define(["events"],function (events) {
             var $request = {
                 url: d2botConfig.host + "/api",// + Base64blob,
                 type: "POST",
-                timeout: 5000,
+                /*timeout: 5000,*/ // <- Appears to be a bad idea :)
+				/*headers: {
+					'Content-Type':'text/plain'
+				},*/
 				crossDomain: true,
                 dataType: "text",
                 data:data
