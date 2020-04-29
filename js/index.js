@@ -877,7 +877,7 @@ require(["D2Bot"], function (D2BOTAPI) {
         }
 		
 		function queryCountables($account, $character, loadMoreItem, itemGroup={key: "all", value: { regex: "" } }) {
-            loader.hidden = false;
+            //loader.hidden = false;
             var callback = function (err, results) {
 				if (err) { console.log(err); return false; };
 				var y = $(window).scrollTop();
@@ -942,7 +942,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
 
 		function doQuery($account, $character, loadMoreItem) {
-            loader.hidden = false;
+            //loader.hidden = false;
             var callback = function (err, results) {
                 if (err) {
                     console.log(err);
@@ -976,7 +976,8 @@ require(["D2Bot"], function (D2BOTAPI) {
                 }
             }
             
-            var regex = "^"+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$";
+            var regex = $("#search-bar").val().toLocaleLowerCase();
+			regex = (regex.length>0)?"^"+buildregex(regex)+".*$":null;
             
             if(!dummyData) {
                 API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
@@ -1023,7 +1024,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			accList.push(account);
 		}
 		
-		console.log(itemGroups);
+		//console.log(itemGroups);
 		
 		for (var group in itemGroups) {
 			groupList.push({ key: group, value: itemGroups[group] });
@@ -1048,12 +1049,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 			roundTime.total += time_ms;
 			roundTime.start = new Date().getTime();
 
+			//accountListid++;
 			//console.log("Found Account:", accList[accountListid - 1], "After:", (time_ms / 1000).toFixed(3),"seconds");
-			if (accountListid == accList.length) {
+			//if (accountListid == accList.length) {
 				if (!ended) {
 					$footer = `
 <div>
-    <p>End of Items on all Accounts</p>
+    <p>End of Items on ` + accList.length + ` Accounts</p>
 	<span class="m-b-15 d-block">` + itemCount + ` Items in total.
         <br>` + groupCount + ` item groups sorted after ` + (roundTime.groups / 1000).toFixed(3) + ` seconds. ` + groupItemCount + ` items were grouped.
         <br>Saved ` + savedEntryCount + ` list entries with ` + groupEntryCount +` group entries
@@ -1068,9 +1070,9 @@ require(["D2Bot"], function (D2BOTAPI) {
 				}
 
 				return;
-			}
+			//}
 
-			doQuery(accList[accountListid++], chr, itemCount > MAX_ITEM ? limit ? false : window.loadMoreItem : window.loadMoreItem);
+			//doQuery(accList[accountListid++], chr, itemCount > MAX_ITEM ? limit ? false : window.loadMoreItem : window.loadMoreItem);
 		};
 
 		window.loadAllCountable = function () {
@@ -1078,46 +1080,56 @@ require(["D2Bot"], function (D2BOTAPI) {
 			roundTime.groups += time_ms;
 			roundTime.start = new Date().getTime();
 
+			accountListid++;
 			//console.log("Found Group:", groupList[groupListid - 1], "After:", (time_ms / 1000).toFixed(3),"seconds");
 			//if (accountListid == accList.length) {
-			if (groupListid == groupList.length) {
-				if (!ended) {
-					var sortedGroups = [];
-					Object.keys(countables).forEach((uid) => {
-						Object.keys(countables[uid]).forEach((name) => {
-							if (!sortedGroups[name]) {
-								sortedGroups[name] = 0;
-								groupCount++;
-							}
-							sortedGroups[name]++;
-							groupItemCount++;
+				
+				// Todo: use promises instead.. correct group not guaranteed on bulk search
+				console.log("Finished group:", Object.keys(itemGroups)[groupListid++]);
+				accountListid = 0;
+				
+				if (groupListid == groupList.length) {
+					if (!ended) {
+						var sortedGroups = [];
+						Object.keys(countables).forEach((uid) => {
+							Object.keys(countables[uid]).forEach((name) => {
+								if (!sortedGroups[name]) {
+									sortedGroups[name] = 0;
+									groupCount++;
+								}
+								sortedGroups[name]++;
+								groupItemCount++;
+							});
 						});
-					});
 
-					window.loadAllCountable = false;
-					accountListid = 0;
+						window.loadAllCountable = false;
+						accountListid = 0;
 
-					console.log(
-						"Finished collecting item groups:",
-						sortedGroups,
-						"\nFetching the rest now..."
-					);
+						console.log(
+							"Finished collecting item groups:",
+							sortedGroups,
+							"\nFetching the rest now..."
+						);
 
-					loader.hidden = true;
+						//loader.hidden = true;
 
-					roundTime.total += roundTime.groups;
+						roundTime.total += roundTime.groups;
+						
+						//for(var j = 0; j < accList.length; j++)
+							doQuery(/*accList[j]*/"", chr, window.loadMoreItem);
+					}
 
-					doQuery(accList[accountListid++], chr, itemCount > MAX_ITEM ? limit ? false : window.loadMoreItem : window.loadMoreItem);
+					return;
 				}
-
-				return;
-			}
-
-			queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
+				
+				//for(var j = 0; j < accList.length; j++)
+					//queryCountables(/*accList[j]*/"", chr, window.loadAllCountable, groupList[groupListid]);
+			//}
 		};
-
-        queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
-		loader.hidden = true;
+	
+		for(var j = 0; j < groupList.length; j++)
+			queryCountables(/*accList[j]*/"", chr, window.loadAllCountable, groupList[j]);
+		//loader.hidden = true;
 	}
 
 	function pupulateAccountCharSelect(realm, core, type, ladder) {

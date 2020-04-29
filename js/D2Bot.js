@@ -38,7 +38,7 @@ define(["events"],function (events) {
             var thejson = JSON.stringify(requestObject);
             var Base64blob = base64encode(JSON.stringify(requestObject));//Buffer.from(JSON.stringify(requestObject)).toString('base64');
             //console.log("---------------------");
-            console.log(thejson);
+            //console.log(thejson);
             //console.log(Base64blob);
 
             makePostRequest(d2botConfig, Base64blob, function (err, results) {
