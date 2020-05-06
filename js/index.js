@@ -1355,47 +1355,45 @@ require(["D2Bot"], function (D2BOTAPI) {
 							return;
 						}
 
-						console.log(msg);
+						//console.log(msg);
 						msg.body = JSON.parse(msg.body);
+
+						var itemTitles = [];
 
 						for (var i = 0; i < msg.body.length; i++) {
 							var data = JSON.parse(msg.body[i].body);
 							drops[data.hash].forEach(itemData => {
-								console.log(itemData.itemid);
 								//$("#" + itemData.itemid).remove();
 								var item = document.getElementById(itemData.itemid);
 								item.parentNode.removeChild(item);
 							});
 							
-						}
+							drops[data.hash].forEach(itemData => {
+								var description = cleanDecription(itemData.description).split("<br/>");
+								itemTitles.push(description.shift());
+							});
 						
 						
-						var itemTitles = [];
-						
-						drops[data.hash].forEach(itemData => {
-							var description = cleanDecription(itemData.description).split("<br/>");
-							itemTitles.push(description.shift());
-						});
-						
-						// TODO: add data to logfile
-						
-						delete drops[data.hash];
-						
-						if(itemTitles.length > 0) {
-							var titles = itemTitles.join("<br/>")
-							if(data.data == "GameAction has completed task") {
-								showNotification(data.data, "Items Dropped:<br/>" + titles, false);
-							} else if(data.status) {
-								if(data.status == "error" || data.status == "failed") {
-									showNotification("<span class='color1'>" + data.data + "</span><br/>", "<span class='color1'>Not Dropped:</span><br/>" + titles, false);
+							// TODO: add data to logfile
+							
+							delete drops[data.hash];
+							
+							if(itemTitles.length > 0) {
+								var titles = itemTitles.join("<br/>")
+								if(data.data == "GameAction has completed task") {
+									showNotification(data.data, "Items Dropped:<br/>" + titles, false);
+								} else if(data.status) {
+									if(data.status == "error" || data.status == "failed") {
+										showNotification("<span class='color1'>" + data.data + "</span><br/>", "<span class='color1'>Not Dropped:</span><br/>" + titles, false);
+									} else {
+										showNotification(data.data, "Happy to be back :-)" , false);
+									}
 								} else {
-									showNotification(data.data, "Happy to be back :-)" , false);
+									showNotification("<span class='color1'>" + data.data + "</span><br/>", "<span class='color1'>Not Dropped:</span><br/>" + titles, false);
 								}
 							} else {
-								showNotification("<span class='color1'>" + data.data + "</span><br/>", "<span class='color1'>Not Dropped:</span><br/>" + titles, false);
+								showNotification(data.data, "Successfully logged Character." , false);
 							}
-						} else {
-							showNotification(data.data, "Happy to be back :-)" , false);
 						}
 						
 						// Check our queue list if it is empty yet
