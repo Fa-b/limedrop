@@ -1302,8 +1302,8 @@ LimeConfig = {
 				["^.+:eth$", "Eth"],
 			]
 		},
-        "AmaExceptionalBows": { // stagbow, reflexbow
-			"regex": "(?=^ÿc[05].+?:28[1-2]:[37]:\\d:\\d(:eth)?$)",
+        "AmaExceptionalBows": { // ashwoodbow, ceremonialbow
+			"regex": "(?=^ÿc[05].+?:29[1-2]:[37]:\\d:\\d(:eth)?$)",
 			"specs": [
 				["^.+damage: ÿc3(\\d+(?: to \\d+)?).+\\+(\\d+)\\% enhanced.+$", "$2ed"],
 				["^.+durability: \\d+ of (\\d+).+durability (\\d+)\\%.+$", "$2dur"],

@@ -888,7 +888,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				
 				// Here go the countable items by RegEx.. to extend the list simply append another entry to LimeConfig.js.
 				// Countable items will receive an additional number field in the view (upper right corner of item box).
-				for (var i in results) {
+				/*for (var i in results) {
 					if(results[i].description) {
 						//if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
 							var item = {
@@ -910,7 +910,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 							$updateItemGroup(countables[item.uid][itemGroup.key], results[i]);
 						//}
 					}
-				}
+				}*/
 				
 				$(window).scrollTop(y);
 				//loader.hidden = true;
@@ -955,7 +955,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                 var sc = CurrentGameMode == "Softcore";
                 var lod = CurrentGameType == "Expansion";
 
-                for (var i in results) {
+                /*for (var i in results) {
                     if (results[i].description) {
                         //if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
                         var itemID = results[i].description.split("$")[1].split(":")[1];
@@ -965,7 +965,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                         itemCount += 1;
                         //}
                     }
-                }
+                }*/
 
                 $(window).scrollTop(y);
                 //loader.hidden = true;
@@ -1043,6 +1043,11 @@ require(["D2Bot"], function (D2BOTAPI) {
 		accountListid = 0;
 		groupListid = 0;
 		ended = false;
+		
+		var accounts = accList[0];
+	
+		for(var i = 1; i < accList.length; i++)
+			accounts += "," + accList[i];
 
 		window.loadMoreItem = function () {
 			var time_ms = roundTime.elapsed - roundTime.start;
@@ -1057,7 +1062,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 <div>
     <p>End of Items on ` + accList.length + ` Accounts</p>
 	<span class="m-b-15 d-block">` + itemCount + ` Items in total.
-        <br>` + groupCount + ` item groups sorted after ` + (roundTime.groups / 1000).toFixed(3) + ` seconds. ` + groupItemCount + ` items were grouped.
+        <br>` + groupCount + ` item groups sorted out of ` + groupList.length + ` after ` + (roundTime.groups / 1000).toFixed(3) + ` seconds. ` + groupItemCount + ` items were grouped.
         <br>Saved ` + savedEntryCount + ` list entries with ` + groupEntryCount +` group entries
         <br>After ` + (roundTime.total / 1000).toFixed(3) + ` seconds in total.
 	</span>
@@ -1086,6 +1091,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				
 				// Todo: use promises instead.. correct group not guaranteed on bulk search
 				console.log("Finished group:", Object.keys(itemGroups)[groupListid++]);
+				//groupListid++;
 				accountListid = 0;
 				
 				if (groupListid == groupList.length) {
@@ -1116,19 +1122,23 @@ require(["D2Bot"], function (D2BOTAPI) {
 						roundTime.total += roundTime.groups;
 						
 						//for(var j = 0; j < accList.length; j++)
-							doQuery(/*accList[j]*/"", chr, window.loadMoreItem);
+							doQuery(/*accounts*/"", chr, window.loadMoreItem);
 					}
 
 					return;
 				}
 				
 				//for(var j = 0; j < accList.length; j++)
-					//queryCountables(/*accList[j]*/"", chr, window.loadAllCountable, groupList[groupListid]);
+					//queryCountables(accounts/*""*/, chr, window.loadAllCountable, groupList[j]);
 			//}
 		};
-	
-		for(var j = 0; j < groupList.length; j++)
-			queryCountables(/*accList[j]*/"", chr, window.loadAllCountable, groupList[j]);
+		
+		
+		
+		console.log("Account List:",accounts);
+		
+		for(var j = 0; j < groupList.length; j++)		
+			queryCountables(/*accounts*/"", chr, window.loadAllCountable, groupList[j]);
 		//loader.hidden = true;
 	}
 
