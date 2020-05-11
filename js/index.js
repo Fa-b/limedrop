@@ -921,7 +921,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 	function addItemstoList(limit = true, itemGroups = [], dummyData = (Object.keys(AccountsMap).length === 0)) {
 		var loader = document.getElementById("loader");
-		loader.hidden = false;
+		// loader.hidden = false;
 
 		if (dummyData) {
             var dummyText = "No accounts found, dummy data will be used!";
@@ -935,7 +935,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
 
 		function queryCountables($account, $character, loadMoreItem, itemGroup = { key: "all", value: { regex: "" } }) {
-			loader.hidden = false;
+			// loader.hidden = false;
 			var callback = function (err, results) {
 				if (err) { console.log(err); return false; };
 				var y = $(window).scrollTop();
@@ -1002,7 +1002,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
 
 		function doQuery($account, $character, loadMoreItem) {
-			loader.hidden = false;
+			// loader.hidden = false;
 			var callback = function (err, results) {
 				if (err) {
 					console.log(err);
@@ -1126,7 +1126,9 @@ require(["D2Bot"], function (D2BOTAPI) {
 					ended = true;
 					window.loadMoreItem = false;
 
-					loader.hidden = true;
+					setTimeout(() => {
+						loader.hidden = true;
+					  }, 0);
 				}
 
 				return;
@@ -1165,7 +1167,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 						"\nFetching the rest now..."
 					);
 
-					loader.hidden = true;
+					// loader.hidden = true;
 
 					roundTime.total += roundTime.groups;
 
