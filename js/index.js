@@ -294,23 +294,23 @@ require(["D2Bot"], function (D2BOTAPI) {
 			} else {
 				console.info("Invalid Config Entry for Search Filters");
 			}
-
-			// Initially up-to-date
-			regexFilter = JSON.parse(JSON.stringify(filterUpdate));
-
-			$("#search-group").on("keypress", function (e) {
-				var key = e.which;
-				if (
-					key == 13 &&
-					JSON.stringify(regexFilter) != JSON.stringify(filterUpdate)
-				) {
-					// the enter key code
-					regexFilter = JSON.parse(JSON.stringify(filterUpdate));
-					$("#search-bar").trigger("change");
-				}
-			});
 		}
 
+		// Initially up-to-date
+		regexFilter = JSON.parse(JSON.stringify(filterUpdate));
+
+		$("#search-group").on("keypress", function (e) {
+			var key = e.which;
+			if (
+				key == 13 &&
+				JSON.stringify(regexFilter) != JSON.stringify(filterUpdate)
+			) {
+				// the enter key code
+				regexFilter = JSON.parse(JSON.stringify(filterUpdate));
+				$("#search-bar").trigger("change");
+			}
+		});
+			
 		cookie.load();
 
 		if (!cookie.data.server) {
@@ -877,7 +877,8 @@ require(["D2Bot"], function (D2BOTAPI) {
         }
 		
 		function queryCountables($account, $character, loadMoreItem, itemGroup={key: "all", value: { regex: "" } }) {
-            //loader.hidden = false;
+            var regex = "^"+itemGroup.value.regex.toLocaleLowerCase()+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$";
+			
             var callback = function (err, results) {
 				if (err) { console.log(err); return false; };
 				var y = $(window).scrollTop();
@@ -888,7 +889,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				
 				// Here go the countable items by RegEx.. to extend the list simply append another entry to LimeConfig.js.
 				// Countable items will receive an additional number field in the view (upper right corner of item box).
-				/*for (var i in results) {
+				for (var i in results) {
 					if(results[i].description) {
 						//if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
 							var item = {
@@ -910,18 +911,15 @@ require(["D2Bot"], function (D2BOTAPI) {
 							$updateItemGroup(countables[item.uid][itemGroup.key], results[i]);
 						//}
 					}
-				}*/
+				}
 				
 				$(window).scrollTop(y);
-				//loader.hidden = true;
 
 				roundTime.elapsed = new Date().getTime();
 				if (loadMoreItem) {
-					loadMoreItem();
+					loadMoreItem(itemGroup.key);
 				}
 			}
-            
-            var regex = "^"+itemGroup.value.regex.toLocaleLowerCase()+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$";
             
             if(!dummyData) {
                 API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
@@ -942,7 +940,6 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
 
 		function doQuery($account, $character, loadMoreItem) {
-            //loader.hidden = false;
             var callback = function (err, results) {
                 if (err) {
                     console.log(err);
@@ -955,7 +952,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                 var sc = CurrentGameMode == "Softcore";
                 var lod = CurrentGameType == "Expansion";
 
-                /*for (var i in results) {
+                for (var i in results) {
                     if (results[i].description) {
                         //if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
                         var itemID = results[i].description.split("$")[1].split(":")[1];
@@ -965,10 +962,9 @@ require(["D2Bot"], function (D2BOTAPI) {
                         itemCount += 1;
                         //}
                     }
-                }*/
+                }
 
                 $(window).scrollTop(y);
-                //loader.hidden = true;
 
                 roundTime.elapsed = new Date().getTime();
                 if (loadMoreItem) {
@@ -1033,11 +1029,10 @@ require(["D2Bot"], function (D2BOTAPI) {
 		var groupCount = 0;
 		var groupItemCount = 0;
 
-		var roundTime = {
+		let roundTime = {
 			start: new Date().getTime(),
-			elapsed: new Date().getTime(),
-			groups: 0,
-			total: 0
+			end: new Date().getTime(),
+			groups: []
 		};
 
 		accountListid = 0;
@@ -1050,21 +1045,24 @@ require(["D2Bot"], function (D2BOTAPI) {
 			accounts += "," + accList[i];
 
 		window.loadMoreItem = function () {
-			var time_ms = roundTime.elapsed - roundTime.start;
-			roundTime.total += time_ms;
+			var end = new Date().getTime();
+			var elapsed = end - roundTime.start;
 			roundTime.start = new Date().getTime();
-
 			//accountListid++;
 			//console.log("Found Account:", accList[accountListid - 1], "After:", (time_ms / 1000).toFixed(3),"seconds");
 			//if (accountListid == accList.length) {
+				var groups = roundTime.groups[roundTime.groups.length - 1];
+				var total = elapsed + groups;
+				console.log("Time total:", total);
+				
 				if (!ended) {
 					$footer = `
 <div>
     <p>End of Items on ` + accList.length + ` Accounts</p>
 	<span class="m-b-15 d-block">` + itemCount + ` Items in total.
-        <br>` + groupCount + ` item groups sorted out of ` + groupList.length + ` after ` + (roundTime.groups / 1000).toFixed(3) + ` seconds. ` + groupItemCount + ` items were grouped.
+        <br>` + groupCount + ` item groups sorted out of ` + groupList.length + ` after ` + (groups / 1000).toFixed(3) + ` seconds. ` + groupItemCount + ` items were grouped.
         <br>Saved ` + savedEntryCount + ` list entries with ` + groupEntryCount +` group entries
-        <br>After ` + (roundTime.total / 1000).toFixed(3) + ` seconds in total.
+        <br>After ` + (total / 1000).toFixed(3) + ` seconds in total.
 	</span>
 </div>`;
 					$("#load-more").html($footer);
@@ -1078,24 +1076,34 @@ require(["D2Bot"], function (D2BOTAPI) {
 			//}
 
 			//doQuery(accList[accountListid++], chr, itemCount > MAX_ITEM ? limit ? false : window.loadMoreItem : window.loadMoreItem);
-		};
+		};		
+		
+		roundTime.start = new Date().getTime();
 
-		window.loadAllCountable = function () {
-			var time_ms = roundTime.elapsed - roundTime.start;
-			roundTime.groups += time_ms;
-			roundTime.start = new Date().getTime();
+		window.loadAllCountable = function (regex) {
+			var end = new Date().getTime();
+			roundTime.groups.push(end - roundTime.start);
 
 			accountListid++;
-			//console.log("Found Group:", groupList[groupListid - 1], "After:", (time_ms / 1000).toFixed(3),"seconds");
 			//if (accountListid == accList.length) {
 				
 				// Todo: use promises instead.. correct group not guaranteed on bulk search
-				console.log("Finished group:", Object.keys(itemGroups)[groupListid++]);
+				console.log(regex, " Time:", roundTime.groups[groupListid++]);
 				//groupListid++;
 				accountListid = 0;
-				
-				if (groupListid == groupList.length) {
+
+				if (groupListid == groupList.length) {					
 					if (!ended) {
+						roundTime.start = new Date().getTime();
+						
+						//for(var j = 0; j < accList.length; j++)
+							doQuery(/*accounts*/"", chr, window.loadMoreItem);
+						console.log(
+									"Finished collecting item groups:",
+									sortedGroups,
+									"\nFetching the rest now..."
+								);
+						
 						var sortedGroups = [];
 						Object.keys(countables).forEach((uid) => {
 							Object.keys(countables[uid]).forEach((name) => {
@@ -1110,19 +1118,6 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 						window.loadAllCountable = false;
 						accountListid = 0;
-
-						console.log(
-							"Finished collecting item groups:",
-							sortedGroups,
-							"\nFetching the rest now..."
-						);
-
-						//loader.hidden = true;
-
-						roundTime.total += roundTime.groups;
-						
-						//for(var j = 0; j < accList.length; j++)
-							doQuery(/*accounts*/"", chr, window.loadMoreItem);
 					}
 
 					return;
@@ -1132,14 +1127,11 @@ require(["D2Bot"], function (D2BOTAPI) {
 					//queryCountables(accounts/*""*/, chr, window.loadAllCountable, groupList[j]);
 			//}
 		};
-		
-		
-		
-		console.log("Account List:",accounts);
+
+		console.log("Time Start:", roundTime.start);
 		
 		for(var j = 0; j < groupList.length; j++)		
 			queryCountables(/*accounts*/"", chr, window.loadAllCountable, groupList[j]);
-		//loader.hidden = true;
 	}
 
 	function pupulateAccountCharSelect(realm, core, type, ladder) {
