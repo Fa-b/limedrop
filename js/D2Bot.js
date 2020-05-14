@@ -38,7 +38,7 @@ define(["events"],function (events) {
             var thejson = JSON.stringify(requestObject);
             var Base64blob = base64encode(JSON.stringify(requestObject));//Buffer.from(JSON.stringify(requestObject)).toString('base64');
             //console.log("---------------------");
-            console.log(thejson);
+            //console.log(thejson);
             //console.log(Base64blob);
 
             makePostRequest(d2botConfig, Base64blob, function (err, results) {
@@ -177,12 +177,15 @@ define(["events"],function (events) {
                 }
                 else {
                     console.log("status: " + JSON.stringify(msg));//done(null,msg);
-					console.warn("Old D2Bot# version active or no API server running..","Using deprecated API.");
-					d2botConfig.fastQuery = false;
-					D2BotAPI.emit("query", item, realm, account, charname, done);
                 }
             }, function (textStatus) {
-                done(textStatus);
+                if(d2botConfig.fastQuery) {
+                    console.warn("Old D2Bot# version active or no API server running..","Using deprecated API.");
+                    d2botConfig.fastQuery = false;
+                    D2BotAPI.emit("query", item, realm, account, charname, done);
+                } else {
+                    done(textStatus);
+                }
             });
         });
         

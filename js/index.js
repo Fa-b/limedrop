@@ -296,23 +296,23 @@ require(["D2Bot"], function (D2BOTAPI) {
 			} else {
 				console.info("Invalid Config Entry for Search Filters");
 			}
-
-			// Initially up-to-date
-			regexFilter = JSON.parse(JSON.stringify(filterUpdate));
-
-			$("#search-group").on("keypress", function (e) {
-				var key = e.which;
-				if (
-					key == 13 &&
-					JSON.stringify(regexFilter) != JSON.stringify(filterUpdate)
-				) {
-					// the enter key code
-					regexFilter = JSON.parse(JSON.stringify(filterUpdate));
-					$("#search-bar").trigger("change");
-				}
-			});
 		}
 
+		// Initially up-to-date
+		regexFilter = JSON.parse(JSON.stringify(filterUpdate));
+
+		$("#search-group").on("keypress", function (e) {
+			var key = e.which;
+			if (
+				key == 13 &&
+				JSON.stringify(regexFilter) != JSON.stringify(filterUpdate)
+			) {
+				// the enter key code
+				regexFilter = JSON.parse(JSON.stringify(filterUpdate));
+				$("#search-bar").trigger("change");
+			}
+		});
+			
 		cookie.load();
 
 		if (!cookie.data.server) {
@@ -404,7 +404,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		countables = [];
 
 		console.log("refresh");
-		addItemstoList(limit, LimeConfig["ItemGroup"], false);
+		addItemstoList(limit, LimeConfig["ItemGroup"], true);
 	}
     
     /* ITEM LIST UPDATE HELPERS */
@@ -690,7 +690,6 @@ require(["D2Bot"], function (D2BOTAPI) {
 			var count = 0;
 			description = description.join("<br/>");
 			var htmlTemplate =`
-<div class="d-flex flex-row comment-row hidden p-l-0 m-t-0 m-b-0" aria-haspopup="true" id="` + groupId + `">
     <div class="p-2 ld-img-col" style="position:relative; display: flex; align-self: center; justify-content: center;">
         <div style="position:relative">
             <div id="png-` + groupId + `"><i>image</i></div>
@@ -712,10 +711,14 @@ require(["D2Bot"], function (D2BOTAPI) {
     </div>
     <div class="comment-footer w-100" hidden>
         <span class="text-muted float-right">` + CurrentRealm + "/" + result.account + "/" + result.character + "/{" + itemUID + "}" + `</span>
-    </div>
-</div>`;
+    </div>`;
+            
+            var itemGroup = document.createElement("div");
 
-			var $itemGroup = $(htmlTemplate);
+            itemGroup.className += "d-flex flex-row comment-row hidden p-l-0 m-t-0 m-b-0";
+            itemGroup.setAttribute("aria-haspopup", true);
+            itemGroup.setAttribute("id", groupId);
+			itemGroup.innerHTML = htmlTemplate;
 
 			let prevRatio = {};
 			let handleIntersect = (entries, observer) => {
@@ -727,7 +730,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 						//console.log("Leaving:", elem);
 						//$itemGroup.addClass("hidden");
 					} else if (entry.intersectionRatio >= 0.1) {
-						$itemGroup.removeClass("hidden");
+						itemGroup.classList.remove("hidden");
 						if (!result.itemImage) {
 							try {
 								var tmp = JSON.parse(result.image);
@@ -767,7 +770,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				threshold: 0.4
 			});
 
-			$itemGroup.data("itemData", result);
+			$(itemGroup).data("itemData", result);
 			//$itemGroup.data("itemCount", count);
 
 			function updateSelectCount(selected) {
@@ -783,7 +786,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                 let selectBox = $("#item-menu-select-"+groupId);
                 let groupMenu = $("#item-menu-" + groupId);
                 
-				if ($(event.target).closest($itemGroup).length) {
+				if ($(event.target).closest($(itemGroup)).length) {
 					// Show dropdown item selection
 					groupMenu.show();
 					// Using mousedown & move might be good for checking the change events in the input box :)
@@ -824,13 +827,16 @@ require(["D2Bot"], function (D2BOTAPI) {
 				($("#character-select").val().split(".")[0] === "Show All" ||
 					$("#character-select").val().split(".")[0] === result.character)
 			) {
-				$("#items-list").append($itemGroup);
-				var itemDiv = document.getElementById(groupId);
-				observer.observe(itemDiv);
+				//$("#items-list").append($itemGroup);
+                var itemsList = document.getElementById("items-list");
+                itemsList.appendChild(itemGroup);
+                
+				//var itemDiv = document.getElementById(groupId);
+				observer.observe(itemGroup);
 			}
 
 			groupEntryCount += 1;
-			return $itemGroup;
+			return $(itemGroup);
 		}
 
 		savedEntryCount += 1;
@@ -859,9 +865,15 @@ require(["D2Bot"], function (D2BOTAPI) {
         }
 		
 		function queryCountables($account, $character, loadMoreItem, itemGroup={key: "all", value: { regex: "" } }) {
-            loader.hidden = false;
+            var regex = "^"+itemGroup.value.regex.toLocaleLowerCase()+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$";
+			var status = "Success";
+            
             var callback = function (err, results) {
-				if (err) { console.log(err); return false; };
+				if (err) {
+                    console.log(err);
+                    status = "Error";
+                }
+                
 				var y = $(window).scrollTop();
 				
 				var ladder = CurrentGameClass == "Ladder";
@@ -895,20 +907,19 @@ require(["D2Bot"], function (D2BOTAPI) {
 				}
 				
 				$(window).scrollTop(y);
-				//loader.hidden = true;
 
 				roundTime.elapsed = new Date().getTime();
 				if (loadMoreItem) {
-					loadMoreItem();
+
+                    loadMoreItem(status, itemGroup.key);
 				}
 			}
-            
-            var regex = "^"+itemGroup.value.regex.toLocaleLowerCase()+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$";
             
             if(!dummyData) {
                 API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
             } else {
                 console.warn("No accounts found. Appending dummy group items..");
+                regex = regex?regex:"";
                 setTimeout(() => {
                     var re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
                     var list = [];
@@ -924,12 +935,14 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
 
 		function doQuery($account, $character, loadMoreItem) {
-            loader.hidden = false;
+            var status = "Success";
+            
             var callback = function (err, results) {
-                if (err) {
+				if (err) {
                     console.log(err);
-                    return;
+                    status = "Error";
                 }
+                
                 var y = $(window).scrollTop();
 
                 var item;
@@ -950,20 +963,21 @@ require(["D2Bot"], function (D2BOTAPI) {
                 }
 
                 $(window).scrollTop(y);
-                //loader.hidden = true;
 
                 roundTime.elapsed = new Date().getTime();
                 if (loadMoreItem) {
-                    loadMoreItem();
+                    loadMoreItem(status);
                 }
             }
             
-            var regex = "^"+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$";
+            var regex = $("#search-bar").val().toLocaleLowerCase();
+			regex = (regex.length>0)?"^"+buildregex(regex)+".*$":null;
             
             if(!dummyData) {
                 API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
             } else {
                 console.warn("No accounts found. Appending dummy items..");
+                regex = regex?regex:"";
                 setTimeout(() => {
                     var re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
                     var list = [];
@@ -1005,7 +1019,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			accList.push(account);
 		}
 		
-		console.log(itemGroups);
+		//console.log(itemGroups);
 		
 		for (var group in itemGroups) {
 			groupList.push({ key: group, value: itemGroups[group] });
@@ -1014,32 +1028,40 @@ require(["D2Bot"], function (D2BOTAPI) {
 		var groupCount = 0;
 		var groupItemCount = 0;
 
-		var roundTime = {
+		let roundTime = {
 			start: new Date().getTime(),
-			elapsed: new Date().getTime(),
-			groups: 0,
-			total: 0
+			end: new Date().getTime(),
+			groups: []
 		};
 
 		accountListid = 0;
 		groupListid = 0;
 		ended = false;
+		
+		var accounts = accList[0];
+	
+		for(var i = 1; i < accList.length; i++)
+			accounts += "," + accList[i];
 
-		window.loadMoreItem = function () {
-			var time_ms = roundTime.elapsed - roundTime.start;
-			roundTime.total += time_ms;
+		window.loadMoreItem = function (status) {
+			var end = new Date().getTime();
+			var elapsed = end - roundTime.start;
 			roundTime.start = new Date().getTime();
-
+			//accountListid++;
 			//console.log("Found Account:", accList[accountListid - 1], "After:", (time_ms / 1000).toFixed(3),"seconds");
-			if (accountListid == accList.length) {
+			//if (accountListid == accList.length) {
+				var groups = roundTime.groups[roundTime.groups.length - 1];
+				var total = elapsed + groups;
+				console.log("Time total:", total, "status:", status);
+				
 				if (!ended) {
 					$footer = `
 <div>
-    <p>End of Items on all Accounts</p>
+    <p>End of Items on ` + accList.length + ` Accounts</p>
 	<span class="m-b-15 d-block">` + itemCount + ` Items in total.
-        <br>` + groupCount + ` item groups sorted after ` + (roundTime.groups / 1000).toFixed(3) + ` seconds. ` + groupItemCount + ` items were grouped.
+        <br>` + groupCount + ` item groups sorted out of ` + groupList.length + ` after ` + (groups / 1000).toFixed(3) + ` seconds. ` + groupItemCount + ` items were grouped.
         <br>Saved ` + savedEntryCount + ` list entries with ` + groupEntryCount +` group entries
-        <br>After ` + (roundTime.total / 1000).toFixed(3) + ` seconds in total.
+        <br>After ` + (total / 1000).toFixed(3) + ` seconds in total.
 	</span>
 </div>`;
 					$("#load-more").html($footer);
@@ -1050,60 +1072,70 @@ require(["D2Bot"], function (D2BOTAPI) {
 				}
 
 				return;
-			}
+			//}
 
-			doQuery(accList[accountListid++], chr, itemCount > MAX_ITEM ? limit ? false : window.loadMoreItem : window.loadMoreItem);
-		};
+			//doQuery(accList[accountListid++], chr, itemCount > MAX_ITEM ? limit ? false : window.loadMoreItem : window.loadMoreItem);
+		};		
+		
+		roundTime.start = new Date().getTime();
 
-		window.loadAllCountable = function () {
-			var time_ms = roundTime.elapsed - roundTime.start;
-			roundTime.groups += time_ms;
-			roundTime.start = new Date().getTime();
+		window.loadAllCountable = function (status, regex) {
+			var end = new Date().getTime();
+			roundTime.groups.push(end - roundTime.start);
 
-			//console.log("Found Group:", groupList[groupListid - 1], "After:", (time_ms / 1000).toFixed(3),"seconds");
+			accountListid++;
 			//if (accountListid == accList.length) {
-			if (groupListid == groupList.length) {
-				if (!ended) {
-					var sortedGroups = [];
-					Object.keys(countables).forEach((uid) => {
-						Object.keys(countables[uid]).forEach((name) => {
-							if (!sortedGroups[name]) {
-								sortedGroups[name] = 0;
-								groupCount++;
-							}
-							sortedGroups[name]++;
-							groupItemCount++;
+				
+				// Todo: use promises instead.. correct group not guaranteed on bulk search
+				console.log(regex, " Time:", roundTime.groups[groupListid++], "status:", status);
+				//groupListid++;
+				accountListid = 0;
+
+				if (groupListid == groupList.length) {					
+					if (!ended) {
+						roundTime.start = new Date().getTime();
+						
+						//for(var j = 0; j < accList.length; j++)
+							doQuery(/*accounts*/"", chr, window.loadMoreItem);
+						
+						var sortedGroups = [];
+						Object.keys(countables).forEach((uid) => {
+							Object.keys(countables[uid]).forEach((name) => {
+								if (!sortedGroups[name]) {
+									sortedGroups[name] = 0;
+									groupCount++;
+								}
+								sortedGroups[name]++;
+								groupItemCount++;
+							});
 						});
-					});
+                        
+                        console.log(
+									"Found items in the following groups:",
+									sortedGroups,
+									"\nFetching the rest now..."
+								);
 
-					window.loadAllCountable = false;
-					accountListid = 0;
+						window.loadAllCountable = false;
+						accountListid = 0;
+					}
 
-					console.log(
-						"Finished collecting item groups:",
-						sortedGroups,
-						"\nFetching the rest now..."
-					);
-
-					loader.hidden = true;
-
-					roundTime.total += roundTime.groups;
-
-					doQuery(accList[accountListid++], chr, itemCount > MAX_ITEM ? limit ? false : window.loadMoreItem : window.loadMoreItem);
+					return;
 				}
-
-				return;
-			}
-
-			queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
+				
+				//for(var j = 0; j < accList.length; j++)
+					//queryCountables(accounts/*""*/, chr, window.loadAllCountable, groupList[j]);
+			//}
 		};
 
-        queryCountables("", chr, window.loadAllCountable, groupList[groupListid++]);
-		loader.hidden = true;
+		console.log("Time Start:", roundTime.start);
+		
+		for(var j = 0; j < groupList.length; j++)
+            queryCountables(/*accounts*/"", chr, window.loadAllCountable, groupList[j]);
 	}
-
+    
     /* UPDATE SIDEBAR SELECTION */
-
+    
 	function pupulateAccountCharSelect(realm, core, type, ladder) {
 		API.emit("accounts", realm, function (err, account) {
 			if (err) {
