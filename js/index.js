@@ -73,6 +73,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 			);
 		});
 	})();
+    
+    /* INIT LIMEDROP */
 
 	function initialize() {
 		$(".app-search").toggle(0);
@@ -350,37 +352,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 		//refreshList();
 	}
 
-	function login(username, password, server, callback) {
-		API.emit("login", username, password, server, function (err, result) {
-			if (err) {
-				console.log(err);
-				cookie.data.username = "";
-				cookie.data.session = "";
-				cookie.data.loggedin = false;
-				cookie.save();
-				return callback(false);
-			}
-
-			cookie.data.loggedin = username !== "public" ? true : false;
-			// Don't override Cookie with default..
-			if (cookie.data.loggedin) {
-				cookie.data.server = server;
-				cookie.data.username = username;
-				cookie.data.session = result;
-				cookie.save();
-			}
-			$("#ld-login-api").val(cookie.data.server);
-			showNotification("Notification", "Now logged in as " + username, false);
-			$(document).trigger("click");
-			callback(cookie.data.loggedin);
-		});
-	}
-
 	var CurrentRealm;
 	var CurrentGameType;
 	var CurrentGameMode;
 	var CurrentGameClass;
 	var AccountsMap = {};
+    
+    /* NOTIFICATION CARD */
 
 	function showNotification(head, text, perm) {
 		var template = `
@@ -414,6 +392,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 		});
 	}
 
+    /* UPDATE ITEM LIST */
+
 	function refreshList(limit = true) {
 		$("#items-list").html("");
 		itemCount = 0;
@@ -426,6 +406,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 		console.log("refresh");
 		addItemstoList(limit, LimeConfig["ItemGroup"], false);
 	}
+    
+    /* ITEM LIST UPDATE HELPERS */
 
 	function getItemDesc(desc) {
 		var i,
@@ -1120,6 +1102,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 		loader.hidden = true;
 	}
 
+    /* UPDATE SIDEBAR SELECTION */
+
 	function pupulateAccountCharSelect(realm, core, type, ladder) {
 		API.emit("accounts", realm, function (err, account) {
 			if (err) {
@@ -1180,6 +1164,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 	}
 
 	var add_row_index = 1;
+    
+    /* INIT SESSION */
 
 	function start(loggedin) {
 		if (loggedin) {
@@ -1191,7 +1177,16 @@ require(["D2Bot"], function (D2BOTAPI) {
 			);
 		}
 
-		$("#account-select").off("change");
+        /* INIT SEARCH */
+
+		$("#search-bar").off("change");
+		$("#search-bar").change(function () {
+			refreshList(true);
+		});
+        
+        /* INIT SIDEBAR SELECTION */
+
+        $("#account-select").off("change");
 		$("#account-select").change(function () {
 			$("#character-select").html("");
 			var $thisAccount = $(this).val();
@@ -1203,11 +1198,6 @@ require(["D2Bot"], function (D2BOTAPI) {
 				csoption.text(AccountsMap[$thisAccount][j]);
 				$("#character-select").append(csoption);
 			}
-			refreshList(true);
-		});
-
-		$("#search-bar").off("change");
-		$("#search-bar").change(function () {
 			refreshList(true);
 		});
 
@@ -1311,12 +1301,15 @@ require(["D2Bot"], function (D2BOTAPI) {
 				CurrentGameClass
 			);
 		});
+
 		pupulateAccountCharSelect(
 			CurrentRealm,
 			CurrentGameMode,
 			CurrentGameType,
 			CurrentGameClass
 		);
+
+        /* INIT ASYNC ACTION RESPONSE HANDLING (POLL) */
 
 		var intCount = 0;
 		$(function () {
@@ -1362,6 +1355,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 						for (var i = 0; i < msg.body.length; i++) {
 							var data = JSON.parse(msg.body[i].body);
+                            // TODO: check for data.hash first, then use switch case for various returned actions
 							drops[data.hash].forEach(itemData => {
 								//$("#" + itemData.itemid).remove();
 								var item = document.getElementById(itemData.itemid);
@@ -1422,9 +1416,71 @@ require(["D2Bot"], function (D2BOTAPI) {
 				}
 			}, 100);
 		});
+        
+        /* INIT DROP ACTION */
+        
+        $(".launch-btn").off("click");
+		$(".launch-btn").click(function () {
+			var gamename = $("#gamename").val();
+			var gamepass = $("#gamepass").val();
+			drops = {};
 
+			if (!gamename || gamename == "") {
+				alert("GameName Required!");
+				return;
+			}
+
+			$(".selected").each(function (i, v) {
+				var $item = $(v);
+				var item = $item.data("itemData");
+				//delete item.image;
+				//delete item.description;
+
+				//$item.remove();
+
+				// It appears this causes issues during realm selection otherwise
+				item.realm = item.realm.toLowerCase();
+
+				var hash = API.md5(item.realm + item.account.toLowerCase()).toString();
+
+				if (!drops[hash]) {
+					drops[hash] = [];
+				}
+
+				drops[hash].push(item);
+			});
+
+			var idx = 0;
+			const start = Date.now();
+			
+			for (var d in drops) {
+				if (drops.hasOwnProperty(d)) {
+					let GameInfo = {
+						hash: d,
+						profile: cookie.data.username,
+						action: "doDrop",
+						data: JSON.stringify({
+							gameName: gamename,
+							gamePass: gamepass,
+							items: drops[d]
+						})
+					};
+
+					setTimeout((i) => {
+						console.log("Scheduled drop", i, "after", ((Date.now() - start)/1000).toFixed(3),"seconds");
+						console.log(GameInfo);
+						API.emit("gameaction", GameInfo, function (err) { });
+					}, idx * 1000, idx++);
+					
+				}
+			}
+		});
+
+        /* INIT MULELOG ACTION */
+        
 		$("#log-accounts").off("click");
 		$("#log-accounts").click(function () {
+            // TODO: consider removing apipass and instead use session authentication
 			var apipass = document.getElementById("log-accounts-api").value;
 
 			if (!apipass || apipass.length < 1) {
@@ -1483,63 +1539,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			$("#add-accounts-modal").modal("hide");
 		});
 
-		$(".launch-btn").off("click");
-		$(".launch-btn").click(function () {
-			var gamename = $("#gamename").val();
-			var gamepass = $("#gamepass").val();
-			drops = {};
-
-			if (!gamename || gamename == "") {
-				alert("GameName Required!");
-				return;
-			}
-
-			$(".selected").each(function (i, v) {
-				var $item = $(v);
-				var item = $item.data("itemData");
-				//delete item.image;
-				//delete item.description;
-
-				//$item.remove();
-
-				// It appears this causes issues during realm selection otherwise
-				item.realm = item.realm.toLowerCase();
-
-				var hash = API.md5(item.realm + item.account.toLowerCase()).toString();
-
-				if (!drops[hash]) {
-					drops[hash] = [];
-				}
-
-				drops[hash].push(item);
-			});
-
-			var idx = 0;
-			const start = Date.now();
-			
-			for (var d in drops) {
-				if (drops.hasOwnProperty(d)) {
-					let GameInfo = {
-						hash: d,
-						profile: cookie.data.username,
-						action: "doDrop",
-						data: JSON.stringify({
-							gameName: gamename,
-							gamePass: gamepass,
-							items: drops[d]
-						})
-					};
-
-					// TODO: make delay a config
-					setTimeout((i) => {
-						console.log("Scheduled drop", i, "after", ((Date.now() - start)/1000).toFixed(3),"seconds");
-						console.log(GameInfo);
-						API.emit("gameaction", GameInfo, function (err) { });
-					}, idx * 1000, idx++);
-					
-				}
-			}
-		});
+        /* INIT LOGOUT SESSION */
 
 		$(".logout-btn").off("click");
 		$(".logout-btn").click(function () {
@@ -1557,6 +1557,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
 	  }
 	});*/
+    
+    /* MULELOG MODAL */
 
 	$(".add-acc-btn").click(function () {
 		$("#add-accounts-modal").modal("show");
@@ -1581,6 +1583,34 @@ require(["D2Bot"], function (D2BOTAPI) {
 		$("#tab-logic").append('<tr id="addr' + (add_row_index + 1) + '"></tr>');
 		add_row_index++;
 	});
+    
+    /* LOGIN SESSION */
+    
+    function login(username, password, server, callback) {
+		API.emit("login", username, password, server, function (err, result) {
+			if (err) {
+				console.log(err);
+				cookie.data.username = "";
+				cookie.data.session = "";
+				cookie.data.loggedin = false;
+				cookie.save();
+				return callback(false);
+			}
+
+			cookie.data.loggedin = username !== "public" ? true : false;
+			// Don't override Cookie with default..
+			if (cookie.data.loggedin) {
+				cookie.data.server = server;
+				cookie.data.username = username;
+				cookie.data.session = result;
+				cookie.save();
+			}
+			$("#ld-login-api").val(cookie.data.server);
+			showNotification("Notification", "Now logged in as " + username, false);
+			$(document).trigger("click");
+			callback(cookie.data.loggedin);
+		});
+	}
 
 	$("#login-ok-btn").click(function () {
 		var username = String($("#ld-login-user").val());
@@ -1619,6 +1649,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 			$("#login-ok-btn").trigger("click");
 		}
 	});
+    
+    /* IMGUR UPLOAD MODAL */
 
 	$("#imgur-upload-btn").click(function () {
 		$("#upload-imgur-modal").modal("show");
