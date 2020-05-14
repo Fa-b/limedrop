@@ -404,7 +404,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		countables = [];
 
 		console.log("refresh");
-		addItemstoList(limit, LimeConfig["ItemGroup"], true);
+		addItemstoList(limit, LimeConfig["ItemGroup"]/*, true*/);
 	}
     
     /* ITEM LIST UPDATE HELPERS */
@@ -451,7 +451,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			desc[desc.length - 1] = desc[desc.length - 1].trim();
 		}
 
-		desc = desc.join("<br>");
+		desc = desc.join("<br/>");
 
 		return desc;
 	}
@@ -852,8 +852,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 	}
 
 	function addItemstoList(limit=true, itemGroups=[], dummyData=(Object.keys(AccountsMap).length===0)) {
-		var loader = document.getElementById("loader");
-        loader.hidden = false;
+		//var loader = document.getElementById("loader");
+        //loader.hidden = false;
         
         if(dummyData) {
             showNotification("Dummy Output", "No accounts found, dummy data will be used!", false);
@@ -1052,7 +1052,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			//if (accountListid == accList.length) {
 				var groups = roundTime.groups[roundTime.groups.length - 1];
 				var total = elapsed + groups;
-				console.log("Time total:", total, "status:", status);
+				//console.log("Time total:", total, "status:", status);
 				
 				if (!ended) {
 					$footer = `
@@ -1068,7 +1068,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 					ended = true;
 					window.loadMoreItem = false;
 
-					loader.hidden = true;
+					//loader.hidden = true;
 				}
 
 				return;
@@ -1087,8 +1087,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 			//if (accountListid == accList.length) {
 				
 				// Todo: use promises instead.. correct group not guaranteed on bulk search
-				console.log(regex, " Time:", roundTime.groups[groupListid++], "status:", status);
-				//groupListid++;
+				//console.log(regex, " Time:", roundTime.groups[groupListid], "status:", status);
+				groupListid++;
 				accountListid = 0;
 
 				if (groupListid == groupList.length) {					
@@ -1096,7 +1096,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 						roundTime.start = new Date().getTime();
 						
 						//for(var j = 0; j < accList.length; j++)
-							doQuery(/*accounts*/"", chr, window.loadMoreItem);
+							doQuery(accounts, chr, window.loadMoreItem);
 						
 						var sortedGroups = [];
 						Object.keys(countables).forEach((uid) => {
@@ -1110,11 +1110,11 @@ require(["D2Bot"], function (D2BOTAPI) {
 							});
 						});
                         
-                        console.log(
+                        /*console.log(
 									"Found items in the following groups:",
 									sortedGroups,
 									"\nFetching the rest now..."
-								);
+								);*/
 
 						window.loadAllCountable = false;
 						accountListid = 0;
@@ -1128,10 +1128,10 @@ require(["D2Bot"], function (D2BOTAPI) {
 			//}
 		};
 
-		console.log("Time Start:", roundTime.start);
+		//console.log("Time Start:", roundTime.start);
 		
 		for(var j = 0; j < groupList.length; j++)
-            queryCountables(/*accounts*/"", chr, window.loadAllCountable, groupList[j]);
+            queryCountables(accounts, chr, window.loadAllCountable, groupList[j]);
 	}
     
     /* UPDATE SIDEBAR SELECTION */
@@ -1383,7 +1383,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 						//console.log(msg);
 						msg.body = JSON.parse(msg.body);
 
-						var itemTitles = [];
+						let itemTitles = [];
 
 						for (var i = 0; i < msg.body.length; i++) {
 							var data = JSON.parse(msg.body[i].body);
@@ -1391,6 +1391,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 							drops[data.hash].forEach(itemData => {
 								//$("#" + itemData.itemid).remove();
 								var item = document.getElementById(itemData.itemid);
+								// TODO: remove item only if dropped, keep in queue otherwise
 								item.parentNode.removeChild(item);
 							});
 							

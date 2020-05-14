@@ -13,7 +13,7 @@ LimeConfig = {
 		"PerfectGems": {
 			"regex": "(?=.+?:(5[678][16]|601):[37]:\\d:\\d$)",
 		},
-        /*"FlawlessGems": {
+        "FlawlessGems": {
 			"regex": "(?=.+?:(5[678][05]|600):[37]:\\d:\\d$)",
 		},
         "RegularGems": {
@@ -24,7 +24,7 @@ LimeConfig = {
 		},
         "ChippedGems": {
 			"regex": "(?=.+?:5([67][27]|82|[59]7):[37]:\\d:\\d$)",
-		},*/
+		},
 		"Keys": {
 			"regex": "(?=.+?:64[7-9]:[37]:\\d:\\d$)",
 		},
