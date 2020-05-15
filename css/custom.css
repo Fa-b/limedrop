@@ -89,9 +89,15 @@
   min-width: 100% !important;
 }
 
+body {
+    height:100%;
+    width: 100%;
+    position: fixed;
+    overflow: hidden;
+}
+
 #main-wrapper .page-wrapper .container-fluid {
   height: calc(100vh - 94px + 30px);
-  overflow-y: scroll;
 }
 
 th {
@@ -390,7 +396,6 @@ span.badge.badge-secondary.mt-2 {
   margin: 10px;
   display: block;
   height: 400px;
-  overflow-y: scroll;
   -webkit-scrollbar-thumb: width 5px;
 }
 
@@ -431,7 +436,9 @@ h6.drop-queue-styled {
 }
 
 .dropQueueList {
+  height: 100%;
   overflow-y: scroll;
+  margin-bottom: 0px;
 }
 
 .app-search {
