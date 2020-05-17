@@ -511,12 +511,12 @@
 		<!-- Container fluid  -->
 		<!-- ============================================================== -->
 		<div class="container-fluid">
-		  <div class="row">
+		  <div style="height:100%;" class="row">
 			<!-- column -->
-			<div class="col-xs-12 col-lg-8">
-			  <div class="card">
+			<div style="height:100%;" class="col-xs-12 col-lg-8">
+			  <div style="height:calc(100% + 20px);" class="card">
 				<h4 class="card-title ld-title-indent">Inventory</h4>
-				<div class="comment-widgets scrollable">
+				<div style="overflow-y: scroll; overflow-x: hidden; direction:rtl; margin-bottom:0px; display:" class="comment-widgets" id="root-box">
 				  <div id="loader" hidden>
 					<div
 					  class="d-flex flex-column"
@@ -530,7 +530,7 @@
 					  <div class="d-flex ld-loader"></div>
 					</div>
 				  </div>
-				  <div class="items-list" id="items-list"></div>
+				  <div style="direction:ltr" class="items-list" id="items-list"></div>
 				  <div id="load-more"></div>
 				</div>
 			  </div>
@@ -832,6 +832,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
 	<script src="./js/font16.js"></script>
 	<script src="./js/item.js"></script>
+    <script src="./js/JSThread.js"></script>
 	<script src="./js/itemScreenshot.js"></script>
 	<script src="./js/testItems.js"></script>
 	<script src="/socket.io/socket.io.js"></script>

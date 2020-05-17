@@ -532,20 +532,22 @@ require(["D2Bot"], function (D2BOTAPI) {
 							console.warn("Old D2Bot# version active.. please update");
 						}
 						if (tmp) {
-							result.itemImage = new ItemImage({
-								image: tmp.code,
-								itemColor: tmp.color,
-								sockets: tmp.sockets,
-								description: result.description
-							});
-							result.itemImage.onload = () => {
-								result.itemImage.getItem().then((canvas) => {
-									result.image = canvas.toDataURL();
-									var imageTemplate = `<img src="` + result.image + `" alt="user" class="ld-item">`;
-									var imgDiv = document.getElementById("png-" + itemUID);
-									imgDiv.innerHTML = imageTemplate;
-								});
-							};
+                            setImmediate(() => {
+                                result.itemImage = new ItemImage({
+                                    image: tmp.code,
+                                    itemColor: tmp.color,
+                                    sockets: tmp.sockets,
+                                    description: result.description
+                                });
+                                result.itemImage.onload = () => {
+                                    result.itemImage.getItem().then((canvas) => {
+                                        result.image = canvas.toDataURL();
+                                        var imageTemplate = `<img src="` + result.image + `" alt="user" class="ld-item">`;
+                                        var imgDiv = document.getElementById("png-" + itemUID);
+                                        imgDiv.innerHTML = imageTemplate;
+                                    });
+                                };
+                            });
 						} else {
 							var imageTemplate = `<img src="` + ((result.image.indexOf("data") != -1) ? "" : "data:image/jpeg;base64,") + result.image + `" alt="user" class="ld-item">`;
 							var imgDiv = document.getElementById("png-" + itemUID);
@@ -560,7 +562,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 		let observer = new IntersectionObserver(handleIntersect, {
 			root: null,
-			rootMargin: "100px",
+			rootMargin: "1000px",
 			threshold: 0.4
 		});
 
@@ -716,87 +718,88 @@ require(["D2Bot"], function (D2BOTAPI) {
     <div class="comment-footer w-100" hidden>
         <span class="text-muted float-right">` + CurrentRealm + "/" + result.account + "/" + result.character + "/{" + itemUID + "}" + `</span>
     </div>`;
-            
+
             var itemGroup = document.createElement("div");
 
             itemGroup.className += "d-flex flex-row comment-row hidden p-l-0 m-t-0 m-b-0";
             itemGroup.setAttribute("aria-haspopup", true);
             itemGroup.setAttribute("id", groupId);
-			itemGroup.innerHTML = htmlTemplate;
+            itemGroup.innerHTML = htmlTemplate;
 
-			let prevRatio = {};
-			let handleIntersect = (entries, observer) => {
-				entries.forEach((entry) => {
-					//if (entry.intersectionRatio > 0.05) {
-					let elem = entry.target;
+            let prevRatio = {};
+            let handleIntersect = (entries, observer) => {
+                entries.forEach((entry) => {
+                    //if (entry.intersectionRatio > 0.05) {
+                    let elem = entry.target;
+                    if (prevRatio[elem] > entry.intersectionRatio) {
+                        //console.log("Leaving:", elem);
+                        //itemGroup.classList.add("hidden");
+                    } else if (entry.intersectionRatio >= 0.1) {
+                        itemGroup.classList.remove("hidden");
+                        if (!result.itemImage) {
+                            try {
+                                var tmp = JSON.parse(result.image);
+                            } catch (e) {
+                                //console.warn("Old D2Bot# version active.. please update");
+                            }
+                            if (tmp) {
+                                setImmediate(() => {
+                                    result.itemImage = new ItemImage({
+                                        image: tmp.code,
+                                        itemColor: tmp.color,
+                                        sockets: tmp.sockets,
+                                        description: result.description
+                                    });
+                                    result.itemImage.onload = () => {
+                                        result.itemImage.getItem().then((canvas) => {
+                                            result.image = canvas.toDataURL();
+                                            var imageTemplate = `<img src="` + result.image + `" alt="user" class="ld-item">`;
+                                            var imgDiv = document.getElementById("png-" + groupId);
+                                            imgDiv.innerHTML = imageTemplate;
+                                        });
+                                    };
+                                });
+                            } else {
+                                var imageTemplate = `<img src="` + ((result.image.indexOf("data") != -1) ? "" : "data:image/jpeg;base64,") + result.image + `" alt="user" class="ld-item">`;
+                                var imgDiv = document.getElementById("png-" + groupId);
+                                imgDiv.innerHTML = imageTemplate;
+                            }
+                        }
+                    }
+                    prevRatio[elem] = entry.intersectionRatio;
+                    //}
+                });
+            };
 
-					if (prevRatio[elem] > entry.intersectionRatio) {
-						//console.log("Leaving:", elem);
-						//$itemGroup.addClass("hidden");
-					} else if (entry.intersectionRatio >= 0.1) {
-						itemGroup.classList.remove("hidden");
-						if (!result.itemImage) {
-							try {
-								var tmp = JSON.parse(result.image);
-							} catch (e) {
-								//console.warn("Old D2Bot# version active.. please update");
-							}
-							if (tmp) {
-								result.itemImage = new ItemImage({
-									image: tmp.code,
-									itemColor: tmp.color,
-									sockets: tmp.sockets,
-									description: result.description
-								});
-								result.itemImage.onload = () => {
-									result.itemImage.getItem().then((canvas) => {
-										result.image = canvas.toDataURL();
-										var imageTemplate = `<img src="` + result.image + `" alt="user" class="ld-item">`;
-										var imgDiv = document.getElementById("png-" + groupId);
-										imgDiv.innerHTML = imageTemplate;
-									});
-								};
-							} else {
-								var imageTemplate = `<img src="` + ((result.image.indexOf("data") != -1) ? "" : "data:image/jpeg;base64,") + result.image + `" alt="user" class="ld-item">`;
-								var imgDiv = document.getElementById("png-" + groupId);
-								imgDiv.innerHTML = imageTemplate;
-							}
-						}
-					}
-					prevRatio[elem] = entry.intersectionRatio;
-					//}
-				});
-			};
+            let observer = new IntersectionObserver(handleIntersect, {
+                root: document.querySelector("#root-box"),
+                rootMargin: "200%",
+                threshold: 0.4
+            });
 
-			let observer = new IntersectionObserver(handleIntersect, {
-				root: null,
-				rootMargin: "100px",
-				threshold: 0.4
-			});
+            $(itemGroup).data("itemData", result);
+            //$itemGroup.data("itemCount", count);
 
-			$(itemGroup).data("itemData", result);
-			//$itemGroup.data("itemCount", count);
+            function updateSelectCount(selected) {
+                var i = 0;
+                selected.find(":selected").each(function () {
+                    i++;
+                });
 
-			function updateSelectCount(selected) {
-				var i = 0;
-				selected.find(":selected").each(function () {
-					i++;
-				});
-
-				$("#item-menu-input-" + groupId).val(i);
-			}
+                $("#item-menu-input-" + groupId).val(i);
+            }
             
-			$(document).on("click", function (event) {
+            $(document).on("click", function (event) {
                 let selectBox = $("#item-menu-select-"+groupId);
                 let groupMenu = $("#item-menu-" + groupId);
                 
-				if ($(event.target).closest($(itemGroup)).length) {
-					// Show dropdown item selection
-					groupMenu.show();
-					// Using mousedown & move might be good for checking the change events in the input box :)
-					selectBox.on("change mousedown mousemove", function() {
-						updateSelectCount($(this));
-					});
+                if ($(event.target).closest($(itemGroup)).length) {
+                    // Show dropdown item selection
+                    groupMenu.show();
+                    // Using mousedown & move might be good for checking the change events in the input box :)
+                    selectBox.on("change mousedown mousemove", function() {
+                        updateSelectCount($(this));
+                    });
                     
                     var selectList = () => {
                         list = selectBox.val();
@@ -808,39 +811,39 @@ require(["D2Bot"], function (D2BOTAPI) {
                                 updateItemCount(groupId);
                             });
                         }
-					};
+                    };
                     
-					selectBox.on("keydown", function (e) {
-						var key = window.event?window.event.keyCode:e.which;
-						if(key == 13)// the enter key code
+                    selectBox.on("keydown", function (e) {
+                        var key = window.event?window.event.keyCode:e.which;
+                        if(key == 13)// the enter key code
                             selectList();
                     });
                     
                     $("#group-list-btn-" + groupId).on("click", selectList);
-				} else if (!$(event.target).closest("#item-menu-select-" + groupId).length) {
-					// Close the dropdown item selection if the user clicks outside of it
-					selectBox.off();
-					groupMenu.hide();
-				}
-			});
+                } else if (!$(event.target).closest("#item-menu-select-" + groupId).length) {
+                    // Close the dropdown item selection if the user clicks outside of it
+                    selectBox.off();
+                    groupMenu.hide();
+                }
+            });
 
-			// First check if currently selected account location is same or ALL, then check if selected character location is the same or ALL
-			if (
-				($("#account-select").val() === "Show All" ||
-					$("#account-select").val() === result.account) &&
-				($("#character-select").val().split(".")[0] === "Show All" ||
-					$("#character-select").val().split(".")[0] === result.character)
-			) {
-				//$("#items-list").append($itemGroup);
+            // First check if currently selected account location is same or ALL, then check if selected character location is the same or ALL
+            if (
+                ($("#account-select").val() === "Show All" ||
+                    $("#account-select").val() === result.account) &&
+                ($("#character-select").val().split(".")[0] === "Show All" ||
+                    $("#character-select").val().split(".")[0] === result.character)
+            ) {
+                //$("#items-list").append($itemGroup);
                 var itemsList = document.getElementById("items-list");
                 itemsList.appendChild(itemGroup);
                 
-				//var itemDiv = document.getElementById(groupId);
-				observer.observe(itemGroup);
-			}
-
-			groupEntryCount += 1;
-			return $(itemGroup);
+                //var itemDiv = document.getElementById(groupId);
+                observer.observe(itemGroup);
+            }
+            
+            groupEntryCount += 1;
+            return $(itemGroup);
 		}
 
 		savedEntryCount += 1;
@@ -921,20 +924,31 @@ require(["D2Bot"], function (D2BOTAPI) {
             
             if(!dummyData) {
                 API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
+                
             } else {
                 console.warn("No accounts found. Appending dummy group items..");
                 regex = regex?regex:"";
-                setTimeout(() => {
-                    var re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
-                    var list = [];
-                    for (var key in items) {
-                        if(re.exec(items[key].description)) {
-                            list.push(items[key]);
-                        }
+                var re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
+                var list = [];
+                // Synchronize async 'requests' for dummy items :x
+                let wait = () => {
+                    if(groupList.findIndex(function(group) { return group.key === itemGroup.key }) === groupListid) {
+                        JSThread.create(async () => {
+                            for (var key in items) {
+                                if(re.exec(items[key].description)) {
+                                    list.push(items[key]);
+                                }
+                            }
+                            
+                            callback(null, list);
+                            await JSThread.yield();
+                        })();
+                    } else {
+                        setTimeout(wait, 10);
                     }
-                    
-                    callback(null, list);
-                }, 0);
+                };
+                
+                wait();
             }
 		}
 
@@ -982,16 +996,19 @@ require(["D2Bot"], function (D2BOTAPI) {
             } else {
                 console.warn("No accounts found. Appending dummy items..");
                 regex = regex?regex:"";
+                var re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
+                var list = [];
                 setTimeout(() => {
-                    var re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
-                    var list = [];
-                    for (var key in items) {
-                        if(re.exec(items[key].description)) {
-                            list.push(items[key]);
+                    JSThread.create(async () => {
+                        for (var key in items) {
+                            if(re.exec(items[key].description)) {
+                                list.push(items[key]);
+                            }
                         }
-                    }
 
-                    return callback(null, list);
+                        callback(null, list);
+                        await JSThread.yield();
+                    })();
                 }, 0);
             }
 		}
