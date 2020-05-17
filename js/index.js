@@ -644,8 +644,12 @@ require(["D2Bot"], function (D2BOTAPI) {
 			var desc = result.description.replace(/\n|\r/gm, "");
 			specs = "";
 			result.groupData.specs.forEach((entry) => {
-				if(desc.match(new RegExp(entry[0], 'gi')))
-					specs += desc.replace(new RegExp(entry[0], 'gi'), entry[1]) + " - ";
+				if (typeof entry !== 'undefined' && entry.length > 0) {
+					if(desc.match(new RegExp(entry[0], 'gi')))
+						specs += desc.replace(new RegExp(entry[0], 'gi'), entry[1]) + " - ";
+				} else {
+					console.error(result.group, result.groupData.specs, entry);
+				}
 			});
 		}
 		result.groupId = $group.attr("id");
@@ -895,13 +899,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 							var itemID = results[i].description.split("$")[1].split(":")[1];
 							results[i].group = itemGroup.key;
 							results[i].groupData = itemGroup.value;
-							if(!countables[item.uid])
+							/*if(!countables[item.uid])
 								countables[item.uid] = []
 							if(!countables[item.uid][itemGroup.key])
 								countables[item.uid][itemGroup.key] = $addItemGroup(results[i]);
 								
 
-							$updateItemGroup(countables[item.uid][itemGroup.key], results[i]);
+							$updateItemGroup(countables[item.uid][itemGroup.key], results[i]);*/
 						//}
 					}
 				}
@@ -955,7 +959,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                         //if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
                         var itemID = results[i].description.split("$")[1].split(":")[1];
                         // Only the first countable item will be used
-                        item = $addItem(results[i]);
+                        //item = $addItem(results[i]);
 
                         itemCount += 1;
                         //}
@@ -1019,9 +1023,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 			accList.push(account);
 		}
 		
-		//console.log(itemGroups);
-		
 		for (var group in itemGroups) {
+			//console.log(itemGroups[group]);
 			groupList.push({ key: group, value: itemGroups[group] });
 		}
 
@@ -1031,30 +1034,40 @@ require(["D2Bot"], function (D2BOTAPI) {
 		let roundTime = {
 			start: new Date().getTime(),
 			end: new Date().getTime(),
-			groups: []
+			groups: [],
+			bulks: []
 		};
-
+		
 		accountListid = 0;
 		groupListid = 0;
-		ended = false;
-		
-		var accounts = accList[0];
-	
-		for(var i = 1; i < accList.length; i++)
-			accounts += "," + accList[i];
+		ended = false;	
+
+		var accounts = [];
+		var accountListMax = accList.length;
+		var accountListStart = 1;
+		var accountListCount = accountListStart;
 
 		window.loadMoreItem = function (status) {
 			var end = new Date().getTime();
-			var elapsed = end - roundTime.start;
-			roundTime.start = new Date().getTime();
-			//accountListid++;
-			//console.log("Found Account:", accList[accountListid - 1], "After:", (time_ms / 1000).toFixed(3),"seconds");
-			//if (accountListid == accList.length) {
-				var groups = roundTime.groups[roundTime.groups.length - 1];
-				var total = elapsed + groups;
+			var now = end - roundTime.start;			
+			var last_time = roundTime.bulks[roundTime.bulks.length - 1] - (roundTime.bulks.length>1?roundTime.bulks[roundTime.bulks.length - 2]:0);
+			var this_time = now - roundTime.bulks[roundTime.bulks.length - 1];
+			roundTime.bulks.push(now);
+			console.log("last (ms):", last_time, "now (ms):", this_time, accounts.length, "accounts", "(" + accountListid + "/" + accountListMax + ")");
+			if(this_time/2 < last_time) {
+				if(accountListCount < 64)
+					accountListCount *= 2;
+			} else {
+				accountListCount = accountListStart;
+			}
+			
+			if (accountListid == accList.length) {
 				//console.log("Time total:", total, "status:", status);
 				
 				if (!ended) {
+					var groups = roundTime.groups[roundTime.groups.length - 1];
+					var total = roundTime.bulks[roundTime.bulks.length - 1];
+				
 					$footer = `
 <div>
     <p>End of Items on ` + accList.length + ` Accounts</p>
@@ -1072,31 +1085,52 @@ require(["D2Bot"], function (D2BOTAPI) {
 				}
 
 				return;
-			//}
+			}
 
-			//doQuery(accList[accountListid++], chr, itemCount > MAX_ITEM ? limit ? false : window.loadMoreItem : window.loadMoreItem);
+			accounts = [];
+			var cur_id = accountListid;
+			while(accountListid < (((cur_id + accountListCount)<accountListMax)?(cur_id + accountListCount):accountListMax))
+				accounts.push(accList[accountListid++]);
+			//console.log(accounts);
+			doQuery(accounts.join(","), chr, window.loadMoreItem);
 		};		
 		
 		roundTime.start = new Date().getTime();
 
 		window.loadAllCountable = function (status, regex) {
 			var end = new Date().getTime();
-			roundTime.groups.push(end - roundTime.start);
-
-			accountListid++;
-			//if (accountListid == accList.length) {
+			var now = end - roundTime.start;
+			roundTime.groups.push(now);
+			
+			// Todo: use promises instead.. correct group not guaranteed on bulk search
+			//console.log(regex, " Time:", roundTime.groups[groupListid], "status:", status);
+			
+			groupListid++;
+			
+			if(groupListid == groupList.length) {
+				var last_time = roundTime.bulks[roundTime.bulks.length - 1] - (roundTime.bulks.length>1?roundTime.bulks[roundTime.bulks.length - 2]:0);
+				var this_time = now - roundTime.bulks[roundTime.bulks.length - 1];
+				roundTime.bulks.push(now);
+				console.log("last (ms):", last_time, "now (ms):", this_time, accounts.length, "accounts", "(" + accountListid + "/" + accountListMax + ")");
+				if(this_time/2 < last_time) {
+					if(accountListCount < 64)
+						accountListCount *= 2;
+				} else {
+					accountListCount = accountListStart;
+				}
+				groupListid = 0;
 				
-				// Todo: use promises instead.. correct group not guaranteed on bulk search
-				//console.log(regex, " Time:", roundTime.groups[groupListid], "status:", status);
-				groupListid++;
-				accountListid = 0;
-
-				if (groupListid == groupList.length) {					
-					if (!ended) {
-						roundTime.start = new Date().getTime();
+				if (accountListid == accList.length) {
+					if (!ended) {						
+						window.loadAllCountable = false;
+						accountListid = 0;
 						
-						//for(var j = 0; j < accList.length; j++)
-							doQuery(accounts, chr, window.loadMoreItem);
+						accounts = [];
+						var cur_id = accountListid;
+						while(accountListid < (((cur_id + accountListCount)<accountListMax)?(cur_id + accountListCount):accountListMax))
+							accounts.push(accList[accountListid++]);
+						//console.log(accounts);
+						doQuery(accounts.join(","), chr, window.loadMoreItem);
 						
 						var sortedGroups = [];
 						Object.keys(countables).forEach((uid) => {
@@ -1109,29 +1143,31 @@ require(["D2Bot"], function (D2BOTAPI) {
 								groupItemCount++;
 							});
 						});
-                        
-                        /*console.log(
-									"Found items in the following groups:",
-									sortedGroups,
-									"\nFetching the rest now..."
-								);*/
-
-						window.loadAllCountable = false;
-						accountListid = 0;
 					}
 
 					return;
 				}
 				
-				//for(var j = 0; j < accList.length; j++)
-					//queryCountables(accounts/*""*/, chr, window.loadAllCountable, groupList[j]);
-			//}
+				accounts = [];
+				var cur_id = accountListid;
+				while(accountListid < (((cur_id + accountListCount)<accountListMax)?(cur_id + accountListCount):accountListMax))
+					accounts.push(accList[accountListid++]);
+				//console.log(accounts);
+				for(var j = 0; j < groupList.length; j++)
+					queryCountables(accounts.join(","), chr, window.loadAllCountable, groupList[j]);
+			}
 		};
 
 		//console.log("Time Start:", roundTime.start);
-		
+
+		accounts = [];
+		var cur_id = accountListid;
+		while(accountListid < (((cur_id + accountListCount)<accountListMax)?(cur_id + accountListCount):accountListMax))
+			accounts.push(accList[accountListid++]);
+		//console.log(accounts);
 		for(var j = 0; j < groupList.length; j++)
-            queryCountables(accounts, chr, window.loadAllCountable, groupList[j]);
+			queryCountables(accounts.join(","), chr, window.loadAllCountable, groupList[j]);
+		
 	}
     
     /* UPDATE SIDEBAR SELECTION */
@@ -1174,7 +1210,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 					charCheck.lod == checks.lod &&
 					charCheck.sc == checks.sc
 				)
-					AccountsMap[res[1]].push(res[2]);
+				
+				AccountsMap[res[1]].push(res[2]);
 			}
 
 			$("#character-select").html("");
