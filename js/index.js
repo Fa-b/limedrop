@@ -115,7 +115,6 @@ require(["D2Bot"], function (D2BOTAPI) {
 			$formFilter.data("inputmask", mask);
 			$formFilter.data("validate", function (value) {
 				$("#search-data-" + name).removeClass("valid");
-
 				if ($formFilter.data("inputmask").exec(value)) {
 					$("#search-data-" + name).addClass("valid");
 					var output = value;
@@ -364,22 +363,22 @@ require(["D2Bot"], function (D2BOTAPI) {
 		var template = `
 <a class="` + (perm ? `always-there ` : "") + `ld-notify-card link" style="border-top:1px solid #3c3c3c">
 	<div class="d-flex no-block align-items-center p-10">
-        <span class="btn btn-success btn-circle">
-            <i class="ti-calendar"></i>
-        </span>
+	<span class="p-2">
+		<i class="far fa-flag"></i>
+			</span>
         <div class="m-l-10">
             <h5 class="m-b-0">` + head + `</h5>
             <span class="mail-desc">` + text + `</span>
         </div>
 	</div>
 </a>`;
-    
-        $("#ldNotify").append($(template));
 
-        var expanded = $("#ldNotifyDrop").attr("aria-expanded");
-        $("#ldNotifyDrop").click();
-        if(expanded === "true")
-            $("#ldNotifyDrop").click();
+		$("#ldNotify").append($(template));
+
+		var expanded = $("#ldNotifyDrop").attr("aria-expanded");
+		$("#ldNotifyDrop").click();
+		if (expanded === "true")
+			$("#ldNotifyDrop").click();
 
 		$(".ld-notify-card").off("click");
 		$(".ld-notify-card").click(function (event) {
@@ -404,7 +403,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		countables = [];
 
 		console.log("refresh");
-		addItemstoList(limit, LimeConfig["ItemGroup"]/*, true*/);
+		addItemstoList(limit, LimeConfig["ItemGroup"]/*, false*/);
 	}
     
     /* ITEM LIST UPDATE HELPERS */
@@ -480,6 +479,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 		// Check if item is not already listed as a countable, unless it is just
 		// a group list entry
 		if (!result.groupId && countables[itemUID] != undefined) return undefined;
+        // Also if the item is already on the DOM
+        if(document.getElementById(itemUID) != undefined) return undefined;
 
 		var description = cleanDecription(result.description).split("<br/>");
 		var title = description.shift();
@@ -616,7 +617,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 	function updateItemCount(groupId) {
 		var count = $("#item-menu-select-" + groupId + " option").length;
-		var countTemplate =`
+		var countTemplate = `
 <span class="badge badge-dark animated wobble" style="webkit-animation-duration: 0.3s; animation-duration: 0.3s; border: 1px solid #464646; box-shadow: 0px 0px 5px #00000066;">
 
     <h6 class="styled-counter" if="item-menu-count-` + groupId + `">` + count + `</h6>
@@ -646,12 +647,14 @@ require(["D2Bot"], function (D2BOTAPI) {
 			var desc = result.description.replace(/\n|\r/gm, "");
 			specs = "";
 			result.groupData.specs.forEach((entry) => {
-				if(desc.match(new RegExp(entry[0], 'gi')))
-					specs += desc.replace(new RegExp(entry[0], 'gi'), entry[1]) + " - ";
+                		var regex = new RegExp(entry[0], 'gi');
+				if (desc.match(regex))
+					specs += desc.replace(regex, entry[1]) + " -/ ";
 			});
 		}
+        	specs = specs.replace(/\/([^\/]*)$/, '-$1')
 		result.groupId = $group.attr("id");
-		var optionTemplate =`<option value="` + itemUID + `" id="item-menu-option-` + result.groupId + `">` + specs + result.account+"/"+result.character + `</option>`;
+		var optionTemplate = `<option value="` + itemUID + `" id="item-menu-option-` + result.groupId + `">` + specs + result.account + "/" + result.character + `</option>`;
 		var $itemOption = $(optionTemplate);
 		$itemOption.data("itemData", result);
 
@@ -684,6 +687,40 @@ require(["D2Bot"], function (D2BOTAPI) {
 		var id = itemUID.split(":")[1];
 
 		var groupId = result.group + id;
+        
+        var highlightSpecs = function(description, specs) {
+            if (!specs)
+                return description;
+
+            specs.forEach((entry, index) => {
+                
+                var lines = description.split('\n');
+                description = lines.join('<br/>');
+                
+                var find = new RegExp(entry[0], 'i');
+                
+                var regex = new MultiRegExp(find);
+                
+                //console.log(description.match(find));
+                var matches = regex.exec(description);
+                var offset = 0;
+                
+                //console.log(regex);
+                //console.log(matches);	
+                
+                Object.keys(matches).forEach(group => {
+                    var replaceStr = "<span class='color11'>#" + index + "</span>";
+                    description = description.slice(0, offset + matches[group].index) + replaceStr + description.slice(offset + matches[group].index + matches[group].text.length);
+                    offset += replaceStr.length - matches[group].text.length;
+                });
+                
+                lines = description.split('<br/>');
+                description = lines.join('\n');
+
+			});
+            
+            return description;
+        }
 
 		if (!document.getElementById(groupId)) {
 			// Group doesn't exist yet.. create it
@@ -691,7 +728,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			var title = description.shift();
 			var count = 0;
 			description = description.join("<br/>");
-			var htmlTemplate =`
+			var htmlTemplate = `
     <div class="p-2 ld-img-col" style="position:relative; display: flex; align-self: center; justify-content: center;">
         <div style="position:relative">
             <div id="png-` + groupId + `"><i>image</i></div>
@@ -1220,7 +1257,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		if (loggedin) {
 			$(".logged-in-out").fadeToggle("hide");
 			$(".current-user-btn").html(
-				"<i class='font-24 mdi mdi-account-circle current-user-btn'></i>" +
+				"<i class='font-24 mdi mdi-account current-user-btn'></i>" +
 				cookie.data.username +
 				"</a>"
 			);
@@ -1768,7 +1805,6 @@ require(["D2Bot"], function (D2BOTAPI) {
 			});
 		});
 	});
-
 	initialize();
 	showNotification("Notification", "Welcome to Lime Drop!", true);
 	API.emit("poll", function () { });

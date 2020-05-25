@@ -3,54 +3,70 @@
   color: Black;
 }
 
+/* WHITE */
 .color0 {
   color: #c4c4c4;
 }
 
-/* WHITE */
+/* RED */
 .color1 {
   color: #b04434;
 }
 
-/* RED */
+/* SET */
 .color2 {
   color: #18fc00;
 }
 
-/* SET */
+/* MAGIC */
 .color3 {
   color: #787ce7;
 }
 
-/* MAGIC */
+/* UNIQUE */
 .color4 {
   color: #948064;
 }
 
-/* UNIQUE */
+/* DARK GRAY */
 .color5 {
   color: #505050;
 }
 
-/* DARK GRAY */
+/* BLACK */
 .color6 {
-  color: WhiteSmoke;
+  color: #000000;
 }
 
+/* OCHER */
 .color7 {
-  color: WhiteSmoke;
+  color: #ac9c64;
 }
 
+/* CRAFT */
 .color8 {
   color: #d08420;
 }
 
-/* CRAFT */
+/* RARE */
 .color9 {
   color: #d8b864;
 }
 
-/* RARE */
+/* DARK GREEN */
+.color10 {
+  color: #186408;
+}
+
+/* PURPLE */
+.color11 {
+  color: #a420fc;
+}
+
+/* GREEN */
+.color12 {
+  color: #287c14;
+}
 
 .ld-select-add {
   width: 100% !important;
@@ -157,7 +173,6 @@ td {
 .form-filter-element {
   display: inline-flex;
   min-width: 280px;
-  cursor: pointer;
   justify-content: flex-start;
 }
 
@@ -335,7 +350,8 @@ td {
   background-color: transparent;
   width: auto;
 }
-.styled-item-menu input::-webkit-outer-spin-button,
+.styled-item-menu
+  input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
@@ -346,16 +362,16 @@ input::-webkit-inner-spin-button {
   background-color: transparent;
 }
 .styled-item-menu select {
-    border: none;
-    color: white;
-    padding: 5px;
-    background-color: #505050;
-    border-radius: 5px;
+  border: none;
+  color: white;
+  padding: 5px;
+  background-color: #505050;
+  border-radius: 5px;
 }
 
 .styled-item-menu select[size] {
-    width: 100%;
-    height: calc(100% - 50px);
+  width: 100%;
+  height: calc(100% - 50px);
 }
 
 .styled-item-menu select:focus:se {
@@ -368,7 +384,8 @@ input::-webkit-inner-spin-button {
   border-radius: 20px;
 }
 
-.styled-item-menu select::-webkit-scrollbar-thumb {
+.styled-item-menu
+  select::-webkit-scrollbar-thumb {
   width: 5px;
   background-color: #11c501;
   border-radius: 20px;
@@ -529,6 +546,54 @@ h6.drop-queue-styled {
   border-radius: 15px;
 }
 
-.navbar-icons{
+.navbar-icons {
   font-size: 20px;
+}
+/* Mobile media querys Rev patches, such an awfull way to make things. */
+
+@media (max-width: 500px) {
+  .page-wrapper .container-fluid {
+    padding: 0px !important;
+  }
+  .comment-footer {
+    font-size: 7px;
+    width: auto !important;
+  }
+  .styled-search-menu {
+    width: auto;
+    top: calc(100% - -5px);
+  }
+  .flex-row {
+    flex-direction: column !important;
+  }
+  .comment-widgets {
+    padding: 10px;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Settings Menu New */
+
+.rev-set-menu {
+  justify-content: center;
+  background-color: transparent;
+  color: #11c501;
+}
+.rev-set-menu button {
+  background-color: transparent;
+  padding: 5px;
+  margin: 5px;
+  align-self: center;
+  font-size: large;
+  color: #f3f3f3;
+  border: none;
+  border-bottom: 3px solid transparent;
+}
+
+.rev-set-menu button:hover,
+.rev-set-menu button:focus {
+  outline: none;
+  color: #11c501;
+  border-bottom: #11c501 3px solid;
 }
