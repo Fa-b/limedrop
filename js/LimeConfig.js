@@ -145,12 +145,36 @@ LimeConfig = {
 		"CatsEye": {
 			"regex": "(?=ÿc4the cat.+?:520:[37]:\\d:\\d$)"
 		},
-		"Rbf": {
-			"regex": "(?=ÿc4rainbow.+?:643:[37]:\\d:\\d$)",
+		"LightRbf": {
+			"regex": "(?=ÿc4rainbow.+?light.+?:643:[37]:\\d:\\d$)",
 			"specs": [
 				["^.+(.\\d)\\%.+(.\\d)\\%.+$", "$1/$2"],
-				["^.+(\\d\\d meteor|\\d\\d blizzard|\\d\\d chain lightning|\\d\\d venom).+(fire|cold|light|poison).+(fire|cold|light|poison).+(fire|cold|light|poison).+$", "$2"],
-				["^.+(level.up|die).+$", "$1"]
+				["^.+(level.up|die).+$", "$1"],
+                ["^.+(\\d\\d chain lightning|\\d\\d nova).+$"],
+			]
+		},
+        "ColdRbf": {
+			"regex": "(?=ÿc4rainbow.+?cold.+?:643:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+(.\\d)\\%.+(.\\d)\\%.+$", "$1/$2"],
+				["^.+(level.up|die).+$", "$1"],
+                ["^.+(\\d\\d blizzard|\\d\\d frost).+$"]
+			]
+		},
+        "FireRbf": {
+			"regex": "(?=ÿc4rainbow.+?fire.+?:643:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+(.\\d)\\%.+(.\\d)\\%.+$", "$1/$2"],
+				["^.+(level.up|die).+$", "$1"],
+				["^.+(\\d\\d meteor|\\d\\d blaze).+$"]
+			]
+		},
+        "PoisonRbf": {
+			"regex": "(?=ÿc4rainbow.+?poison.+?:643:[37]:\\d:\\d$)",
+			"specs": [
+				["^.+(.\\d)\\%.+(.\\d)\\%.+$", "$1/$2"],
+				["^.+(level.up|die).+$", "$1"],
+				["^.+(\\d\\d poison|\\d\\d venom).+$"]
 			]
 		},
 //---------------------------------------------------------- SMALL CHARMS ----------------------------------------------------------

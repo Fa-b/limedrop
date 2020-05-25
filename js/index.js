@@ -593,10 +593,10 @@ require(["D2Bot"], function (D2BOTAPI) {
 						// first remove it from the DOM
 						$(this).remove();
                         // Now add it back to all containing groups
-                        for (let [group, groupItem] of list) {
-                            let data = $(groupItem).data("itemData");
+                        for (var [group, groupItem] of list) {
+                            var listData = $(groupItem).data("itemData");
                             // we have the group and the item info still here, so we can add it back to the list
-                            $updateItemGroup($("#" + data.groupId), data);
+                            $updateItemGroup($("#" + listData.groupId), itemGroup);
                         }
 					} else {
 						// No.. move the item to the inventory
@@ -652,14 +652,14 @@ require(["D2Bot"], function (D2BOTAPI) {
 			specs = "";
 			result.groupData.specs.forEach((entry) => {
 				if (typeof entry !== 'undefined' && entry.length > 0) {
-					if(desc.match(new RegExp(entry[0], 'gi')))
+					if(desc.match(new RegExp(entry[0], 'gi')) && entry[1] != undefined)
 							specs += desc.replace(new RegExp(entry[0], 'gi'), entry[1]) + " - ";
 				} else {
 					console.error(result.group, result.groupData.specs, entry);
 				}
 			});
 		}
-        	specs = specs.replace(/\/([^\/]*)$/, '-$1')
+        //specs = specs.replace(/\/([^\/]*)$/, '-$1')
 		result.groupId = $group.attr("id");
 		var optionTemplate = `<option value="` + itemUID + `" id="item-menu-option-` + result.groupId + `">` + specs + result.account + "/" + result.character + `</option>`;
 		var $itemOption = $(optionTemplate);
@@ -839,8 +839,8 @@ require(["D2Bot"], function (D2BOTAPI) {
             }
             
             $(document).on("click", function (event) {
-                let selectBox = $("#item-menu-select-"+groupId);
-                let groupMenu = $("#item-menu-" + groupId);
+                var selectBox = $("#item-menu-select-"+groupId);
+                var groupMenu = $("#item-menu-" + groupId);
                 
                 if ($(event.target).closest($(itemGroup)).length) {
                     // Show dropdown item selection
@@ -851,17 +851,17 @@ require(["D2Bot"], function (D2BOTAPI) {
                     });
                     
                     var selectList = () => {
-                        list = selectBox.val();
-                        for (var item in list) {
-                            
-                            $("option[value='" + list[item] + "']").each(function () {
-                                let itemData = $(this).data("itemData");
-                                var queuedItem = $addItem(itemData);
-                                if(queuedItem)
-                                    queuedItem.trigger("click");
-                                $(this).remove();
-                                
-                                updateItemCount(itemData.groupId);
+                        var list = selectBox.val();
+                        if(list != null) {
+                            list.forEach((item) => {
+                                $("option[value='" + item + "']").each(function () {
+                                    var itemData = $(this).data("itemData");
+                                    var queuedItem = $addItem(itemData);
+                                    if(queuedItem)
+                                        queuedItem.trigger("click");
+                                    $(this).remove();
+                                    updateItemCount(itemData.groupId);
+                                });
                             });
                         }
                     };
