@@ -1759,7 +1759,7 @@ LimeConfig = {
 				["^.+damage: ÿc3(\\d+(?: to \\d+)?).+\\+(\\d+)\\% enhanced.+$", "$2ed"],
 				["^.+durability: \\d+ of (\\d+).+durability (\\d+)\\%.+$", "$2dur"],
                 ["^.+\\+(\\d+) to attack.+$", "$1ar"],
-                ["^.+damage: ÿc3(\\d+(?: to \\d+)?).+\\+(\\d+) to max.+$", "$2max"]
+                ["^.+damage: ÿc3(\\d+(?: to \\d+)?).+\\+(\\d+) to max.+$", "$2max"],
 				["^.+:eth$", "Eth"],
 			]
 		},
@@ -1769,7 +1769,7 @@ LimeConfig = {
 				["^.+damage: ÿc3(\\d+(?: to \\d+)?).+\\+(\\d+)\\% enhanced.+$", "$2ed"],
 				["^.+durability: \\d+ of (\\d+).+durability (\\d+)\\%.+$", "$2dur"],
                 ["^.+\\+(\\d+) to attack.+$", "$1ar"],
-                ["^.+damage: ÿc3(\\d+(?: to \\d+)?).+\\+(\\d+) to max.+$", "$2max"]
+                ["^.+damage: ÿc3(\\d+(?: to \\d+)?).+\\+(\\d+) to max.+$", "$2max"],
 				["^.+:eth$", "Eth"],
 			]
 		},
@@ -1779,7 +1779,7 @@ LimeConfig = {
 				["^.+damage: ÿc3(\\d+(?: to \\d+)?).+\\+(\\d+)\\% enhanced.+$", "$2ed"],
 				["^.+durability: \\d+ of (\\d+).+durability (\\d+)\\%.+$", "$2dur"],
                 ["^.+\\+(\\d+) to attack.+$", "$1ar"],
-                ["^.+damage: ÿc3(\\d+(?: to \\d+)?).+\\+(\\d+) to max.+$", "$2max"]
+                ["^.+damage: ÿc3(\\d+(?: to \\d+)?).+\\+(\\d+) to max.+$", "$2max"],
 				["^.+:eth$", "Eth"],
 			]
 		},
