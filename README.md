@@ -22,25 +22,32 @@ Remember to escape string delimiters such as `"` and `'`.
 - **Try and error..** the generated RegEx is printed to the browsers developer console [Shift+Ctrl+i].
 
 ### ItemGroup
-- Every entry listed here defines a group of items to be displayed in a collated manner.
-The order and naming of each of these entries is not used for evaluation (yet).
-- Every match in any of these groups is sorted according to it's itemID. This search is performed upfront querying ALL your accounts.
-This ensures that the counts are up to date after a single refresh (no need to scroll to the end of the list).
-Keep in mind that the [SearchFilter](#SearchFilter) configuration is also active and may limit the amount of items counted.
 
-If an item satisfies two groups, only 1 count will be added and there is no way to determine to which of those groups it belongs.
-For example if you defined the two groups:
+Outdated info, has to be updated...
+
+- ~Every entry listed here defines a group of items to be displayed in a collated manner.
+The order and naming of each of these entries is not used for evaluation (yet).~
+- ~Every match in any of these groups is sorted according to it's itemID. This search is performed upfront querying ALL your accounts.
+This ensures that the counts are up to date after a single refresh (no need to scroll to the end of the list).
+Keep in mind that the [SearchFilter](#SearchFilter) configuration is also active and may limit the amount of items counted.~
+
+~If an item satisfies two groups, only 1 count will be added and there is no way to determine to which of those groups it belongs.
+For example if you defined the two groups:~
+
+
 ```js
     ...
     "NonEthEnigmaBase":["(?=Socketed \\((3)\\)\\$)(?!.*:eth)"],
     "EthFortiBase":["(?=Socketed \\((4)\\)\\$)(?=.*:eth)"],
     ...
 ```
-You will receive the weirdest of all your expectations because every item type will receive it's own group, disregarding eth and socket count.
 
-After the grouping has finished, all other items will load according to your [SearchFilter](#SearchFilter] configuration.
 
-**Note: Items that didn't match the above armor base example before, would not load at this point because their itemID is flagged to have been counted already!**
+~You will receive the weirdest of all your expectations because every item type will receive it's own group, disregarding eth and socket count.~
+
+~After the grouping has finished, all other items will load according to your [SearchFilter](#SearchFilter] configuration.~
+
+**~Note: Items that didn't match the above armor base example before, would not load at this point because their itemID is flagged to have been counted already!~**
 
 ### SearchFilter
 Here filters can be added, adjusted or removed from search-bar.
