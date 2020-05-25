@@ -588,12 +588,16 @@ require(["D2Bot"], function (D2BOTAPI) {
 				) {
 					// Yes, then check if it is a group item
 					var itemGroup = $(this).data("itemData");
-					if ($("#" + itemGroup.groupId).length) {
+                    var list = Object.entries(countables[itemGroup.itemid]);
+					if (list.length) {
 						// first remove it from the DOM
 						$(this).remove();
-
-						// we have the group and the item info still here, so we can add it back to the list
-						$updateItemGroup($("#" + itemGroup.groupId), itemGroup);
+                        // Now add it back to all containing groups
+                        for (let [group, groupItem] of list) {
+                            let data = $(groupItem).data("itemData");
+                            // we have the group and the item info still here, so we can add it back to the list
+                            $updateItemGroup($("#" + data.groupId), data);
+                        }
 					} else {
 						// No.. move the item to the inventory
 						$("#items-list").append($(this));
@@ -649,7 +653,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			result.groupData.specs.forEach((entry) => {
 				if (typeof entry !== 'undefined' && entry.length > 0) {
 					if(desc.match(new RegExp(entry[0], 'gi')))
-						specs += desc.replace(new RegExp(entry[0], 'gi'), entry[1]) + " - ";
+							specs += desc.replace(new RegExp(entry[0], 'gi'), entry[1]) + " - ";
 				} else {
 					console.error(result.group, result.groupData.specs, entry);
 				}
@@ -689,7 +693,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			itemUID;
 		var id = itemUID.split(":")[1];
 
-		var groupId = result.group + id;
+		let groupId = result.group + id;
         
         var highlightSpecs = function(description, specs) {
             if (!specs)
@@ -726,11 +730,20 @@ require(["D2Bot"], function (D2BOTAPI) {
         }
 
 		if (!document.getElementById(groupId)) {
-			// Group doesn't exist yet.. create it
-			var description = cleanDecription(result.description).split("<br/>");
-			var title = description.shift();
+			// Group doesn't exist yet.. create it            
+            var generateItem = () => {
+				
+				var description = highlightSpecs(result.description, result.groupData.specs);
+				description = cleanDecription(description).split("<br/>");
+				var title = description.shift();
+				description = description.join("<br/>");
+				var htmlTemplate = `
+<h6 class="-medium">` + title + `</h6>
+<span class="m-b-15 d-block">` + description + `</span>`;
+				return htmlTemplate;
+			};
+            
 			var count = 0;
-			description = description.join("<br/>");
 			var htmlTemplate = `
     <div class="p-2 ld-img-col" style="position:relative; display: flex; align-self: center; justify-content: center;">
         <div style="position:relative">
@@ -747,10 +760,7 @@ require(["D2Bot"], function (D2BOTAPI) {
             <select multiple="multiple" id="item-menu-select-` + groupId + `" size></select>
         </div>
     </div>
-    <div class="p-2 comment-text">
-        <h6 class="-medium">` + title + `</h6>
-        <span class="m-b-15 d-block">` + description + `</span>
-    </div>
+    <div class="p-2 comment-text" id="item-desc-` + groupId + `"><i>Description</i></div>
     <div class="comment-footer w-100" hidden>
         <span class="text-muted float-right">` + CurrentRealm + "/" + result.account + "/" + result.character + "/{" + itemUID + "}" + `</span>
     </div>`;
@@ -771,6 +781,8 @@ require(["D2Bot"], function (D2BOTAPI) {
                         //console.log("Leaving:", elem);
                         //itemGroup.classList.add("hidden");
                     } else if (entry.intersectionRatio >= 0.1) {
+                        document.getElementById("item-desc-" + groupId).innerHTML = generateItem();
+                        var imgDiv = document.getElementById("png-" + groupId);
                         itemGroup.classList.remove("hidden");
                         if (!result.itemImage) {
                             try {
@@ -790,16 +802,17 @@ require(["D2Bot"], function (D2BOTAPI) {
                                         result.itemImage.getItem().then((canvas) => {
                                             result.image = canvas.toDataURL();
                                             var imageTemplate = `<img src="` + result.image + `" alt="user" class="ld-item">`;
-                                            var imgDiv = document.getElementById("png-" + groupId);
                                             imgDiv.innerHTML = imageTemplate;
                                         });
                                     };
                                 });
                             } else {
                                 var imageTemplate = `<img src="` + ((result.image.indexOf("data") != -1) ? "" : "data:image/jpeg;base64,") + result.image + `" alt="user" class="ld-item">`;
-                                var imgDiv = document.getElementById("png-" + groupId);
                                 imgDiv.innerHTML = imageTemplate;
                             }
+                        } else if ((imgDiv.innerHTML == "<i>image</i>") && (result.image.indexOf("data") != -1)) {
+                            var imageTemplate = `<img src="` + result.image + `" alt="user" class="ld-item">`;
+                            imgDiv.innerHTML = imageTemplate;
                         }
                     }
                     prevRatio[elem] = entry.intersectionRatio;
@@ -840,11 +853,15 @@ require(["D2Bot"], function (D2BOTAPI) {
                     var selectList = () => {
                         list = selectBox.val();
                         for (var item in list) {
-                            selectBox.find("option[value='" + list[item] + "']").each(function () {
-                                var item = $addItem($(this).data("itemData"));
-                                item.trigger("click");
+                            
+                            $("option[value='" + list[item] + "']").each(function () {
+                                let itemData = $(this).data("itemData");
+                                var queuedItem = $addItem(itemData);
+                                if(queuedItem)
+                                    queuedItem.trigger("click");
                                 $(this).remove();
-                                updateItemCount(groupId);
+                                
+                                updateItemCount(itemData.groupId);
                             });
                         }
                     };
@@ -939,7 +956,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 							results[i].group = itemGroup.key;
 							results[i].groupData = itemGroup.value;
 							if(!countables[item.uid])
-								countables[item.uid] = []
+								countables[item.uid] = {}
 							if(!countables[item.uid][itemGroup.key])
 								countables[item.uid][itemGroup.key] = $addItemGroup(results[i]);
 								
@@ -964,8 +981,8 @@ require(["D2Bot"], function (D2BOTAPI) {
             } else {
                 console.warn("No accounts found. Appending dummy group items..");
                 regex = regex?regex:"";
-                var re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
-                var list = [];
+                let re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
+                let list = [];
                 // Synchronize async 'requests' for dummy items :x
                 let wait = () => {
                     if(groupList.findIndex(function(group) { return group.key === itemGroup.key }) === groupListid) {
@@ -976,7 +993,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                                 }
                             }
                             
-                            callback(null, list);
+                            callback(null, JSON.parse(JSON.stringify(list)));
                             await JSThread.yield();
                         })();
                     } else {
@@ -1025,15 +1042,15 @@ require(["D2Bot"], function (D2BOTAPI) {
             }
             
             var regex = $("#search-bar").val().toLocaleLowerCase();
-			regex = (regex.length>0)?"^"+buildregex(regex)+".*$":null;
+			regex = (regex.length>0)?"^"+buildregex(regex)+".*?$":null;
             
             if(!dummyData) {
                 API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
             } else {
                 console.warn("No accounts found. Appending dummy items..");
                 regex = regex?regex:"";
-                var re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
-                var list = [];
+                let re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
+                let list = [];
                 setTimeout(() => {
                     JSThread.create(async () => {
                         for (var key in items) {
@@ -1042,7 +1059,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                             }
                         }
 
-                        callback(null, list);
+                        callback(null, JSON.parse(JSON.stringify(list)));
                         await JSThread.yield();
                     })();
                 }, 0);
