@@ -1449,6 +1449,127 @@ require(["D2Bot"], function (D2BOTAPI) {
 		);
 
         /* INIT ASYNC ACTION RESPONSE HANDLING (POLL) */
+		
+		let handleDropResponse = function(data) {
+			var itemList = [];
+			var itemTitles = [];
+			var success = false;
+			drops[data.hash].forEach(itemData => {
+				var item = document.getElementById(itemData.itemid);
+				itemList.push(item);
+				
+				var description = cleanDecription(itemData.description).split("<br/>");
+				itemTitles.push(description.shift());
+			});
+			
+			// doDrop should always return with valid itemData
+			if(itemTitles.length > 0) {
+				var titles = itemTitles.join("<br/>")
+				if(data.data == "GameAction has completed task") {
+					showNotification(data.data, "Items Dropped:<br/>" + titles, false);
+					success = true;
+				} else if(data.status) {
+					if(data.status == "error" || data.status == "failed") {
+						showNotification("<span class='color1'>" + data.data + "</span><br/>", "<span class='color1'>Not Dropped:</span><br/>" + titles, false);
+					} else {
+						showNotification("<span class='color1'>" + data.data + "</span><br/>", "<span class='color1'>Unhandled status:</span><br/>" + data.status , false);
+					}
+				} else {
+					showNotification("<span class='color1'>" + data.data + "</span><br/>", "<span class='color1'>Not Dropped:</span><br/>" + titles, false);
+				}
+			} else {
+				showNotification("<span class='color1'>" + data.data + "</span><br/>", "<span class='color1'>Invalid drop:</span><br/>" + data.hash , false);
+			}
+			
+			// TODO: add data to logfile
+			
+			// Remove items from drop queue on success
+			if(success) {
+				itemList.forEach(item => {
+					if(item) {
+						item.parentNode.removeChild(item);
+					}
+				});
+			}
+			
+			// Always clear task from list
+			delete drops[data.hash];
+			
+			// Check if task list is empty
+			var keys = Object.keys(drops);
+			if(keys.length === 0) {
+				// Check our queue list if it is also empty
+				// TODO: this fails if unscheduled items are added to the queue in between
+				var queuedItems = document.getElementById("dropQueueList").children;
+				if(queuedItems.length == 0) {
+					// Yes, so we finished :-)
+					showNotification("Finished", "All drops have completed successfully", false);
+				} else {
+					// No, some drop must have failed :-(
+					showNotification("<span class='color1'>Unfinished</span><br/>", "<span class='color1'>Some of the scheduled drops failed</span><br/>", false);
+				}
+			}
+		}
+		
+		let handleMuleResponse = function(data) {
+			var charList = [];
+			var realm = logs[data.hash].data.realm;
+			var account = logs[data.hash].data.account;
+			var success = false;
+			logs[data.hash].data.chars.forEach(character => {
+				
+				charList.push(realm + "/" + account + "/" + character);
+			})
+			
+			// doMule should always return with valid characters
+			if(charList.length > 0) {
+				var chars = charList.join("<br/>")
+				if(data.data == "GameAction has completed task") {
+					showNotification(data.data, "Characters Logged:<br/>" + chars, false);
+					success = true;
+				} else if(data.status) {
+					if(data.status == "error" || data.status == "failed") {
+						showNotification("<span class='color1'>" + data.data + "</span><br/>", "<span class='color1'>Not Logged:</span><br/>" + chars, false);
+					} else {
+						showNotification("<span class='color1'>" + data.data + "</span><br/>", "<span class='color1'>Unhandled status:</span><br/>" + data.status , false);
+					}
+				} else {
+					showNotification("<span class='color1'>" + data.data + "</span><br/>", "<span class='color1'>Not Logged:</span><br/>" + chars, false);
+				}
+			} else {
+				showNotification("<span class='color1'>" + data.data + "</span><br/>", "<span class='color1'>Invalid mule log:</span><br/>" + data.hash , false);
+			}
+			
+			// TODO: add data to logfile
+			
+			// TODO: Remove items from char logger form on success
+			if(success) {
+				charList.forEach(characterInfo => {
+					var logData = characterInfo.split("/");
+					if(logData.length === 3) {
+						// TODO: find Elements by values and remove from DOM
+					}
+				});
+			}
+			
+			// Always clear task from list
+			delete logs[data.hash];
+			
+			// Check if task list is empty
+			var keys = Object.keys(logs);
+			if(keys.length === 0) {
+				showNotification("Finished", "All mule logs have completed", false);
+				// TODO: Check our char logger form if it is also empty instead
+				// TODO: this fails if unscheduled mule logs are appended to the form
+				//if(yes) {
+					// Yes, so we finished :-)
+					//showNotification("Finished", "All mule logs have completed successfully", false);
+				//} else {
+					// No, some mule log must have failed :-(
+					//showNotification("<span class='color1'>Unfinished</span><br/>", "<span class='color1'>Some of the scheduled mule logs failed</span><br/>" + titles, false);
+				//}
+			}
+		}
 
 		var intCount = 0;
 		$(function () {
@@ -1495,61 +1616,14 @@ require(["D2Bot"], function (D2BOTAPI) {
 						for (var i = 0; i < msg.body.length; i++) {
 							var data = JSON.parse(msg.body[i].body);
                             // TODO: check for data.hash first, then use switch case for various returned actions
-							drops[data.hash].forEach(itemData => {
-								//$("#" + itemData.itemid).remove();
-								var item = document.getElementById(itemData.itemid);
-								// TODO: remove item only if dropped, keep in queue otherwise
-								item.parentNode.removeChild(item);
-							});
-							
-							drops[data.hash].forEach(itemData => {
-								var description = cleanDecription(itemData.description).split("<br/>");
-								itemTitles.push(description.shift());
-							});
-						
-						
-							// TODO: add data to logfile
-							
-							delete drops[data.hash];
-							
-							if(itemTitles.length > 0) {
-								var titles = itemTitles.join("<br/>")
-								if(data.data == "GameAction has completed task") {
-									showNotification(data.data, "Items Dropped:<br/>" + titles, false);
-								} else if(data.status) {
-									if(data.status == "error" || data.status == "failed") {
-										showNotification("<span class='color1'>" + data.data + "</span><br/>", "<span class='color1'>Not Dropped:</span><br/>" + titles, false);
-									} else {
-										showNotification(data.data, "Happy to be back :-)" , false);
-									}
-								} else {
-									showNotification("<span class='color1'>" + data.data + "</span><br/>", "<span class='color1'>Not Dropped:</span><br/>" + titles, false);
-								}
-							} else {
-								showNotification(data.data, "Successfully logged Character." , false);
-							}
-						}
-						
-						// Check our queue list if it is empty yet
-						var queuedItems = document.getElementById("dropQueueList").children;
-						// Queue is empty, so we finished :-)
-						if(queuedItems.length == 0) {
-							// TODO: store and link logfile
-							var keys = Object.keys(drops);
-							if(keys.length === 0) {
-								showNotification("Finished", "All tasks have completed", false);
-							} else {
-								itemTitles = [];
-								keys.forEach(key => {
-									drops[key].forEach(itemData => {
-										var description = cleanDecription(itemData.description).split("<br/>");
-										itemTitles.push(description.shift());
-									});
-								});
-
-								drops = {};
-								
-								showNotification("<span class='color1'>Fatal</span><br/>", "<span class='color1'>Something went wrong with the following items:</span><br/>" + titles, false);
+							console.log(data);
+							if(data.hash) {
+								if(drops[data.hash])
+									handleDropResponse(data);
+								else if(logs[data.hash])
+									handleMuleResponse(data);
+								else
+									showNotification("<span class='color1'>Unhandled Action</span><br/>", "<span class='color1'>The response received is not known</span><br/>", false);
 							}
 						}
 					});
