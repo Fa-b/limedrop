@@ -40,6 +40,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 	var MAX_ITEM = 1000; // TODO: make this a config
 	var countables = [];
 	var drops = {};
+	var logs = {};
 
 	(function enableBackToTop() {
 		var backToTop = $("<a>", {
@@ -933,7 +934,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                     console.log(err);
                     status = "Error";
                 }
-                
+
 				var y = $(window).scrollTop();
 				
 				var ladder = CurrentGameClass == "Ladder";
@@ -959,7 +960,6 @@ require(["D2Bot"], function (D2BOTAPI) {
 								countables[item.uid] = {}
 							if(!countables[item.uid][itemGroup.key])
 								countables[item.uid][itemGroup.key] = $addItemGroup(results[i]);
-								
 
 							$updateItemGroup(countables[item.uid][itemGroup.key], results[i]);
 						//}
@@ -1476,7 +1476,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				) {
 					if (window.loadMoreItem) {
 						MAX_ITEM += 1000;
-						window.loadMoreItem();
+						//window.loadMoreItem();
 					}
 				}
 
@@ -1626,18 +1626,21 @@ require(["D2Bot"], function (D2BOTAPI) {
 			if (!apipass || apipass.length < 1) {
 				return;
 			}
+			
+			var idx = 0;
+			const start = Date.now();
 
 			for (var i = 0; i < add_row_index; i++) {
 				var realm = document
 					.getElementsByName("realm" + i)[0]
 					.value.toLowerCase();
-				var acc = document.getElementsByName("acc" + i)[0].value.toLowerCase();
+				var acc = document.getElementsByName("acc" + i)[0].value;
 				var pass = document
 					.getElementsByName("pass" + i)[0]
 					.value.toLowerCase();
 				var chars = document
 					.getElementsByName("chars" + i)[0]
-					.value.toLowerCase();
+					.value;
 
 				if (realm.length == 0 || acc.length == 0 || pass.length == 0) {
 					continue;
@@ -1648,32 +1651,46 @@ require(["D2Bot"], function (D2BOTAPI) {
 				} else {
 					chars = document
 						.getElementsByName("chars" + i)[0]
-						.value.toLowerCase()
-						.split(/[\s,;: ]+/);
+						.value.split(/[\s,;: ]+/);
 				}
 
 				var hash = API.md5(realm + acc).toString();
-
-				API.emit("put", "secure", hash + ".txt", pass, apipass, function (
-					err
-				) { });
-
-				var GameInfo = {
-					hash: hash,
-					profile: cookie.data.username,
-					action: "doMule",
-					data: JSON.stringify({
-						realm: realm,
-						account: acc,
-						chars: chars
-					})
-				};
-
-				API.emit("gameaction", GameInfo, function (err) { });
-
+				
+				if (!logs[hash]) {
+					logs[hash] = {
+						pass: pass,
+						data: {
+							realm: realm,
+							account: acc,
+							chars: chars
+						}
+					};
+				} else {
+					logs[hash].data.chars = logs[hash].data.chars.concat(chars);
+				}
+				
 				document.getElementsByName("acc" + i)[0].value = "";
 				document.getElementsByName("pass" + i)[0].value = "";
 				document.getElementsByName("chars" + i)[0].value = "";
+			}
+			
+			for (var l in logs) {
+				if (logs.hasOwnProperty(l)) {
+					API.emit("put", "secure", l + ".txt", logs[l].pass, apipass, function (err) { });
+					
+					let GameInfo = {
+						hash: l,
+						profile: cookie.data.username,
+						action: "doMule",
+						data: JSON.stringify(logs[l].data)
+					};
+
+					setTimeout((i) => {
+							console.log("Scheduled log", i, "after", ((Date.now() - start)/1000).toFixed(3),"seconds");
+							console.log(GameInfo);
+							API.emit("gameaction", GameInfo, function (err) { });
+						}, idx * 1000, idx++);
+				}
 			}
 
 			$("#add-accounts-modal").modal("hide");
