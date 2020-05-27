@@ -14,6 +14,7 @@ var cookie = {
 		if (the_cookie[0]) {
 			this.data = JSON.parse(unescape(the_cookie[0]));
 		}
+		
 		return this.data;
 	},
 
@@ -402,7 +403,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 			</span>
         <div class="m-l-10">
             <h5 class="m-b-0">` + head + `</h5>
-            <span class="mail-desc">` + text + `</span>
+            <p><span class="mail-desc">` + text + `</span></p>
+			<span class="text-white-50" style="position: absolute; font-size:8px">[` + new Date(Date.now()).toLocaleTimeString(undefined, { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' }) + `]</span>
         </div>
 	</div>
 </a>`;
@@ -1573,7 +1575,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			var itemList = [];
 			var itemTitles = [];
 			var success = false;
-			drops[data.hash].forEach(itemData => {
+			drops[data.hash].data.items.forEach(itemData => {
 				var item = document.getElementById(itemData.itemid);
 				itemList.push(item);
 				
@@ -1601,6 +1603,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 			}
 			
 			// TODO: add data to logfile
+			var retVal = {
+				job: data.hash,
+				datetime: new Date(Date.now()).toLocaleTimeString(undefined, { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' }),
+				action: "doDrop",
+				status: success?"success":"error",
+				data: drops[data.hash].data
+			};
 			
 			// Remove items from drop queue on success
 			if(success) {
@@ -1628,6 +1637,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 					showNotification("<span class='color1'>Unfinished</span><br/>", "<span class='color1'>Some of the scheduled drops failed</span><br/>", false);
 				}
 			}
+			
+			return retVal;
 		}
 		
 		let handleMuleResponse = function(data) {
@@ -1660,6 +1671,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 			}
 			
 			// TODO: add data to logfile
+			var retVal = {
+				job: data.hash,
+				datetime: new Date(Date.now()).toLocaleTimeString(undefined, { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' }),
+				action: "doMule",
+				status: success?"success":"error",
+				data: logs[data.hash].data
+			};
 			
 			// TODO: Remove items from char logger form on success
 			if(success) {
@@ -1688,7 +1706,12 @@ require(["D2Bot"], function (D2BOTAPI) {
 					//showNotification("<span class='color1'>Unfinished</span><br/>", "<span class='color1'>Some of the scheduled mule logs failed</span><br/>" + titles, false);
 				//}
 			}
+			
+			return retVal;
 		}
+
+		var dropLog = [];
+		var muleLog = [];
 
 		var intCount = 0;
 		$(function () {
@@ -1730,19 +1753,23 @@ require(["D2Bot"], function (D2BOTAPI) {
 						//console.log(msg);
 						msg.body = JSON.parse(msg.body);
 
-						let itemTitles = [];
-
 						for (var i = 0; i < msg.body.length; i++) {
 							var data = JSON.parse(msg.body[i].body);
-                            // TODO: check for data.hash first, then use switch case for various returned actions
 							console.log(data);
 							if(data.hash) {
-								if(drops[data.hash])
-									handleDropResponse(data);
-								else if(logs[data.hash])
-									handleMuleResponse(data);
-								else
+								if(drops[data.hash]) {
+									dropLog.push(handleDropResponse(data));
+									if(Object.keys(drops).length === 0) {
+										console.log(dropLog);
+									}
+								} else if(logs[data.hash]) {
+									muleLog.push(handleMuleResponse(data));
+									if(Object.keys(logs).length === 0) {
+										console.log(muleLog);
+									}
+								} else {
 									showNotification("<span class='color1'>Unhandled Action</span><br/>", "<span class='color1'>The response received is not known</span><br/>", false);
+								}
 							}
 						}
 					});
@@ -1756,7 +1783,6 @@ require(["D2Bot"], function (D2BOTAPI) {
 		$(".launch-btn").click(function () {
 			var gamename = $("#gamename").val();
 			var gamepass = $("#gamepass").val();
-			drops = {};
 
 			if (!gamename || gamename == "") {
 				alert("GameName Required!");
@@ -1777,10 +1803,20 @@ require(["D2Bot"], function (D2BOTAPI) {
 				var hash = API.md5(item.realm + item.account.toLowerCase()).toString();
 
 				if (!drops[hash]) {
-					drops[hash] = [];
+					drops[hash] = {
+						data: {
+							gameName: gamename,
+							gamePass: gamepass,
+							items: [
+								item
+							]
+						}
+					}
+				} else {
+					drops[hash].data.items.push(item);
 				}
 
-				drops[hash].push(item);
+				
 			});
 
 			var idx = 0;
@@ -1792,11 +1828,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 						hash: d,
 						profile: cookie.data.username,
 						action: "doDrop",
-						data: JSON.stringify({
-							gameName: gamename,
-							gamePass: gamepass,
-							items: drops[d]
-						})
+						data: JSON.stringify(drops[d].data)
 					};
 
 					setTimeout((i) => {
