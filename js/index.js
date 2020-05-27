@@ -38,26 +38,43 @@ require(["D2Bot"], function (D2BOTAPI) {
 	var savedEntryCount = 0;
 	var groupEntryCount = 0;
 	var MAX_ITEM = 1000; // TODO: make this a config
+    var LIST_ITEMS = 200;
 	var countables = [];
 	var drops = {};
 	var logs = {};
 
 	(function enableBackToTop() {
-		var backToTop = $("<a>", {
+		var backToTop = $("<button>", {
+            type: "button",
+            style: "position: -webkit-sticky;position: sticky;opacity: 0.6;bottom: 60px;right: 5%;z-index: 100;color: #0b8300;",
+            class: "btn icon",
 			id: "back-to-top",
 			href: "#top"
 		});
-		var icon = $("<i>", {
-			class: "icon-chevron-up"
+        
+		var topIcon = $("<i>", {
+			class: "fa fa-arrow-circle-up fa-3x"
+		});
+        
+        var backToBottom = $("<button>", {
+            type: "button",
+            style: "position: -webkit-sticky;position: sticky;opacity: 0.6;top: 30px;right: 5%;z-index: 100;color: #0b8300;",
+            class: "btn icon",
+			id: "back-to-bottom",
+			href: "#top"
+		});
+        
+        var bottomIcon = $("<i>", {
+			class: "fa fa-arrow-circle-down fa-3x"
 		});
 
-		backToTop.appendTo("body");
-		icon.appendTo(backToTop);
+        backToTop.appendTo("#root-box");
+		topIcon.appendTo(backToTop);
 
 		backToTop.hide();
 
-		$(window).scroll(function () {
-			if ($(this).scrollTop() > 150) {
+		$("#root-box").scroll(function () {
+			if ($(this).scrollTop() > 2000) {
 				backToTop.fadeIn();
 			} else {
 				backToTop.fadeOut();
@@ -66,13 +83,29 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 		backToTop.click(function (e) {
 			e.preventDefault();
-
-			$("body, html").animate({
+			$("#root-box").stop().animate({
 				scrollTop: 0
-			},
-				600
-			);
+			}, 2000, "swing");
 		});
+        
+        backToBottom.appendTo("#dropQueueList");
+		bottomIcon.appendTo(backToBottom);
+
+		backToBottom.hide();
+        
+        $("#dropQueueList").scroll(function () {
+			if (($(this)[$(this).length - 1].scrollHeight - $(this).scrollTop()) > 2000) {
+				backToBottom.fadeIn();
+			} else {
+				backToBottom.fadeOut();
+			}
+		});
+        
+        backToBottom.click(function (e) {
+            $("#dropQueueList").stop().animate({
+                scrollTop: $("#dropQueueList")[0].scrollHeight
+            }, 2000, "swing");
+        });
 	})();
     
     /* INIT LIMEDROP */
@@ -459,6 +492,93 @@ require(["D2Bot"], function (D2BOTAPI) {
 	function cleanDecription(description) {
 		return getItemDesc(description.toString().split("$")[0]);
 	}
+    
+    function highlightSpecs(description, groupData) {
+        if (!groupData || !groupData.specs)
+            return description;
+
+        groupData.specs.forEach((entry, index) => {
+            
+            var lines = description.split('\n');
+            description = lines.join('<br/>');
+            
+            var find = new RegExp(entry[0], 'i');
+            
+            var regex = new MultiRegExp(find);
+            
+            //console.log(description.match(find));
+            var matches = regex.exec(description);
+            var offset = 0;
+            
+            //console.log(regex);
+            //console.log(matches);	
+            
+            Object.keys(matches).forEach(group => {
+                var replaceStr = "<span class='color11'>#" + index + "</span>";
+                description = description.slice(0, offset + matches[group].index) + replaceStr + description.slice(offset + matches[group].index + matches[group].text.length);
+                offset += replaceStr.length - matches[group].text.length;
+            });
+            
+            lines = description.split('<br/>');
+            description = lines.join('\n');
+
+        });
+        
+        return description;
+    }
+    
+    function updateDescription(itemData) {
+        var description = highlightSpecs(itemData.description, itemData.groupData);
+        description = cleanDecription(description).split("<br/>");
+        var title = description.shift();
+        description = description.join("<br/>");
+        var htmlTemplate = `
+<h6 class="-medium">` + title + `</h6>
+<span class="m-b-15 d-block">` + description + `</span>`;
+        return htmlTemplate;
+    };
+    
+    function loadItem(itemData) {
+        var item = document.getElementById(itemData.itemid);
+        var id = (!item)?itemData.groupId:itemData.itemid;
+        var imgDiv = document.getElementById("png-" + id);
+
+        if (!itemData.itemImage) {
+            try {
+                var tmp = JSON.parse(itemData.image);
+            } catch (e) {
+                //console.warn("Old D2Bot# version active.. please update");
+            }
+            if (tmp) {
+                setImmediate(() => {
+                    itemData.itemImage = new ItemImage({
+                        image: tmp.code,
+                        itemColor: tmp.color,
+                        sockets: tmp.sockets,
+                        description: itemData.description
+                    });
+                    itemData.itemImage.onload = () => {
+                        itemData.itemImage.getItem().then((canvas) => {
+                            itemData.image = canvas.toDataURL();
+                            var imageTemplate = `<img src="` + itemData.image + `" alt="user" class="ld-item">`;
+                            imgDiv.innerHTML = imageTemplate;
+                        });
+                    };
+                });
+            } else {
+                var imageTemplate = `<img src="` + ((itemData.image.indexOf("data") != -1) ? "" : "data:image/jpeg;base64,") + itemData.image + `" alt="user" class="ld-item">`;
+                imgDiv.innerHTML = imageTemplate;
+            }
+        } else if ((imgDiv.innerHTML == "<i>image</i>") && (itemData.image.indexOf("data") != -1)) {
+            var imageTemplate = `<img src="` + itemData.image + `" alt="user" class="ld-item">`;
+            imgDiv.innerHTML = imageTemplate;
+        }
+        
+        var itemDesc = document.getElementById("item-desc-" + id);
+        if (itemDesc.innerHTML == "<i>description</i>") {
+            itemDesc.innerHTML = updateDescription(itemData);
+        }
+    }
 
 	function $addItem(result) {
 		var itemUID = result.description.split("$")[1];
@@ -483,100 +603,119 @@ require(["D2Bot"], function (D2BOTAPI) {
         // Also if the item is already on the DOM
         if(document.getElementById(itemUID) != undefined) return undefined;
 
-		var description = cleanDecription(result.description).split("<br/>");
-		var title = description.shift();
-		description = description.join("<br/>");
-
-		result.realm = CurrentRealm;
+        result.realm = CurrentRealm;
 		result.itemid = itemUID;
-		var templateid =
-			CurrentRealm +
-			"-" +
-			result.account +
-			"-" +
-			result.character +
-			"-" +
-			itemUID;
-		var htmlTemplate =`
-<div class="d-flex flex-row comment-row p-l-0 m-t-0 m-b-0" id="` + itemUID + `">
-    <div class="p-2 ld-img-col" style="position:relative; display: flex; align-self: center; justify-content: center;">
-        <div style="position:relative">
-            <div id="png-` + itemUID + `"><i>image</i></div>
-        </div>
+    
+        var htmlTemplate =`
+<div class="p-2 ld-img-col" style="position:relative; display: flex; align-self: center; justify-content: center;">
+    <div style="position:relative">
+        <div id="png-` + itemUID + `"><i>image</i></div>
     </div>
-    <div class="p-2 comment-text">
-		<h6 class="-medium">` + title + `</h6>
-		<span class="m-b-15 d-block">` + description + `</span>
-	</div>
-    <div class="comment-footer w-100">
-        <span class="text-muted float-right">` + CurrentRealm + "/" + result.account + "/" + result.character + "/{" + itemUID + "}" + `</span>
-    </div>
+</div>
+<div class="p-2 comment-text" id="item-desc-` + itemUID  + `"><i>description</i></div>
+<div class="comment-footer w-100">
+    <span class="text-muted float-right">` + CurrentRealm + "/" + result.account + "/" + result.character + "/{" + itemUID + "}" + `</span>
 </div>`;
 
-		// Todo: try using DOM operations instead of jQuery
-		var $item = $(htmlTemplate);
+        var item = document.createElement("div");
 
+        item.className += "d-flex flex-row comment-row p-l-0 m-t-0 m-b-0";
+        item.classList.add("hidden");
+        item.setAttribute("id", itemUID);
+        item.style.opacity = "0.0";
+        item.innerHTML = htmlTemplate;
+        
 		let prevRatio = {};
+        let prevY = {}
+        let loaded = {}
 		let handleIntersect = (entries, observer) => {
 			entries.forEach((entry) => {
-				//if (entry.intersectionRatio > 0.05) {
-				let elem = entry.target;
+                let elem = entry.target;
+                
+                if (entry.intersectionRatio >= 0.1 || $(elem).hasClass("selected")) {
+                    loadItem($(elem).data("itemData"));
+                    elem.classList.remove("hidden");
+                }
+                
+                elem.style.opacity = entry.intersectionRatio.toString();
+                
+                if(prevY[elem] === undefined || entry.boundingClientRect.y <= prevY[elem]) {
+                    // Scrolling down
+                    if(loaded[elem] === undefined && prevRatio[elem] <= entry.intersectionRatio) {
+                        var next = elem;
+                        for(var i = 0; i < (LIST_ITEMS/2); i++) {
+                            if(next) {
+                                loadItem($(next).data("itemData"));
+                                next.classList.remove("hidden");
+                                next = next.nextSibling
+                            }
+                        }
+                        loaded[elem] = true;
+                    } else if(prevRatio[elem] > entry.intersectionRatio) {
+                        var last = elem;
+                        for(var i = 0; i < (LIST_ITEMS/2); i++) {                            
+                            if(last.previousSibling) {
+                                last = last.previousSibling
+                            }
+                        }
+                        last.classList.add("hidden");
+                    }
+                } else if(entry.boundingClientRect.y > prevY[elem]) {
+                    // Scrolling up
+                    if(loaded[elem] && prevRatio[elem] >= entry.intersectionRatio) {
+                        var next = elem;
+                        for(var i = 0; i < (LIST_ITEMS/2); i++) {
+                            if(next.nextSibling) {
+                                next = next.nextSibling
+                            }
+                        }
+                        next.classList.add("hidden");
+                        
+                        delete loaded[elem];
+                    } else if(prevRatio[elem] < entry.intersectionRatio) {
+                        var last = elem;
+                        for(var i = 0; i < (LIST_ITEMS/2); i++) {
+                            if(last) {
+                                last.classList.remove("hidden");
+                                last = last.previousSibling
+                            }
+                        }
+                    }
+                }
+                
+                prevY[elem] = entry.boundingClientRect.y;
+                prevRatio[elem] = entry.intersectionRatio;
 
-				if (prevRatio[elem] > entry.intersectionRatio) {
-					//console.log("Leaving:", elem);
-					//$item.addClass("hidden");
-				} else if (entry.intersectionRatio >= 0.1) {
-					$item.removeClass("hidden");
-					if (!result.itemImage || result.groupId) {
-						try {
-							var tmp = JSON.parse(result.image);
-						} catch (e) {
-							console.warn("Old D2Bot# version active.. please update");
-						}
-						if (tmp) {
-                            setImmediate(() => {
-                                result.itemImage = new ItemImage({
-                                    image: tmp.code,
-                                    itemColor: tmp.color,
-                                    sockets: tmp.sockets,
-                                    description: result.description
-                                });
-                                result.itemImage.onload = () => {
-                                    result.itemImage.getItem().then((canvas) => {
-                                        result.image = canvas.toDataURL();
-                                        var imageTemplate = `<img src="` + result.image + `" alt="user" class="ld-item">`;
-                                        var imgDiv = document.getElementById("png-" + itemUID);
-                                        imgDiv.innerHTML = imageTemplate;
-                                    });
-                                };
-                            });
-						} else {
-							var imageTemplate = `<img src="` + ((result.image.indexOf("data") != -1) ? "" : "data:image/jpeg;base64,") + result.image + `" alt="user" class="ld-item">`;
-							var imgDiv = document.getElementById("png-" + itemUID);
-							imgDiv.innerHTML = imageTemplate;
-						}
-					}
-				}
-				prevRatio[elem] = entry.intersectionRatio;
-				//}
 			});
 		};
+        
+        function buildThresholdList() {
+            let thresholds = [];
+            let numSteps = 50;
+
+            for (let i = 1.0; i <= numSteps; i++) {
+                let ratio = i / numSteps;
+                thresholds.push(ratio);
+            }
+
+            return thresholds;
+        }
 
 		let observer = new IntersectionObserver(handleIntersect, {
-			root: null,
-			rootMargin: "1000px",
-			threshold: 0.4
+            root: document.querySelector("#root-box"),
+			rootMargin: "0%",
+			threshold: buildThresholdList()
 		});
 
-		$item.data("itemData", result);
-		$item.click(function () {
+		$(item).data("itemData", result);
+		$(item).click(function () {
 			$(this).toggleClass("selected");
 			if ($(this).hasClass("selected")) {
-				$("#dropQueueList").append($(this));
-				var itemDiv = document.getElementById(itemUID);
-				observer.observe(itemDiv);
-
-				$("#dropQueueList").animate({ scrollTop: $("#dropQueueList")[0].scrollHeight }, 10);
+                var queueList = document.getElementById("dropQueueList");
+                queueList.appendChild(this);
+                loadItem($(this).data("itemData"));
+                $(this).removeClass("hidden");
+                $(queueList).trigger("scroll");
 			} else {
 				// Unselecting an item in the queue should place it back to inventory
 				// First check if currently selected account location is same or ALL, then check if selected character location is the same or ALL
@@ -588,16 +727,16 @@ require(["D2Bot"], function (D2BOTAPI) {
 						$(this).data("itemData").character)
 				) {
 					// Yes, then check if it is a group item
-					var itemGroup = $(this).data("itemData");
-                    var list = Object.entries(countables[itemGroup.itemid]);
-					if (list.length) {
+					var itemData = $(this).data("itemData");
+                    var groups = countables[itemData.itemid];
+					if (groups) {
 						// first remove it from the DOM
 						$(this).remove();
                         // Now add it back to all containing groups
-                        for (var [group, groupItem] of list) {
+                        for (var [group, groupItem] of Object.entries(groups)) {
                             var listData = $(groupItem).data("itemData");
                             // we have the group and the item info still here, so we can add it back to the list
-                            $updateItemGroup($("#" + listData.groupId), itemGroup);
+                            $updateItemGroup($("#" + listData.groupId), itemData);
                         }
 					} else {
 						// No.. move the item to the inventory
@@ -611,13 +750,16 @@ require(["D2Bot"], function (D2BOTAPI) {
 		});
 
 		if (!result.groupId) {
-			$("#items-list").append($item);
-
+			//$("#items-list").append($item);
+            var itemsList = document.getElementById("items-list");
+            itemsList.appendChild(item);
+            $("root-box").trigger("scroll");
+            
 			var itemDiv = document.getElementById(itemUID);
 			observer.observe(itemDiv);
 		}
 
-		return $item;
+		return $(item);
 	}
 
 	function updateItemCount(groupId) {
@@ -632,7 +774,6 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 	function $updateItemGroup($group, result) {
 		var itemUID = result.description.split("$")[1];
-		var id = itemUID.split(":")[1];
 
 		// Check our queue list if the item is already listed there
 		var queuedItems = document.getElementById("dropQueueList").children;
@@ -682,153 +823,127 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 	function $addItemGroup(result) {
 		var itemUID = result.description.split("$")[1];
-		result.realm = CurrentRealm;
-		result.itemid = itemUID;
-		var templateid =
-			CurrentRealm +
-			"-" +
-			result.account +
-			"-" +
-			result.character +
-			"-" +
-			itemUID;
-		var id = itemUID.split(":")[1];
-
-		let groupId = result.group + id;
-        
-        var highlightSpecs = function(description, specs) {
-            if (!specs)
-                return description;
-
-            specs.forEach((entry, index) => {
-                
-                var lines = description.split('\n');
-                description = lines.join('<br/>');
-                
-                var find = new RegExp(entry[0], 'i');
-                
-                var regex = new MultiRegExp(find);
-                
-                //console.log(description.match(find));
-                var matches = regex.exec(description);
-                var offset = 0;
-                
-                //console.log(regex);
-                //console.log(matches);	
-                
-                Object.keys(matches).forEach(group => {
-                    var replaceStr = "<span class='color11'>#" + index + "</span>";
-                    description = description.slice(0, offset + matches[group].index) + replaceStr + description.slice(offset + matches[group].index + matches[group].text.length);
-                    offset += replaceStr.length - matches[group].text.length;
-                });
-                
-                lines = description.split('<br/>');
-                description = lines.join('\n');
-
-			});
-            
-            return description;
-        }
+		let groupId = result.group + itemUID.split(":")[1];
 
 		if (!document.getElementById(groupId)) {
-			// Group doesn't exist yet.. create it            
-            var generateItem = () => {
-				
-				var description = highlightSpecs(result.description, result.groupData.specs);
-				description = cleanDecription(description).split("<br/>");
-				var title = description.shift();
-				description = description.join("<br/>");
-				var htmlTemplate = `
-<h6 class="-medium">` + title + `</h6>
-<span class="m-b-15 d-block">` + description + `</span>`;
-				return htmlTemplate;
-			};
+			// Group doesn't exist yet.. create it   
+            result.realm = CurrentRealm;
+            result.itemid = itemUID;
             
-			var count = 0;
-			var htmlTemplate = `
-    <div class="p-2 ld-img-col" style="position:relative; display: flex; align-self: center; justify-content: center;">
-        <div style="position:relative">
-            <div id="png-` + groupId + `"><i>image</i></div>
-            <div id="item-menu-count-` + groupId + `" style="position: absolute; top: -10px; right: calc(100% - 10px);">` + count + `</div>
-        </div>
+            var htmlTemplate = `
+<div class="p-2 ld-img-col" style="position:relative; display: flex; align-self: center; justify-content: center;">
+    <div style="position:relative">
+        <div id="png-` + groupId + `"><i>image</i></div>
+        <div id="item-menu-count-` + groupId + `" style="position: absolute; top: -10px; right: calc(100% - 10px);">1</div>
     </div>
-    <div class="styled-item-menu" id="item-menu-` + groupId + `">
-        <div style="height:100%;">
-            <div>
-                <input type="text" disabled placeholder="0"  id="item-menu-input-` + groupId + `"/>
-                <i class="fas fa-share-square fa-2x" id="group-list-btn-` + groupId + `"></i>
-            </div>
-            <select multiple="multiple" id="item-menu-select-` + groupId + `" size></select>
+</div>
+<div class="styled-item-menu" id="item-menu-` + groupId + `">
+    <div style="height:100%;">
+        <div>
+            <input type="text" disabled placeholder="0"  id="item-menu-input-` + groupId + `"/>
+            <i class="fas fa-share-square fa-2x" id="group-list-btn-` + groupId + `"></i>
         </div>
+        <select multiple="multiple" id="item-menu-select-` + groupId + `" size></select>
     </div>
-    <div class="p-2 comment-text" id="item-desc-` + groupId + `"><i>Description</i></div>
-    <div class="comment-footer w-100" hidden>
-        <span class="text-muted float-right">` + CurrentRealm + "/" + result.account + "/" + result.character + "/{" + itemUID + "}" + `</span>
-    </div>`;
+</div>
+<div class="p-2 comment-text" id="item-desc-` + groupId + `"><i>description</i></div>
+<div class="comment-footer w-100" hidden>
+    <span class="text-muted float-right">` + CurrentRealm + "/" + result.account + "/" + result.character + "/{" + result.itemid + "}" + `</span>
+</div>`;
 
             var itemGroup = document.createElement("div");
 
-            itemGroup.className += "d-flex flex-row comment-row hidden p-l-0 m-t-0 m-b-0";
+            itemGroup.className += "d-flex flex-row comment-row p-l-0 m-t-0 m-b-0";
+            itemGroup.classList.add("hidden");
             itemGroup.setAttribute("aria-haspopup", true);
             itemGroup.setAttribute("id", groupId);
+            itemGroup.style.opacity = "0.0";
             itemGroup.innerHTML = htmlTemplate;
 
+            let prevY = {};
             let prevRatio = {};
+            let loaded = {};
             let handleIntersect = (entries, observer) => {
                 entries.forEach((entry) => {
-                    //if (entry.intersectionRatio > 0.05) {
                     let elem = entry.target;
-                    if (prevRatio[elem] > entry.intersectionRatio) {
-                        //console.log("Leaving:", elem);
-                        //itemGroup.classList.add("hidden");
-                    } else if (entry.intersectionRatio >= 0.1) {
-                        document.getElementById("item-desc-" + groupId).innerHTML = generateItem();
-                        var imgDiv = document.getElementById("png-" + groupId);
-                        itemGroup.classList.remove("hidden");
-                        if (!result.itemImage) {
-                            try {
-                                var tmp = JSON.parse(result.image);
-                            } catch (e) {
-                                //console.warn("Old D2Bot# version active.. please update");
+                    
+                    if (entry.intersectionRatio >= 0.1) {
+                        loadItem($(elem).data("itemData"));
+                        elem.classList.remove("hidden");
+                    }
+                    
+                    elem.style.opacity = entry.intersectionRatio.toString();
+                    
+                    if(prevY[elem] === undefined || entry.boundingClientRect.y <= prevY[elem]) {
+                        // Scrolling down
+                        if(loaded[elem] === undefined && prevRatio[elem] <= entry.intersectionRatio) {
+                            var next = elem;
+                            for(var i = 0; i < (LIST_ITEMS/2); i++) {
+                                if(next) {
+                                    loadItem($(next).data("itemData"));
+                                    next.classList.remove("hidden");
+                                    next = next.nextSibling
+                                }
                             }
-                            if (tmp) {
-                                setImmediate(() => {
-                                    result.itemImage = new ItemImage({
-                                        image: tmp.code,
-                                        itemColor: tmp.color,
-                                        sockets: tmp.sockets,
-                                        description: result.description
-                                    });
-                                    result.itemImage.onload = () => {
-                                        result.itemImage.getItem().then((canvas) => {
-                                            result.image = canvas.toDataURL();
-                                            var imageTemplate = `<img src="` + result.image + `" alt="user" class="ld-item">`;
-                                            imgDiv.innerHTML = imageTemplate;
-                                        });
-                                    };
-                                });
-                            } else {
-                                var imageTemplate = `<img src="` + ((result.image.indexOf("data") != -1) ? "" : "data:image/jpeg;base64,") + result.image + `" alt="user" class="ld-item">`;
-                                imgDiv.innerHTML = imageTemplate;
+                            loaded[elem] = true;
+                        } else if(loaded[elem] && prevRatio[elem] > entry.intersectionRatio) {
+                            var last = elem;
+                            for(var i = 0; i < (LIST_ITEMS/2); i++) {                            
+                                if(last.previousSibling) {
+                                    last = last.previousSibling
+                                }
                             }
-                        } else if ((imgDiv.innerHTML == "<i>image</i>") && (result.image.indexOf("data") != -1)) {
-                            var imageTemplate = `<img src="` + result.image + `" alt="user" class="ld-item">`;
-                            imgDiv.innerHTML = imageTemplate;
+                            last.classList.add("hidden");
+                            
+                            delete loaded[elem];
+                        }
+                    } else if(entry.boundingClientRect.y > prevY[elem]) {
+                        // Scrolling up
+                        if(loaded[elem] && prevRatio[elem] >= entry.intersectionRatio) {
+                            var next = elem;
+                            for(var i = 0; i < (LIST_ITEMS/2); i++) {
+                                if(next.nextSibling) {
+                                    next = next.nextSibling
+                                }
+                            }
+                            next.classList.add("hidden");
+                            
+                            delete loaded[elem];
+                        } else if(prevRatio[elem] < entry.intersectionRatio) {
+                            var last = elem;
+                            for(var i = 0; i < (LIST_ITEMS/2); i++) {
+                                if(last) {
+                                    last.classList.remove("hidden");
+                                    last = last.previousSibling
+                                }
+                            }
+                            loaded[elem] = true;
                         }
                     }
+                    
+                    prevY[elem] = entry.boundingClientRect.y;
                     prevRatio[elem] = entry.intersectionRatio;
-                    //}
                 });
             };
 
+            function buildThresholdList() {
+                let thresholds = [];
+                let numSteps = 50;
+
+                for (let i = 1.0; i <= numSteps; i++) {
+                    let ratio = i / numSteps;
+                    thresholds.push(ratio);
+                }
+                return thresholds;
+            }
+
             let observer = new IntersectionObserver(handleIntersect, {
                 root: document.querySelector("#root-box"),
-                rootMargin: "200%",
-                threshold: 0.4
+                rootMargin: "0%",
+                threshold: buildThresholdList()
             });
 
             $(itemGroup).data("itemData", result);
-            //$itemGroup.data("itemCount", count);
 
             function updateSelectCount(selected) {
                 var i = 0;
@@ -891,6 +1006,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                 //$("#items-list").append($itemGroup);
                 var itemsList = document.getElementById("items-list");
                 itemsList.appendChild(itemGroup);
+                $("root-box").trigger("scroll");
                 
                 //var itemDiv = document.getElementById(groupId);
                 observer.observe(itemGroup);
@@ -953,7 +1069,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 								x: results[i].description.split("$")[1].split(":")[3],
 								y: results[i].description.split("$")[1].split(":")[4]
 							};
-							var itemID = results[i].description.split("$")[1].split(":")[1];
+							//var itemID = results[i].description.split("$")[1].split(":")[1];
 							results[i].group = itemGroup.key;
 							results[i].groupData = itemGroup.value;
 							if(!countables[item.uid])
@@ -1024,7 +1140,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                 for (var i in results) {
                     if (results[i].description) {
                         //if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
-                        var itemID = results[i].description.split("$")[1].split(":")[1];
+                        //var itemID = results[i].description.split("$")[1].split(":")[1];
                         // Only the first countable item will be used
                         item = $addItem(results[i]);
 
@@ -1815,13 +1931,16 @@ require(["D2Bot"], function (D2BOTAPI) {
 		var itemList = {};
 		for (var i = 0; i < queuedItems.length; i++) {
 			var item = $(queuedItems[i]).data("itemData");
-			if (!item.itemImage)
-				try {
-					item.itemImage = JSON.parse(item.image);
-				} catch (e) {
-					//console.warn("Old D2Bot# version active.. please update");
-				}
-			itemList[i] = item;
+            if(item) {
+                if (!item.itemImage)
+                    try {
+                        item.itemImage = JSON.parse(item.image);
+                    } catch (e) {
+                        //console.warn("Old D2Bot# version active.. please update");
+                    }
+                    
+                itemList[i] = item;
+            }
 		}
 
 		var container = document.getElementById("itemScreenshot");
