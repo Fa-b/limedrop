@@ -538,11 +538,11 @@ require(["D2Bot"], function (D2BOTAPI) {
         return htmlTemplate;
     };
     
-    function loadItem(itemData) {
-        var item = document.getElementById(itemData.itemid);
-        var id = (!item)?itemData.groupId:itemData.itemid;
+    function loadItem(item) {
+        var itemData = $(item).data("itemData")
+        var id = (itemData.groupId && item.parentNode.id === "items-list")?itemData.groupId:itemData.itemid;
         var imgDiv = document.getElementById("png-" + id);
-
+        
         if (!itemData.itemImage) {
             try {
                 var tmp = JSON.parse(itemData.image);
@@ -633,7 +633,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                 let elem = entry.target;
                 
                 if (entry.intersectionRatio >= 0.1 || $(elem).hasClass("selected")) {
-                    loadItem($(elem).data("itemData"));
+                    loadItem(elem);
                     elem.classList.remove("hidden");
                 }
                 
@@ -645,7 +645,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                         var next = elem;
                         for(var i = 0; i < (LIST_ITEMS/2); i++) {
                             if(next) {
-                                loadItem($(next).data("itemData"));
+                                loadItem(next);
                                 next.classList.remove("hidden");
                                 next = next.nextSibling
                             }
@@ -713,7 +713,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			if ($(this).hasClass("selected")) {
                 var queueList = document.getElementById("dropQueueList");
                 queueList.appendChild(this);
-                loadItem($(this).data("itemData"));
+                loadItem(this);
                 $(this).removeClass("hidden");
                 $(queueList).trigger("scroll");
 			} else {
@@ -737,6 +737,8 @@ require(["D2Bot"], function (D2BOTAPI) {
                             var listData = $(groupItem).data("itemData");
                             // we have the group and the item info still here, so we can add it back to the list
                             $updateItemGroup($("#" + listData.groupId), itemData);
+                            
+                            updateItemCount(itemData.groupId);
                         }
 					} else {
 						// No.. move the item to the inventory
@@ -775,17 +777,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 	function $updateItemGroup($group, result) {
 		var itemUID = result.description.split("$")[1];
 
-		// Check our queue list if the item is already listed there
-		var queuedItems = document.getElementById("dropQueueList").children;
-		for (var i = 0; i < queuedItems.length; i++) {
-			if (queuedItems[i].id === itemUID) {
-				// ID is already queued.. get out of here
-				return undefined;
-			}
-		}
-
 		// Maybe the description of our item is corrupted
-		// But more likely, the requested item is already listed in the queue
 		if (!itemUID) return undefined;
 
 		var specs = itemUID.split(":")[0] + " - ";
@@ -803,6 +795,16 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
         //specs = specs.replace(/\/([^\/]*)$/, '-$1')
 		result.groupId = $group.attr("id");
+        
+        // Check our queue list if the item is already listed there
+		var queuedItems = document.getElementById("dropQueueList").children;
+		for (var i = 0; i < queuedItems.length; i++) {
+			if (queuedItems[i].id === itemUID) {
+				// ID is already queued.. get out of here
+				return undefined;
+			}
+		}
+        
 		var optionTemplate = `<option value="` + itemUID + `" id="item-menu-option-` + result.groupId + `">` + specs + result.account + "/" + result.character + `</option>`;
 		var $itemOption = $(optionTemplate);
 		$itemOption.data("itemData", result);
@@ -815,7 +817,6 @@ require(["D2Bot"], function (D2BOTAPI) {
 				$("#character-select").val().split(".")[0] === result.character)
 		) {
 			$group.find("#item-menu-select-" + result.groupId).append($itemOption);
-			updateItemCount(result.groupId);
 		}
 
 		return $itemOption;
@@ -868,7 +869,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                     let elem = entry.target;
                     
                     if (entry.intersectionRatio >= 0.1) {
-                        loadItem($(elem).data("itemData"));
+                        loadItem(elem);
                         elem.classList.remove("hidden");
                     }
                     
@@ -880,7 +881,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                             var next = elem;
                             for(var i = 0; i < (LIST_ITEMS/2); i++) {
                                 if(next) {
-                                    loadItem($(next).data("itemData"));
+                                    loadItem(next);
                                     next.classList.remove("hidden");
                                     next = next.nextSibling
                                 }
@@ -1078,6 +1079,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 								countables[item.uid][itemGroup.key] = $addItemGroup(results[i]);
 
 							$updateItemGroup(countables[item.uid][itemGroup.key], results[i]);
+                            
+                            updateItemCount(results[i].groupId);
 						//}
 					}
 				}
