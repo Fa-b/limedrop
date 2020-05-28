@@ -292,13 +292,14 @@ define(["events"],function (events) {
             });
         })
 		
-		D2BotAPI.cancelRequests = function(funcs) {
-			funcs.forEach(func => {
-				requests.filter(req => req.func === func).forEach(req => {
-					req.obj.abort();
-				});
-			});
-		};
+        D2BotAPI.cancelRequests = function(funcs) {
+			console.log(requests);
+            requests = requests.filter(req => {
+                if (funcs.indexOf(req.func) < 0) return true;
+                req.obj.abort();
+                return false;
+            });
+        };
         
         makePostRequest = function makePostRequest_jquery(d2botConfig, func, data, callback) {
             var $request = {
@@ -312,13 +313,18 @@ define(["events"],function (events) {
                 dataType: "text",
                 data:data
             };
-            var request = $.ajax($request);
-			requests.push({func:func, obj:request});
 			
-            request.done(function(msg) {
+            var request = {func:func, obj:$.ajax($request)};
+			requests.push(request);
+			
+			request.obj.always(() => {
+				requests.splice(requests.indexOf(request), 1);
+			});
+			
+            request.obj.done(function(msg) {
                 if (callback) callback(null, msg);
             });
-            request.fail(function(jqXHR, textStatus, errorThrown) {
+            request.obj.fail(function(jqXHR, textStatus, errorThrown) {
                 var msg = '';
                 if (jqXHR.status === 0) {
                     msg = 'Not connected.\n Verify Network.';
