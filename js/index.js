@@ -541,11 +541,12 @@ require(["D2Bot"], function (D2BOTAPI) {
     };
     
     function loadItem(item) {
-        var itemData = $(item).data("itemData")
+        var itemData = $(item).data("itemData");
+        var imageData = $(item).data("imageData");
         var id = (itemData.groupId && item.parentNode.id === "items-list")?itemData.groupId:itemData.itemid;
         var imgDiv = document.getElementById("png-" + id);
         
-        if (!itemData.itemImage) {
+        if (!imageData) {
             try {
                 var tmp = JSON.parse(itemData.image);
             } catch (e) {
@@ -553,19 +554,20 @@ require(["D2Bot"], function (D2BOTAPI) {
             }
             if (tmp) {
                 setImmediate(() => {
-                    itemData.itemImage = new ItemImage({
+                    imageData = new ItemImage({
                         image: tmp.code,
                         itemColor: tmp.color,
                         sockets: tmp.sockets,
                         description: itemData.description
                     });
-                    itemData.itemImage.onload = () => {
-                        itemData.itemImage.getItem().then((canvas) => {
-                            itemData.image = canvas.toDataURL();
-                            var imageTemplate = `<img src="` + itemData.image + `" alt="user" class="ld-item">`;
+                    imageData.onload = () => {
+                        imageData.getItem().then((canvas) => {
+                            var imageTemplate = `<img src="` + canvas.toDataURL() + `" alt="user" class="ld-item">`;
                             imgDiv.innerHTML = imageTemplate;
                         });
+                        $(item).data("imageData", imageData);
                     };
+                    
                 });
             } else {
                 var imageTemplate = `<img src="` + ((itemData.image.indexOf("data") != -1) ? "" : "data:image/jpeg;base64,") + itemData.image + `" alt="user" class="ld-item">`;
@@ -712,8 +714,9 @@ require(["D2Bot"], function (D2BOTAPI) {
 		$(item).data("itemData", result);
 		$(item).click(function () {
 			$(this).toggleClass("selected");
+            var queueList = document.getElementById("dropQueueList");
+            
 			if ($(this).hasClass("selected")) {
-                var queueList = document.getElementById("dropQueueList");
                 queueList.appendChild(this);
                 loadItem(this);
                 $(this).removeClass("hidden");
@@ -735,10 +738,10 @@ require(["D2Bot"], function (D2BOTAPI) {
 						// first remove it from the DOM
 						$(this).remove();
                         // Now add it back to all containing groups
-                        for (var [group, groupItem] of Object.entries(groups)) {
-                            var listData = $(groupItem).data("itemData");
+                        for (var [group, entry] of Object.entries(groups)) {
+                            var groupData = $(entry).data("itemData");
                             // we have the group and the item info still here, so we can add it back to the list
-                            $updateItemGroup($("#" + listData.groupId), itemData);
+                            $updateItemGroup($("#" + groupData.groupId), itemData);
                             
                             updateItemCount(itemData.groupId);
                         }
@@ -750,6 +753,8 @@ require(["D2Bot"], function (D2BOTAPI) {
 					// No, then the unselected item should be removed from the DOM!
 					$(this).remove();
 				}
+                
+                $(queueList).trigger("scroll");
 			}
 		});
 
@@ -1791,16 +1796,12 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 			$(".selected").each(function (i, v) {
 				var $item = $(v);
-				var item = $item.data("itemData");
-				//delete item.image;
-				//delete item.description;
-
-				//$item.remove();
+				var itemData = $item.data("itemData");
 
 				// It appears this causes issues during realm selection otherwise
-				item.realm = item.realm.toLowerCase();
+				itemData.realm = itemData.realm.toLowerCase();
 
-				var hash = API.md5(item.realm + item.account.toLowerCase()).toString();
+				var hash = API.md5(itemData.realm + itemData.account.toLowerCase()).toString();
 
 				if (!drops[hash]) {
 					drops[hash] = {
@@ -1808,12 +1809,12 @@ require(["D2Bot"], function (D2BOTAPI) {
 							gameName: gamename,
 							gamePass: gamepass,
 							items: [
-								item
+								itemData
 							]
 						}
 					}
 				} else {
-					drops[hash].data.items.push(item);
+					drops[hash].data.items.push(itemData);
 				}
 
 				
@@ -2037,31 +2038,27 @@ require(["D2Bot"], function (D2BOTAPI) {
 	$("#imgur-upload-btn").click(function () {
 		$("#upload-imgur-modal").modal("show");
 		var queuedItems = document.getElementById("dropQueueList").children;
-		var itemList = {};
+		var imageList = [];
 		for (var i = 0; i < queuedItems.length; i++) {
-			var item = $(queuedItems[i]).data("itemData");
-            if(item) {
-                if (!item.itemImage)
-                    try {
-                        item.itemImage = JSON.parse(item.image);
-                    } catch (e) {
-                        //console.warn("Old D2Bot# version active.. please update");
-                    }
-                    
-                itemList[i] = item;
-            }
+			var imageData = $(queuedItems[i]).data("imageData");
+            if (imageData)
+                imageList.push(imageData);
 		}
-
 		var container = document.getElementById("itemScreenshot");
-		window.ItemScreenshot.drawCompilation(itemList).then((template) => {
+		window.ItemScreenshot.drawCompilation(imageList, {
+            padding: 5,
+            radius: 10,
+            index: {
+                show: true,
+                left: 10,
+                top: 5,
+                prefix: '#',
+                color: 2
+            }
+        }).then((template) => {
 			container.innerHTML = template;
 			let width = container.firstChild.style.width.split("px")[0];
 			$("#imgurContainer").css("max-width", width + "px");
-			/*setTimeout(function(){
-				html2canvas(container.firstChild).then(canvas => {
-					container.appendChild(canvas)
-				});
-			}, 500);*/
 		});
 	});
 	
@@ -2089,18 +2086,47 @@ require(["D2Bot"], function (D2BOTAPI) {
 		
 		var container = document.getElementById("itemScreenshot");
         
-        html2canvas(container.firstChild).then(canvas => {
+        html2canvas(container, {
+            backgroundColor:null
+        }).then(canvas => {
             $(this).removeAttr("disabled");
             $('#upload-imgur-modal').modal('hide');
 			var formData = new FormData();
 			formData.append("image", canvas.toDataURL().split("data:image/png;base64,")[1]);
 			settings.data = formData;
-			$.ajax(settings).done(function(response) {
-                $('#upload-imgur-modal').modal('hide');
-				var imgurResponse = JSON.parse(response);
-				console.log(imgurResponse);
-				showNotification("Uploaded Image to Imgur", `<a target='_blank' rel='noopener noreferrer' href='` + imgurResponse.data.link + `' style='color:#2962ff'>` + imgurResponse.data.link + `</a>`, false);
-			});
+            
+            let testing = false;
+            
+            if(testing) {
+                var modal = document.createElement("div");
+                var htmlTemplate = `
+<div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width:` + canvas.width + `px">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">\"Testing\" Upload Result</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <i class="far fa-times-circle fa-2x"></i>
+            </button>
+        </div>
+        <div class="modal-body" style="padding:0px;">
+            <img src="` + canvas.toDataURL() + `">
+        </div>
+    </div>
+</div>`;
+                modal.classList.add("modal");
+                modal.classList.add("fade");
+                modal.tabIndex = -1;
+                modal.role = "dialog";
+                modal.innerHTML = htmlTemplate;
+                $(modal).modal("show");
+            } else {
+                $.ajax(settings).done(function(response) {
+                    $('#upload-imgur-modal').modal('hide');
+                    var imgurResponse = JSON.parse(response);
+                    console.log(imgurResponse);
+                    showNotification("Uploaded Image to Imgur", `<a target='_blank' rel='noopener noreferrer' href='` + imgurResponse.data.link + `' style='color:#2962ff'>` + imgurResponse.data.link + `</a>`, false);
+                });
+            }
 		});
 	});
 	initialize();

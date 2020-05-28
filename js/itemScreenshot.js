@@ -298,38 +298,45 @@ window.ItemScreenshot = {
         });
 	},
 		
-    drawCompilation: function (items) {
+    drawCompilation: function (items, options) {
         var packer = new GrowingPacker(window.innerWidth * 0.8);
         var blocks = [];
-		var padding = 10;//parseInt($("#itemList").css("padding"));
-		
+		var padding = options.padding?options.padding:0;
+		var radius = options.radius?options.radius:0;
+        var index = options.index?options.index:null;
+        
         var screenshots = [];
 		
         for (var idx in items) {
-			var img = items[idx].itemImage;
-			img = new ItemImage(img?items[idx].itemImage:items[idx]);
+			var img = new ItemImage(items[idx]);
 			screenshots.push(ItemScreenshot.drawScreenshot(img));
         }
         
         return Promise.all(screenshots).then(results => {
             results.forEach(item => {
-                blocks.push({item: $(item.canvas), w: item.canvas.width + padding, h: item.canvas.height + padding});
+                blocks.push({item: $(item.canvas), w: item.canvas.width, h: item.canvas.height + padding});
             });
             
             blocks.sort(function(a,b) { return (b.h - a.h); });
             packer.fit(blocks);
 
-			var htmlTemplate = `<div style="
-									display:inline-flex;
-									align-items:start;
-									justify-content:center;
-									flex-wrap:wrap;
-									width:` + packer.root.w + `px">`;
+			var htmlTemplate = `<div style="display:inline-flex;flex-wrap:wrap;justify-content:center;width:` + packer.root.w + `px">`;
 			
             for(var n = 0 ; n < blocks.length ; n++) {
                 var block = blocks[n];
                 if (block.fit) {
-					htmlTemplate += `<img src="` + block.item[0].toDataURL() + `" style="padding:`+ padding + `px; border-radius: 20px"/>`;
+                    var text = (index.prefix?index.prefix:"") + n;
+                    var canvas = document.createElement('canvas');
+                    canvas.width = Font16.measureText(text).width * (index.scale?index.scale:1.5);
+                    canvas.height = 16 * (index.scale?index.scale:1.5);
+                    var graphics = canvas.getContext('2d');
+                    graphics.scale((index.scale?index.scale:1.5), (index.scale?index.scale:1.5));
+                    Font16.drawText(graphics, 0, 0, text, (index.color?index.color:0));
+					htmlTemplate += `
+<div style="position:relative;margin:` + (index.padding?index.padding:5) + `px;border-radius:` + radius + `px;overflow:hidden;">
+    ` + ((index && index.show)?"<div style='position:absolute;left:" + (index.left?index.left + 'px':'unset') + ";right:" + (index.right?index.right + 'px':'unset') + ";top:" + (index.top?index.top + 'px':'unset') + ";bottom:" + (index.bottom?index.bottom + 'px':'unset') + ";'><img src='" + canvas.toDataURL() + "'/></div>":"") + `
+    <img src="` + block.item[0].toDataURL() + `"/>
+</div>`;
                 } else {
                     console.error("Couldn't pack image to canvas (Width Height):", block.w, block.h, "max. allowed size (Width Height):", packer.root.w, packer.root.h);
                 }
