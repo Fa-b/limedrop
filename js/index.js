@@ -584,8 +584,8 @@ require(["D2Bot"], function (D2BOTAPI) {
         }
     }
 
-	function $addItem(result) {
-		var itemUID = result.description.split("$")[1];
+	function $addItem(itemData) {
+		var itemUID = itemData.description.split("$")[1];
 
 		// Check our queue list if the item is already listed there
 		var queuedItems = document.getElementById("dropQueueList").children;
@@ -603,12 +603,12 @@ require(["D2Bot"], function (D2BOTAPI) {
 		var itemID = itemUID.split(":")[1];
 		// Check if item is not already listed as a countable, unless it is just
 		// a group list entry
-		if (!result.groupId && countables[itemUID] != undefined) return undefined;
+		if (!itemData.groupId && countables[itemUID] != undefined) return undefined;
         // Also if the item is already on the DOM
         if(document.getElementById(itemUID) != undefined) return undefined;
 
-        result.realm = CurrentRealm;
-		result.itemid = itemUID;
+        itemData.realm = CurrentRealm;
+		itemData.itemid = itemUID;
     
         var htmlTemplate =`
 <div class="p-2 ld-img-col" style="position:relative; display: flex; align-self: center; justify-content: center;">
@@ -618,7 +618,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 </div>
 <div class="p-2 comment-text" id="item-desc-` + itemUID  + `"><i>description</i></div>
 <div class="comment-footer w-100">
-    <span class="text-muted float-right">` + CurrentRealm + "/" + result.account + "/" + result.character + "/{" + itemUID + "}" + `</span>
+    <span class="text-muted float-right">` + CurrentRealm + "/" + itemData.account + "/" + itemData.character + "/{" + itemUID + "}" + `</span>
 </div>`;
 
         var item = document.createElement("div");
@@ -711,7 +711,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			threshold: buildThresholdList()
 		});
 
-		$(item).data("itemData", result);
+		$(item).data("itemData", itemData);
 		$(item).click(function () {
 			$(this).toggleClass("selected");
             var queueList = document.getElementById("dropQueueList");
@@ -722,26 +722,22 @@ require(["D2Bot"], function (D2BOTAPI) {
                 $(this).removeClass("hidden");
                 $(queueList).trigger("scroll");
 			} else {
+                var itemData = $(this).data("itemData");
 				// Unselecting an item in the queue should place it back to inventory
 				// First check if currently selected account location is same or ALL, then check if selected character location is the same or ALL
-				if (
-					($("#account-select").val() === "Show All" ||
-						$("#account-select").val() === $(this).data("itemData").account) &&
+				if (($("#account-select").val() === "Show All" ||
+						$("#account-select").val() === itemData.account) &&
 					($("#character-select").val().split(".")[0] === "Show All" ||
-						$("#character-select").val().split(".")[0] ===
-						$(this).data("itemData").character)
-				) {
+						$("#character-select").val().split(".")[0] === itemData.character)) {
 					// Yes, then check if it is a group item
-					var itemData = $(this).data("itemData");
                     var groups = countables[itemData.itemid];
 					if (groups) {
 						// first remove it from the DOM
 						$(this).remove();
                         // Now add it back to all containing groups
                         for (var [group, entry] of Object.entries(groups)) {
-                            var groupData = $(entry).data("itemData");
                             // we have the group and the item info still here, so we can add it back to the list
-                            $updateItemGroup($("#" + groupData.groupId), itemData);
+                            $updateItemGroup($(entry).data("groupData"), itemData);
                             
                             updateItemCount(itemData.groupId);
                         }
@@ -758,7 +754,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			}
 		});
 
-		if (!result.groupId) {
+		if (!itemData.groupId) {
 			//$("#items-list").append($item);
             var itemsList = document.getElementById("items-list");
             itemsList.appendChild(item);
@@ -781,27 +777,26 @@ require(["D2Bot"], function (D2BOTAPI) {
 		$("#item-menu-count-" + groupId).html(countTemplate);
 	}
 
-	function $updateItemGroup($group, result) {
-		var itemUID = result.description.split("$")[1];
+	function $updateItemGroup(groupData, itemData) {
+		var itemUID = itemData.description.split("$")[1];
 
 		// Maybe the description of our item is corrupted
 		if (!itemUID) return undefined;
 
 		var specs = itemUID.split(":")[0] + " - ";
-		if(result.groupData.specs) {
-			var desc = result.description.replace(/\n|\r/gm, "");
+		if(groupData.specs) {
+			var desc = itemData.description.replace(/\n|\r/gm, "");
 			specs = "";
-			result.groupData.specs.forEach((entry) => {
+			groupData.specs.forEach((entry) => {
 				if (typeof entry !== 'undefined' && entry.length > 0) {
 					if(desc.match(new RegExp(entry[0], 'gi')) && entry[1] != undefined)
 							specs += desc.replace(new RegExp(entry[0], 'gi'), entry[1]) + " - ";
 				} else {
-					console.error(result.group, result.groupData.specs, entry);
+					console.error(itemData.group, groupData.specs, entry);
 				}
 			});
 		}
-        //specs = specs.replace(/\/([^\/]*)$/, '-$1')
-		result.groupId = $group.attr("id");
+        //specs = specs.replace(/\/([^\/]*)$/, '-$1');
         
         // Check our queue list if the item is already listed there
 		var queuedItems = document.getElementById("dropQueueList").children;
@@ -812,31 +807,32 @@ require(["D2Bot"], function (D2BOTAPI) {
 			}
 		}
         
-		var optionTemplate = `<option value="` + itemUID + `" id="item-menu-option-` + result.groupId + `">` + specs + result.account + "/" + result.character + `</option>`;
+		var optionTemplate = `<option value="` + itemUID + `" id="item-menu-option-` + itemData.groupId + `">` + specs + itemData.account + "/" + itemData.character + `</option>`;
 		var $itemOption = $(optionTemplate);
-		$itemOption.data("itemData", result);
+		$itemOption.data("itemData", itemData);
 
 		// First check if currently selected account location is same or ALL, then check if selected character location is the same or ALL
 		if (
 			($("#account-select").val() === "Show All" ||
-				$("#account-select").val() === result.account) &&
+				$("#account-select").val() === itemData.account) &&
 			($("#character-select").val().split(".")[0] === "Show All" ||
-				$("#character-select").val().split(".")[0] === result.character)
+				$("#character-select").val().split(".")[0] === itemData.character)
 		) {
-			$group.find("#item-menu-select-" + result.groupId).append($itemOption);
+			$("#item-menu-select-" + itemData.groupId).append($itemOption);
 		}
 
 		return $itemOption;
 	}
 
-	function $addItemGroup(result) {
-		var itemUID = result.description.split("$")[1];
-		let groupId = result.group + itemUID.split(":")[1];
+	function $addItemGroup(itemData) {
+		var itemUID = itemData.description.split("$")[1];
+		let groupId = itemData.group + itemUID.split(":")[1];
 
 		if (!document.getElementById(groupId)) {
 			// Group doesn't exist yet.. create it   
-            result.realm = CurrentRealm;
-            result.itemid = itemUID;
+            itemData.realm = CurrentRealm;
+            itemData.itemid = itemUID;
+            itemData.groupId = groupId;
             
             var htmlTemplate = `
 <div class="p-2 ld-img-col" style="position:relative; display: flex; align-self: center; justify-content: center;">
@@ -856,7 +852,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 </div>
 <div class="p-2 comment-text" id="item-desc-` + groupId + `"><i>description</i></div>
 <div class="comment-footer w-100" hidden>
-    <span class="text-muted float-right">` + CurrentRealm + "/" + result.account + "/" + result.character + "/{" + result.itemid + "}" + `</span>
+    <span class="text-muted float-right">` + CurrentRealm + "/" + itemData.account + "/" + itemData.character + "/{" + itemData.itemid + "}" + `</span>
 </div>`;
 
             var itemGroup = document.createElement("div");
@@ -951,7 +947,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                 threshold: buildThresholdList()
             });
 
-            $(itemGroup).data("itemData", result);
+            $(itemGroup).data("itemData", itemData);
 
             function updateSelectCount(selected) {
                 var i = 0;
@@ -1007,9 +1003,9 @@ require(["D2Bot"], function (D2BOTAPI) {
             // First check if currently selected account location is same or ALL, then check if selected character location is the same or ALL
             if (
                 ($("#account-select").val() === "Show All" ||
-                    $("#account-select").val() === result.account) &&
+                    $("#account-select").val() === itemData.account) &&
                 ($("#character-select").val().split(".")[0] === "Show All" ||
-                    $("#character-select").val().split(".")[0] === result.character)
+                    $("#character-select").val().split(".")[0] === itemData.character)
             ) {
                 //$("#items-list").append($itemGroup);
                 var itemsList = document.getElementById("items-list");
@@ -1079,13 +1075,15 @@ require(["D2Bot"], function (D2BOTAPI) {
 							};
 							//var itemID = results[i].description.split("$")[1].split(":")[1];
 							results[i].group = itemGroup.key;
-							results[i].groupData = itemGroup.value;
 							if(!countables[item.uid])
 								countables[item.uid] = {}
 							if(!countables[item.uid][itemGroup.key])
 								countables[item.uid][itemGroup.key] = $addItemGroup(results[i]);
 
-							$updateItemGroup(countables[item.uid][itemGroup.key], results[i]);
+                            results[i].groupId = countables[item.uid][itemGroup.key].attr("id");
+                            countables[item.uid][itemGroup.key].data("groupData", itemGroup.value);
+                            
+							$updateItemGroup(itemGroup.value, results[i]);
                             
                             updateItemCount(results[i].groupId);
 						//}
