@@ -1054,6 +1054,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				if (err) {
                     console.log(err);
                     status = "Error";
+					return;
                 }
 
 				var y = $(window).scrollTop();
@@ -1066,7 +1067,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				// Countable items will receive an additional number field in the view (upper right corner of item box).
 				for (var i in results) {
 					if(results[i].description) {
-						//if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
+						if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
 							var item = {
 								classid: results[i].description.split("$")[1].split(":")[1],
 								uid: results[i].description.split("$")[1],
@@ -1087,7 +1088,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 							$updateItemGroup(itemGroup.value, results[i]);
                             
                             updateItemCount(results[i].groupId);
-						//}
+						}
 					}
 				}
 				
@@ -1137,6 +1138,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				if (err) {
                     console.log(err);
                     status = "Error";
+					return;
                 }
                 
                 var y = $(window).scrollTop();
@@ -1148,13 +1150,11 @@ require(["D2Bot"], function (D2BOTAPI) {
 
                 for (var i in results) {
                     if (results[i].description) {
-                        //if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
-                        //var itemID = results[i].description.split("$")[1].split(":")[1];
-                        // Only the first countable item will be used
-                        item = $addItem(results[i]);
+                        if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
+							item = $addItem(results[i]);
 
-                        itemCount += 1;
-                        //}
+							itemCount += 1;
+                        }
                     }
                 }
 

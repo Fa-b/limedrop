@@ -293,7 +293,6 @@ define(["events"],function (events) {
         })
 		
         D2BotAPI.cancelRequests = function(funcs) {
-			console.log(requests);
             requests = requests.filter(req => {
                 if (funcs.indexOf(req.func) < 0) return true;
                 req.obj.abort();
