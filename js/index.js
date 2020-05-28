@@ -1131,7 +1131,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
 
 		function doQuery($account, $character, loadMoreItem) {
-            var regex = $("#search-bar").val().toLocaleLowerCase();
+            var regex = "^"+buildregex($("#search-bar").val().toLocaleLowerCase())+".*$";
             var status = "Success";
             
             var callback = function (err, results) {
