@@ -1104,7 +1104,7 @@ require(["D2Bot"], function (D2BOTAPI) {
                 
             } else {
                 console.warn("No accounts found. Appending dummy group items..");
-                regex = regex?regex:"";
+                regex = regex.length>0?regex:"";
                 let re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
                 let list = [];
                 // Synchronize async 'requests' for dummy items :x
@@ -1130,6 +1130,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		}
 
 		function doQuery($account, $character, loadMoreItem) {
+            var regex = $("#search-bar").val().toLocaleLowerCase();
             var status = "Success";
             
             var callback = function (err, results) {
@@ -1165,14 +1166,11 @@ require(["D2Bot"], function (D2BOTAPI) {
                 }
             }
             
-            var regex = $("#search-bar").val().toLocaleLowerCase();
-			regex = (regex.length>0)?"^"+buildregex(regex)+".*?$":null;
-            
             if(!dummyData) {
                 API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
             } else {
                 console.warn("No accounts found. Appending dummy items..");
-                regex = regex?regex:"";
+                regex = regex.length>0?regex:"";
                 let re = new RegExp(regex.replace(/\./g, "[\\s\\S]"), 'mi');
                 let list = [];
                 setTimeout(() => {

@@ -123,8 +123,11 @@ window.ItemScreenshot = {
 				out[i].text = out[i].text.substring(1);
 				
 				// second color in same row will always be blue/'magic'
-                if (out[i].text.match(/((xff)|ÿc)/))
-                    out[i].color.push(3);
+                var colorList = out[i].text.match(/((xff)|ÿc)(\d)/g);
+                while (colorList && colorList.length > 0) {
+                    out[i].color.push(colorList[0].substring(2));
+                    colorList.splice(0, 1);
+                }
             }
 
             out[i].text = out[i].text.replace(/((xffc)|ÿc)([0-9!"+<;.*])/g, "\$");
@@ -247,8 +250,10 @@ window.ItemScreenshot = {
                             graphics.fillStyle = this.textColorMap[strArray1[index].color[0]];
                             
                             if(strArray1[index].color.length > 1) {
-                                leftText = strArray1[index].text.split("$")[0];
-                                rightText = strArray1[index].text.split("$")[1];
+                                var splitLine = strArray1[index].text.split("$");
+                                leftText = splitLine;
+                                splitLine.splice(0, 1);
+                                rightText = splitLine.join(''); // quick fix
                                 shift = (ctx.measureText(leftText).width + ctx.measureText(rightText).width) / 2;
                                 graphics.textAlign = "left";
                                 graphics.fillText(leftText, Math.round(pos.x - shift), Math.round(pos.y));
@@ -271,8 +276,10 @@ window.ItemScreenshot = {
                             shift = Font16.measureText(line.text).width / 2;
                             
                             if(line.color.length > 1) {
-                                leftText = line.text.split("$")[0];
-                                rightText = line.text.split("$")[1];
+                                var splitLine = line.text.split("$");
+                                leftText = splitLine[0];
+                                splitLine.splice(0, 1);
+                                rightText = splitLine.join(''); // quick fix
                                 // Apply back half the wrong measured kerning for char '$' width 10 / 2 = 5
                                 Font16.drawText(graphics, pos.x - shift + 5, pos.y, leftText, line.color[0]);
                                 Font16.drawText(graphics, pos.x - shift + 5 + Font16.measureText(leftText).width, pos.y, rightText, line.color[1]);
