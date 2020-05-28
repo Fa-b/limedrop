@@ -437,6 +437,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		MAX_ITEM = 1000;
 		roundTime = [];
 		countables = [];
+		API.cancelRequests(["query", "fastQuery"]);
 
 		console.log("refresh");
 		addItemstoList(limit, LimeConfig["ItemGroup"]/*, false*/);
@@ -1100,8 +1101,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			}
             
             if(!dummyData) {
-                API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
-                
+				API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
             } else {
                 console.warn("No accounts found. Appending dummy group items..");
                 regex = regex.length>0?regex:"";
@@ -1167,7 +1167,7 @@ require(["D2Bot"], function (D2BOTAPI) {
             }
             
             if(!dummyData) {
-                API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
+				API.emit("fastQuery", regex, CurrentRealm, $account, $character, callback);
             } else {
                 console.warn("No accounts found. Appending dummy items..");
                 regex = regex.length>0?regex:"";

@@ -16,6 +16,8 @@ define(["events"],function (events) {
             username: "public",
 			fastQuery: true
         };
+		
+		var requests = [];
         
         var makePostRequest;
         
@@ -41,7 +43,7 @@ define(["events"],function (events) {
             //console.log(thejson);
             //console.log(Base64blob);
 
-            makePostRequest(d2botConfig, Base64blob, function (err, results) {
+            makePostRequest(d2botConfig, requestObject.func, Base64blob, function (err, results) {
                 //console.log(err,results);
                 if (err){
                     if (done) done(err);
@@ -289,8 +291,16 @@ define(["events"],function (events) {
                 done(textStatus);
             });
         })
+		
+		D2BotAPI.cancelRequests = function(funcs) {
+			funcs.forEach(func => {
+				requests.filter(req => req.func === func).forEach(req => {
+					req.obj.abort();
+				});
+			});
+		};
         
-        makePostRequest = function makePostRequest_jquery(d2botConfig, data, callback) {
+        makePostRequest = function makePostRequest_jquery(d2botConfig, func, data, callback) {
             var $request = {
                 url: d2botConfig.host + "/api",// + Base64blob,
                 type: "POST",
@@ -303,6 +313,8 @@ define(["events"],function (events) {
                 data:data
             };
             var request = $.ajax($request);
+			requests.push({func:func, obj:request});
+			
             request.done(function(msg) {
                 if (callback) callback(null, msg);
             });
