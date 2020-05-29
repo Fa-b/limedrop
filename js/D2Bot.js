@@ -304,10 +304,6 @@ define(["events"],function (events) {
             var $request = {
                 url: d2botConfig.host + "/api",// + Base64blob,
                 type: "POST",
-                /*timeout: 5000,*/ // <- Appears to be a bad idea :)
-				/*headers: {
-					'Content-Type':'text/plain'
-				},*/
 				crossDomain: true,
                 dataType: "text",
                 data:data

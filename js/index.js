@@ -1067,7 +1067,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				// Countable items will receive an additional number field in the view (upper right corner of item box).
 				for (var i in results) {
 					if(results[i].description) {
-						if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
+						if ((results[i].ladder === undefined || results[i].ladder == ladder) && (results[i].sc === undefined || results[i].sc == sc) && (results[i].lod === undefined || results[i].lod == lod)) {
 							var item = {
 								classid: results[i].description.split("$")[1].split(":")[1],
 								uid: results[i].description.split("$")[1],
@@ -1150,7 +1150,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
                 for (var i in results) {
                     if (results[i].description) {
-                        if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
+                        if ((results[i].ladder === undefined || results[i].ladder == ladder) && (results[i].sc === undefined || results[i].sc == sc) && (results[i].lod === undefined || results[i].lod == lod)) {
 							item = $addItem(results[i]);
 
 							itemCount += 1;
@@ -1744,7 +1744,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 					}
 				}
 
-				if (cookie.data.loggedin && intCount++ > 20) {
+				if (cookie.data.loggedin && intCount++ > 10) {
 					intCount = 0;
 					API.emit("poll", function (err, msg) {
 						if (msg.body === "empty") {
@@ -1769,7 +1769,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 										console.log(muleLog);
 									}
 								} else {
-									showNotification("<span class='color1'>Unhandled Action</span><br/>", "<span class='color1'>The response received is not known</span><br/>", false);
+									showNotification("<span class='color1'>Unhandled Action</span><br/>", "<span class='color1'>The received response is not registered:</span><br/>" + data.data, false);
 								}
 							}
 						}
@@ -2061,9 +2061,11 @@ require(["D2Bot"], function (D2BOTAPI) {
 	$("#begin-upload-btn").click(function () {
 		// Begin file upload
         $(this).attr("disabled", true);
-		console.log("Uploading file to Imgur..");
+		console.log("Uploading image data..");
 
-		var settings = {
+        var remote = "imgur";
+
+		var imgur = {
 			async: true,
 			crossDomain: true,
 			processData: false,
@@ -2076,7 +2078,23 @@ require(["D2Bot"], function (D2BOTAPI) {
 			},
 			mimeType: 'multipart/form-data',
 		    error: function(jqXHR, textStatus, errorMessage) {
-				console.err(jqXHR,textStatus,errorMessage); // Optional
+				console.error(jqXHR,textStatus,errorMessage); // Optional
+		    }
+		};
+        
+        var gyazo = {
+			async: true,
+			crossDomain: true,
+			processData: false,
+			contentType: false,
+			type: 'POST',
+			url: "https://upload.gyazo.com/api/upload/easy_auth",
+            headers: {
+				Accept: 'application/json'
+			},
+            mimeType: 'multipart/form-data',
+		    error: function(jqXHR, textStatus, errorMessage) {
+				console.error(jqXHR,textStatus,errorMessage); // Optional
 		    }
 		};
 		
@@ -2087,9 +2105,14 @@ require(["D2Bot"], function (D2BOTAPI) {
         }).then(canvas => {
             $(this).removeAttr("disabled");
             $('#upload-imgur-modal').modal('hide');
-			var formData = new FormData();
-			formData.append("image", canvas.toDataURL().split("data:image/png;base64,")[1]);
-			settings.data = formData;
+			var imgurData = new FormData();
+            imgurData.append("image", canvas.toDataURL().split("data:image/png;base64,")[1]);
+			imgur.data = imgurData;
+            var gyazoData = new FormData();
+            gyazoData.append("referer_url", document.referrer);
+            gyazoData.append("client_id", "26d53b82d57e58461a04b3e182cc3f0883354797ae520aa9f085a6c1fe3fd28e");
+            gyazoData.append("image_url", canvas.toDataURL());
+            gyazo.data = gyazoData;
             
             let testing = false;
             
@@ -2116,12 +2139,34 @@ require(["D2Bot"], function (D2BOTAPI) {
                 modal.innerHTML = htmlTemplate;
                 $(modal).modal("show");
             } else {
-                $.ajax(settings).done(function(response) {
-                    $('#upload-imgur-modal').modal('hide');
-                    var imgurResponse = JSON.parse(response);
-                    console.log(imgurResponse);
-                    showNotification("Uploaded Image to Imgur", `<a target='_blank' rel='noopener noreferrer' href='` + imgurResponse.data.link + `' style='color:#2962ff'>` + imgurResponse.data.link + `</a>`, false);
-                });
+                if(remote==="imgur") {
+                    $.ajax(imgur).done(function(response) {
+                        $('#upload-imgur-modal').modal('hide');
+                        var imgurResponse = JSON.parse(response);
+                        console.log(imgurResponse);
+                        showNotification("Uploaded Image to Imgur", `<a target='_blank' rel='noopener noreferrer' href='` + imgurResponse.data.link + `' style='color:#2962ff'>` + imgurResponse.data.link + `</a>`, false);
+                    });
+                } else if(remote==="gyazo") {
+                    $.ajax(gyazo).done(function(response) {
+                        $('#upload-imgur-modal').modal('hide');
+                        var gyazoResponse = JSON.parse(response);
+                        console.log(gyazoResponse);
+                        var xhr = new XMLHttpRequest();
+                        if (!('withCredentials' in xhr)) xhr = new XDomainRequest(); // fix IE8/9
+                        xhr.overrideMimeType('text/xml');
+                        xhr.onreadystatechange = () => {
+                            console.log(xhr.readyState, xhr.status, xhr);
+                            const gyazoUrl = xhr.responseURL
+                            if (!(xhr.readyState === 4 && gyazoUrl)) return
+                            
+                            showNotification("Uploaded Image to Gyazo", `<a target='_blank' rel='noopener noreferrer' href='` + gyazoUrl + `' style='color:#2962ff'>` + gyazoUrl + `</a>`, false);
+                        }
+                        xhr.open('GET', "https://cors-anywhere.herokuapp.com/" + gyazoResponse.get_image_url, true);
+                        xhr.setRequestHeader("Accept", 'application/json');
+                        xhr.send()
+                        
+                    });
+                }
             }
 		});
 	});
