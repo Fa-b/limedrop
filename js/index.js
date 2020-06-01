@@ -2030,6 +2030,15 @@ require(["D2Bot"], function (D2BOTAPI) {
 	});
     
     /* IMGUR UPLOAD MODAL */
+	
+	function prettySize(bytes, separator = '', postFix = '') {
+		if (bytes) {
+			const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+			const i = Math.min(parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10), sizes.length - 1);
+			return `${(bytes / (1024 ** i)).toFixed(i ? 1 : 0)}${separator}${sizes[i]}${postFix}`;
+		}
+		return 'n/a';
+	}
 
 	$("#imgur-upload-btn").click(function () {
 		$("#upload-imgur-modal").modal("show");
@@ -2062,8 +2071,6 @@ require(["D2Bot"], function (D2BOTAPI) {
 		// Begin file upload
         $(this).attr("disabled", true);
 		console.log("Uploading image data..");
-
-        var remote = "imgur";
 
 		var imgur = {
 			async: true,
@@ -2105,14 +2112,24 @@ require(["D2Bot"], function (D2BOTAPI) {
         }).then(canvas => {
             $(this).removeAttr("disabled");
             $('#upload-imgur-modal').modal('hide');
-			var imgurData = new FormData();
-            imgurData.append("image", canvas.toDataURL().split("data:image/png;base64,")[1]);
-			imgur.data = imgurData;
-            var gyazoData = new FormData();
-            gyazoData.append("referer_url", document.referrer);
-            gyazoData.append("client_id", "26d53b82d57e58461a04b3e182cc3f0883354797ae520aa9f085a6c1fe3fd28e");
-            gyazoData.append("image_url", canvas.toDataURL());
-            gyazo.data = gyazoData;
+			var head = 'data:image/png;base64,';
+			var data_url = canvas.toDataURL();
+			var imgFileSize = Math.round((data_url.length - head.length)*3/4) ;
+			console.log("Filesize is", prettySize(imgFileSize, " "));
+			var imageData = new FormData();
+			var remote = "imgur";
+			if(imgFileSize <= 5242880) {
+				console.log("..uploading to imgur");
+				imageData.append("image", data_url.split(head)[1]);
+				imgur.data = imageData;
+			} else {
+				console.log("..uploading to gyazo");
+				imageData.append("referer_url", window.location.href);
+				imageData.append("client_id", "26d53b82d57e58461a04b3e182cc3f0883354797ae520aa9f085a6c1fe3fd28e");
+				imageData.append("image_url", data_url);
+				gyazo.data = imageData;
+				remote = "gyazo";
+			}
             
             let testing = false;
             
@@ -2139,31 +2156,42 @@ require(["D2Bot"], function (D2BOTAPI) {
                 modal.innerHTML = htmlTemplate;
                 $(modal).modal("show");
             } else {
-                if(remote==="imgur") {
+                if(remote === "imgur") {
                     $.ajax(imgur).done(function(response) {
                         $('#upload-imgur-modal').modal('hide');
                         var imgurResponse = JSON.parse(response);
-                        console.log(imgurResponse);
-                        showNotification("Uploaded Image to Imgur", `<a target='_blank' rel='noopener noreferrer' href='` + imgurResponse.data.link + `' style='color:#2962ff'>` + imgurResponse.data.link + `</a>`, false);
+						if(imgurResponse) {
+							console.log(imgurResponse);
+							var imgurUrl = imgurResponse.data.link;
+							var thumb = imgurUrl.split(".");
+							thumb[thumb.length-2] += "s";
+							thumb = thumb.join(".");
+							showNotification("Uploaded Image to Imgur", `<div><a target='_blank' rel='noopener noreferrer' href='` + imgurUrl + `' style='color:#2962ff'>` + imgurUrl + `</a><img src='` + thumb + `'/></div>`, false);
+						}
                     });
-                } else if(remote==="gyazo") {
+                } else if(remote === "gyazo") {
                     $.ajax(gyazo).done(function(response) {
                         $('#upload-imgur-modal').modal('hide');
-                        var gyazoResponse = JSON.parse(response);
-                        console.log(gyazoResponse);
-                        var xhr = new XMLHttpRequest();
-                        if (!('withCredentials' in xhr)) xhr = new XDomainRequest(); // fix IE8/9
-                        xhr.overrideMimeType('text/xml');
-                        xhr.onreadystatechange = () => {
-                            console.log(xhr.readyState, xhr.status, xhr);
-                            const gyazoUrl = xhr.responseURL
-                            if (!(xhr.readyState === 4 && gyazoUrl)) return
-                            
-                            showNotification("Uploaded Image to Gyazo", `<a target='_blank' rel='noopener noreferrer' href='` + gyazoUrl + `' style='color:#2962ff'>` + gyazoUrl + `</a>`, false);
-                        }
-                        xhr.open('GET', "https://cors-anywhere.herokuapp.com/" + gyazoResponse.get_image_url, true);
-                        xhr.setRequestHeader("Accept", 'application/json');
-                        xhr.send()
+						var gyazoResponse = JSON.parse(response);
+						if(gyazoResponse) {
+							var xhr = new XMLHttpRequest();
+							if (!('withCredentials' in xhr)) xhr = new XDomainRequest(); // fix IE8/9
+							xhr.overrideMimeType('text/xml');
+							xhr.onreadystatechange = () => {
+								if(xhr.readyState === 4 && xhr.status === 200) {
+									var gyazoRedirect = JSON.parse(xhr.response);
+									if(gyazoRedirect) {
+										console.log(gyazoRedirect);
+										var gyazoUrl = gyazoRedirect.permalink_url;
+										var thumb = gyazoRedirect.thumb_url;
+										showNotification("Uploaded Image to Gyazo", `<div><a target='_blank' rel='noopener noreferrer' href='` + gyazoUrl + `' style='color:#2962ff'>` + gyazoUrl + `</a><img src='` + thumb + `'/></div>`, false);
+									}								
+								}
+							}
+							xhr.open('GET', "https://cors-anywhere.herokuapp.com/" + gyazoResponse.get_image_url, true);
+							xhr.setRequestHeader("Accept", 'application/json');
+							xhr.send()
+						}
                         
                     });
                 }
