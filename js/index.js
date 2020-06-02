@@ -396,18 +396,18 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 	function showNotification(head, text, perm) {
 		var template = `
-<a class="` + (perm ? `always-there ` : "") + `ld-notify-card link" style="border-top:1px solid #3c3c3c">
+<div class="` + (perm ? `always-there ` : "") + `ld-notify-card link" style="border-top:1px solid #3c3c3c">
 	<div class="d-flex no-block align-items-center p-10">
-	<span class="p-2">
-		<i class="far fa-flag"></i>
-			</span>
+        <span class="p-2">
+            <i class="far fa-flag"></i>
+		</span>
         <div class="m-l-10">
             <h5 class="m-b-0">` + head + `</h5>
-            <p><span class="mail-desc">` + text + `</span></p>
-			<span class="text-white-50" style="position: absolute; font-size:8px">[` + new Date(Date.now()).toLocaleTimeString(undefined, { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' }) + `]</span>
+            <div class="mail-desc">` + text + `</div>
+			<p><span class="text-white-50" style="position: absolute; font-size:8px">[` + new Date(Date.now()).toLocaleTimeString(undefined, { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' }) + `]</span></p>
         </div>
 	</div>
-</a>`;
+</div>`;
 
 		$("#ldNotify").append($(template));
 
@@ -2118,7 +2118,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 			console.log("Filesize is", prettySize(imgFileSize, " "));
 			var imageData = new FormData();
 			var remote = "imgur";
-			if(imgFileSize <= 5242880) {
+			if(imgFileSize < 5242880) {
 				console.log("..uploading to imgur");
 				imageData.append("image", data_url.split(head)[1]);
 				imgur.data = imageData;
@@ -2164,7 +2164,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 							console.log(imgurResponse);
 							var imgurUrl = imgurResponse.data.link;
 							var thumb = imgurUrl.split(".");
-							thumb[thumb.length-2] += "s";
+							thumb[thumb.length-2] += "m";
 							thumb = thumb.join(".");
 							showNotification("Uploaded Image to Imgur", `<div><a target='_blank' rel='noopener noreferrer' href='` + imgurUrl + `' style='color:#2962ff'>` + imgurUrl + `</a><img src='` + thumb + `'/></div>`, false);
 						}
@@ -2187,10 +2187,10 @@ require(["D2Bot"], function (D2BOTAPI) {
 										showNotification("Uploaded Image to Gyazo", `<div><a target='_blank' rel='noopener noreferrer' href='` + gyazoUrl + `' style='color:#2962ff'>` + gyazoUrl + `</a><img src='` + thumb + `'/></div>`, false);
 									}								
 								}
-							}
+							};
 							xhr.open('GET', "https://cors-anywhere.herokuapp.com/" + gyazoResponse.get_image_url, true);
-							xhr.setRequestHeader("Accept", 'application/json');
-							xhr.send()
+							xhr.setRequestHeader("Accept", 'text/html');
+                            xhr.send();
 						}
                         
                     });
