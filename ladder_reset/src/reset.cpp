@@ -17,6 +17,7 @@ namespace filesys = std::filesystem;
  * (so you can reverse from non-ladder to ladder also if you accidentally converted a bunch)
  *
  * Just specify a comma separated list of extensions (But make sure to match the indices of both lists).
+ *
  * Default behaviour is:
  * path/to/reset.exe -old .sel.txt,.hel.txt,.scl.txt,.hcl.txt -new .sen.txt,.hen.txt,.scn.txt,.hcn.txt
  *
@@ -34,14 +35,16 @@ std::vector < std::string > getMuleFilesInDir(const std::string & dirPath, const
             filesys::recursive_directory_iterator iter(dirPath);
             filesys::recursive_directory_iterator end;
             while (iter != end) {
+                std::string path = iter->path().string();
                 if (filesys::is_directory(iter->path()) &&
                     (std::find(dirSkipList.begin(), dirSkipList.end(), iter->path().filename()) != dirSkipList.end())) {
                     iter.disable_recursion_pending();
                 } else {
-                    std::vector < std::string > ::const_iterator index = std::find(fileSearchList.begin(), fileSearchList.end(), iter->path().string().substr(iter->path().string().length() - 8));
-                    if (index != fileSearchList.end()) {
-                        std::string path = iter->path().string();
-                        std::rename(path.c_str(), (path.substr(0, path.length() - 8) + fileReplaceList.at(index - fileSearchList.begin())).c_str());
+                    std::vector < std::string > ::const_iterator it = std::find_if(fileSearchList.begin(), fileSearchList.end(), [path](std::string x) {
+                            return (x == path.substr(path.length() - x.length()));
+                        });
+                    if (it != fileSearchList.end()) {
+                        std::rename(path.c_str(), (path.substr(0, path.length() - it->length()) + fileReplaceList.at(it - fileSearchList.begin())).c_str());
                         listOfFiles.push_back(path);
                     }
                 }
@@ -68,6 +71,7 @@ void tokenize(std::string const & str, const char delim, std::vector < std::stri
 }
 
 int main(int argc, char * argv[]) {
+
     std::vector < std::string > skipDirs = {};
     std::vector < std::string > oldExtensions = {
         ".sel.txt",
