@@ -889,7 +889,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 				// Countable items will receive an additional number field in the view (upper right corner of item box).
 				for (var i in results) {
 					if(results[i].description) {
-						//if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
+						if ((results[i].ladder === undefined || results[i].ladder == ladder) && (results[i].sc === undefined || results[i].sc == sc) && (results[i].lod === undefined || results[i].lod == lod)) {
 							var item = {
 								classid: results[i].description.split("$")[1].split(":")[1],
 								uid: results[i].description.split("$")[1],
@@ -907,7 +907,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 								
 
 							$updateItemGroup(countables[item.uid][itemGroup.key], results[i]);
-						//}
+						}
 					}
 				}
 				
@@ -956,13 +956,13 @@ require(["D2Bot"], function (D2BOTAPI) {
 
                 for (var i in results) {
                     if (results[i].description) {
-                        //if ((results[i].ladder == ladder) && (results[i].sc == sc) && (results[i].lod == lod)) {
-                        var itemID = results[i].description.split("$")[1].split(":")[1];
-                        // Only the first countable item will be used
-                        item = $addItem(results[i]);
+                        if ((results[i].ladder === undefined || results[i].ladder == ladder) && (results[i].sc === undefined || results[i].sc == sc) && (results[i].lod === undefined || results[i].lod == lod)) {
+							var itemID = results[i].description.split("$")[1].split(":")[1];
+							// Only the first countable item will be used
+							item = $addItem(results[i]);
 
-                        itemCount += 1;
-                        //}
+							itemCount += 1;
+                        }
                     }
                 }
 
