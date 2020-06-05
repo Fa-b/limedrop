@@ -438,6 +438,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 		roundTime = [];
 		countables = [];
 		API.cancelRequests(["query", "fastQuery"]);
+		$("#load-more").empty();
 
 		console.log("refresh");
 		addItemstoList(limit, LimeConfig["ItemGroup"]/*, false*/);
@@ -1749,6 +1750,11 @@ require(["D2Bot"], function (D2BOTAPI) {
 					API.emit("poll", function (err, msg) {
 						if (msg.body === "empty") {
 							return;
+						} else if (msg.body === "invalid session") {
+							// Session not valid, attempt reconnecting
+							$(".logged-in-out").addClass("hide");
+							$("#login-ok-btn").trigger("click");
+							return;
 						}
 
 						//console.log(msg);
@@ -1784,11 +1790,14 @@ require(["D2Bot"], function (D2BOTAPI) {
 		$(".launch-btn").click(function () {
 			var gamename = $("#gamename").val();
 			var gamepass = $("#gamepass").val();
-
+			
 			if (!gamename || gamename == "") {
 				alert("GameName Required!");
 				return;
 			}
+			
+			// TODO: logfile will be .log/.err file names, format should be configurable by user
+			var logfile = (new Date).toISOString().split(".")[0].replace(/:|-/g, "").replace("T", "-") + "_" + gamename + "(" + gamepass + ")";
 
 			$(".selected").each(function (i, v) {
 				var $item = $(v);
@@ -1799,6 +1808,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 				var hash = API.md5(itemData.realm + itemData.account.toLowerCase()).toString();
 
+				// TODO: logfile info should be added to ensure the key is unique
 				if (!drops[hash]) {
 					drops[hash] = {
 						data: {
@@ -1815,7 +1825,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 
 				
 			});
-
+			
 			var idx = 0;
 			const start = Date.now();
 			
@@ -1825,6 +1835,7 @@ require(["D2Bot"], function (D2BOTAPI) {
 						hash: d,
 						profile: cookie.data.username,
 						action: "doDrop",
+						logfile: logfile,
 						data: JSON.stringify(drops[d].data)
 					};
 

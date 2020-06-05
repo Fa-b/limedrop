@@ -65,11 +65,11 @@ define(["events"],function (events) {
         });
         
         D2BotAPI.on("encrypt",function(data, pw, done){
-            done(null, encrypt(data, pw))
+            done(null, (pw.length > 0)?encrypt(data, pw):data)
         })
         
         D2BotAPI.on("decrypt",function(data, pw, done){
-            done(null, decrypt(data, pw))
+            done(null, (pw.length > 0)?decrypt(data, pw):data)
         })
         
         D2BotAPI.md5 = function(data,done){
@@ -96,6 +96,22 @@ define(["events"],function (events) {
                 }else{
                     done(null, msg.body);
                 }
+            }, function (textStatus) {
+                done(textStatus);
+            });
+        })
+		
+		D2BotAPI.on("store",function(selector, data, done){
+            $get({ func: "store", args: [selector, data] }, function (msg) {
+                done(null, msg);
+            }, function (textStatus) {
+                done(textStatus);
+            });
+        })
+		
+		D2BotAPI.on("retrieve",function(selector, done){
+            API.$get({ func: "retrieve", args: [selector, ""] }, function (msg) {
+                done(null, msg);
             }, function (textStatus) {
                 done(textStatus);
             });
