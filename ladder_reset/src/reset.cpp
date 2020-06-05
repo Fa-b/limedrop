@@ -1,9 +1,9 @@
- # include < iostream >
- # include < vector >
- # include < algorithm >
- # include < string >
- # include < filesystem >
- # include < process.h >
+# include <iostream>
+ # include <vector>
+ # include <algorithm>
+ # include <string>
+ # include <filesystem>
+ # include <process.h>
 using namespace std;
 namespace filesys = std::filesystem;
 
